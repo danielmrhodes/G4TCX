@@ -1,8 +1,8 @@
 //Change this, DO NOT include the ground state spin
 //Ordering must be the same as the level scheme file
-//std::vector<double> spins = {2.0,4.0,2.0,0.0,4.0,3.0,6.0,5.0,8.0,2.0,6.0}; //106Cd
+std::vector<double> spins = {2.0,4.0,2.0,0.0,4.0,3.0,6.0,5.0,8.0,2.0,6.0}; //106Cd
 //std::vector<double> spins = {2.0,4.0,2.0,6.0,4.0}; //48Ti
-std::vector<double> spins = {2.0,4.0,6.0,8.0,10.0,12.0,2.0,3.0,4.0,5.0,6.0,0.0,2.0,4.0,3.0,5.0,7.0}; //78Kr
+//std::vector<double> spins = {2.0,4.0,6.0,8.0,10.0,12.0,2.0,3.0,4.0,5.0,6.0,0.0,2.0,4.0,3.0,5.0,7.0}; //78Kr
 
 int MaxK(double spin) {
 

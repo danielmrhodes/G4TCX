@@ -22,18 +22,18 @@ const double beam_mass = 98626.9;
 
 //You should reduce this value by the energy loss in the target
 //MeV
-const double beam_en = 462;
+const double beam_en = 265;
   
 const int targZ = 82;
 const double targ_mass = 193688.0;
 
 //Silicon detector z-offsets (downstream and upstream) (cm)
-double DS_Offset = 2.6;
-double US_Offset = 3.4;
+double DS_Offset = 3.0;
+double US_Offset = 3.0;
 
 //Beam spot position (cm)
-const double beam_X = 0.02;
-const double beam_Y = -0.06;
+const double beam_X = 0.0;
+const double beam_Y = 0.0;
 
 //Tigress configuration. 0 for detectors forward, 1 for detectors back
 const int tigConfig = 1;

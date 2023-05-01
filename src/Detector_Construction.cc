@@ -346,16 +346,3 @@ void Detector_Construction::PrintTarget() {
 
   return;
 }
-
-/*
-G4VPhysicalVolume* Detector_Construction::GetS3(int num) {
-
-  if(num < 0 || num > 1)
-    return NULL;
-  
-  if(num)
-    return s3_1;
-  
-  return s3_0;
-}
-*/
