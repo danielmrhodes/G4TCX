@@ -35,8 +35,7 @@ Detector_Construction::Detector_Construction() {
   target_thickness = 882*nm;
   target_radius = 0.5*cm;
   target_mat = NULL;
-
-  place_tigress = false;
+  
   place_s3 = false;
   place_spice = false;
   place_target = false;
@@ -83,6 +82,7 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
   G4RunManager* Rman = G4RunManager::GetRunManager();
   Primary_Generator* gen = (Primary_Generator*)Rman->GetUserPrimaryGeneratorAction();
 
+  G4bool place_tigress = false;
   G4bool sens_tig = false;
   G4bool sens_s3 = false;
   G4UserLimits* uLim = NULL;

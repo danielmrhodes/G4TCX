@@ -14,10 +14,6 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
   //Tigress directory
   tigress_dir = new G4UIdirectory("/Geometry/Tigress/");
 
-  placeTg_cmd = new G4UIcmdWithoutParameter("/Geometry/Tigress/Construct",this);
-  placeTg_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
-  placeTg_cmd->SetGuidance("Place the Tigress detectors");
-
   removeTigDet_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/RemoveDetector",this);
   removeTigDet_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
   removeTigDet_cmd->SetGuidance("Remove a tigress detector from the simulation");
@@ -100,7 +96,6 @@ Detector_Construction_Messenger::~Detector_Construction_Messenger() {
   delete update_cmd;
 
   delete tigress_dir;
-  delete placeTg_cmd;
   delete removeTigDet_cmd;
   delete tigConfig_cmd;
   delete tigFrameConfig_cmd;
@@ -128,11 +123,7 @@ Detector_Construction_Messenger::~Detector_Construction_Messenger() {
 void Detector_Construction_Messenger::SetNewValue(G4UIcommand* command, G4String newValue) {
   
   /////TIGRESS commands/////
-  if(command == placeTg_cmd) {
-    construction->SetPlaceTigress();
-    G4cout << "Simulation will include the Tigress detectors" << G4endl;
-  }
-  else if(command == removeTigDet_cmd) {
+  if(command == removeTigDet_cmd) {
     construction->RemoveTigressDetector(removeTigDet_cmd->GetNewIntValue(newValue));
     G4cout << "Removing Tigress detector " << newValue << " from the simulation"  << G4endl;
   }

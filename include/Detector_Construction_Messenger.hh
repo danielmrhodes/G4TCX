@@ -32,8 +32,7 @@ private:
   //Update command
   G4UIcmdWithoutParameter* update_cmd;
 
-  //Tigress commans
-  G4UIcmdWithoutParameter* placeTg_cmd;
+  //Tigress commands
   G4UIcmdWithAnInteger* removeTigDet_cmd;
   G4UIcmdWithAnInteger* tigConfig_cmd;
   G4UIcmdWithAnInteger* tigFrameConfig_cmd;

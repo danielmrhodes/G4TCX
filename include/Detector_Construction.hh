@@ -21,8 +21,7 @@ public:
   void PlaceSpice();
   void PlaceS3(G4bool sensitive);
   void PlaceTarget(G4UserLimits* uLim);
-
-  void SetPlaceTigress() {place_tigress = true;}
+  
   void SetPlaceS3() {place_s3 = true;}
   void SetPlaceSpice() {place_spice = true;}
   void SetPlaceTarget() {place_target = true;} 
@@ -86,8 +85,7 @@ private:
   G4double target_thickness;
   G4double target_radius;
   G4Material* target_mat;
-
-  G4bool place_tigress;
+  
   G4bool place_s3;
   G4bool place_spice;
   G4bool place_target;
