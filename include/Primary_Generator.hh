@@ -42,11 +42,8 @@ public:
   G4bool IsSimpleSource() {return source->GetEnergy() > 0.0;}
   
   void Optimize() {optimize = true;}
-  void OnlyUpstream() {onlyUS = true;}
-  void OnlyDownstream() {onlyDS = true;}
-  void OnlyProjectile() {onlyP = true;}
-  void OnlyRecoil() {onlyR = true;}
-  void RecDS_ProjUS() {rDS_pUS = true;}
+  void OnlyProjectile() {onlyP = true; onlyR = false;}
+  void OnlyRecoil() {onlyR = true; onlyP = false;}
   
   void SetMode(G4String md);
   MODE GetMode() {return mode;}
@@ -73,8 +70,8 @@ private:
   inline void GenerateSourcePrimaries(G4Event* event);
   inline void GenerateFullPrimaries(G4Event* event);
 
-  inline G4bool CheckIntersections(const G4ThreeVector& bdir,
-				   const G4ThreeVector& rdir);
+  inline G4bool CheckIntersections(const G4ThreeVector& bdir, const G4ThreeVector& rdir,
+				   const G4ThreeVector& pos);
 
   inline G4bool Intersects(const G4ThreeVector& dir, const G4ThreeVector& S3pos);
 
@@ -118,11 +115,8 @@ private:
 
   //optimize sampling of scattering angle
   G4bool optimize; //only use sampled angle if a particle will hit an S3
-  G4bool onlyDS; //only consider downstream S3 for optimization
-  G4bool onlyUS; //only consider uptream S3 for optimization
   G4bool onlyP; //only consider projectile for optimization
   G4bool onlyR; //only consider recoil for optimization
-  G4bool rDS_pUS; //optimize for recoil downstream and projectile upstream
   
   G4Tubs* s3; //Shape of S3
   G4ThreeVector s3_0, s3_1; //S3 positions

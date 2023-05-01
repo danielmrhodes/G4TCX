@@ -50,11 +50,8 @@ Primary_Generator::Primary_Generator() {
   mode = Primary_Generator::MODE::Source;
   
   optimize = false;
-  onlyDS = false;
-  onlyUS = false;
   onlyP = false;
   onlyR = false;
-  rDS_pUS = false;
 
   s3 = new G4Tubs("S3",1.1*cm,3.5*cm,150.0*um,0.0*deg,360.0*deg);
   s3_0 = G4ThreeVector(0.0,0.0,0.0);
@@ -169,7 +166,7 @@ void Primary_Generator::GenerateScatteringPrimaries(G4Event* evt) {
   
   if(optimize) {
 
-    G4bool good = CheckIntersections(bdir,rdir);
+    G4bool good = CheckIntersections(bdir,rdir,pos);
     if(!good)
       goto label;
     
@@ -275,7 +272,7 @@ void Primary_Generator::GenerateFullPrimaries(G4Event* evt) {
 
   if(optimize) {
 
-    G4bool good = CheckIntersections(bdir,rdir);
+    G4bool good = CheckIntersections(bdir,rdir,pos);
     if(!good)
       goto label;
     
@@ -357,20 +354,21 @@ void Primary_Generator::Update() {
 
 void Primary_Generator::UpdateReaction() {
 
-  reac->SetBeamMass(projGS->GetPDGMass());
-  reac->SetRecoilMass(recoilGS->GetPDGMass());
-  reac->ConstructRutherfordCM(beam_En,deltaE);
-
+  //These two if statements mush come first
   if(onlyP)
     reac->SetOnlyP();
   if(onlyR)
     reac->SetOnlyR();
   
+  reac->SetBeamMass(projGS->GetPDGMass());
+  reac->SetRecoilMass(recoilGS->GetPDGMass());
+  reac->ConstructRutherfordCM(beam_En,deltaE);
+  
   Detector_Construction* con =
     (Detector_Construction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction();
-
-  s3_0 = G4ThreeVector(-beam_X,-beam_Y,-con->GetUS_Offset());
-  s3_1 = G4ThreeVector(-beam_X,-beam_Y,con->GetDS_Offset());
+  
+  s3_0 = G4ThreeVector(0.0,0.0,-con->GetUS_Offset());
+  s3_1 = G4ThreeVector(0.0,0.0,con->GetDS_Offset());
 
   G4Material* mat = con->GetTargetMaterial();
   //if(con->GetTargetMaterial()) {
@@ -403,37 +401,20 @@ void Primary_Generator::UpdateReaction() {
 }
 
 
-G4bool Primary_Generator::CheckIntersections(const G4ThreeVector& bdir,
-					     const G4ThreeVector& rdir) {
-
-  if(onlyDS) { //Downstream S3 only
-    if(onlyP) //Only projectiles
-      return Intersects(bdir,s3_1) && bdir.getZ() > 0.0;
-    
-    if(onlyR) //Only Recoils
-      return Intersects(rdir,s3_1);
-
-    //No particle restrictions
-    return (Intersects(bdir,s3_1) && bdir.getZ() > 0.0) || Intersects(rdir,s3_1);
-  }
+G4bool Primary_Generator::CheckIntersections(const G4ThreeVector& bdir, const G4ThreeVector& rdir,
+					     const G4ThreeVector& pos) {
   
-  if(onlyUS) //Upstream S3 only, can only be projectile
-    return Intersects(bdir,s3_0) && bdir.getZ() < 0.0;
-  
-  if(rDS_pUS)  //Recoil Downstream or projectile upstream
-    return (Intersects(rdir,s3_1) && rdir.getZ() > 0.0)
-      || (Intersects(bdir,s3_0) && bdir.getZ() < 0.0);
-
   //No detector restrictions
   if(onlyP)  //Only projectiles
-    return Intersects(bdir,s3_1) || Intersects(bdir,s3_0);
+    return (Intersects(bdir,s3_1-pos) && bdir.getZ() > 0.0) ||
+      (Intersects(bdir,s3_0-pos) && bdir.getZ() < 0.0);
   
   if(onlyR) //Only Recoils, can only be downstream S3
-    return Intersects(rdir,s3_1);
+    return Intersects(rdir,s3_1-pos);
 
   //No restrictions
-  return (Intersects(bdir,s3_1) && bdir.getZ() > 0.0) || Intersects(rdir,s3_1) ||
-    (Intersects(bdir,s3_0) && bdir.getZ() < 0.0);
+  return (Intersects(bdir,s3_1-pos) && bdir.getZ() > 0.0) || Intersects(rdir,s3_1-pos) ||
+    (Intersects(bdir,s3_0-pos) && bdir.getZ() < 0.0);
   
 }
 
@@ -447,7 +428,7 @@ G4bool Primary_Generator::Intersects(const G4ThreeVector& dir, const G4ThreeVect
   if(z > 0.0)
     mag = (z - 0.99*150.0*um)/std::cos(dir.getTheta());
   else
-    mag = -(z + 0.99*150.0*um)/std::cos(dir.getTheta());
+    mag = (z + 0.99*150.0*um)/std::cos(dir.getTheta());
 
   newVec.setMag(mag);
   

@@ -59,8 +59,6 @@ void Reaction_Messenger::SetNewValue(G4UIcommand* command, G4String newValue) {
     reaction->SetBeamA(beamA_cmd->GetNewIntValue(newValue));
     G4cout << "Setting projectile nucleus A to " << newValue << G4endl;
   }
-
-  
   
   else if(command == recoilZ_cmd) {
     reaction->SetRecoilZ(recoilZ_cmd->GetNewIntValue(newValue));

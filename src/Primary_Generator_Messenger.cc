@@ -57,21 +57,9 @@ Primary_Generator_Messenger::Primary_Generator_Messenger(Primary_Generator* gen)
   sigEn_cmd->SetGuidance("Set Gaussian sigma of kinetic energy distribution");
 
   //Scattering angle commands
-  toS3_cmd = new G4UIcmdWithoutParameter("/Reaction/SendToS3",this);
+  toS3_cmd = new G4UIcmdWithoutParameter("/Reaction/Optimize",this);
   toS3_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
   toS3_cmd->SetGuidance("Only sample parts of the Rutherford distribution which result in a particle entering S3");
-
-  toUS_cmd = new G4UIcmdWithoutParameter("/Reaction/SendToUpstreamS3",this);
-  toUS_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
-  toUS_cmd->SetGuidance("Only sample parts of the Rutherford distribution which result in the projectile entering the upstream S3 detector");
-
-  toDS_cmd = new G4UIcmdWithoutParameter("/Reaction/SendToDownstreamS3",this);
-  toDS_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
-  toDS_cmd->SetGuidance("Only sample parts of the Rutherford distribution which result in a particle entering the downstream S3 detector");
-
-  rDSpUS_cmd = new G4UIcmdWithoutParameter("/Reaction/RecDS_ProjUS",this);
-  rDSpUS_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
-  rDSpUS_cmd->SetGuidance("Only sample parts of the Rutherford distribution which result in the recoil entering the downstream S3 detector and the projectile entering the upstream S3 detector");
 
   onlyP_cmd = new G4UIcmdWithoutParameter("/Reaction/OnlyProjectiles",this);
   onlyP_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
@@ -105,9 +93,6 @@ Primary_Generator_Messenger::~Primary_Generator_Messenger() {
   delete sigEn_cmd;
 
   delete toS3_cmd;
-  delete toUS_cmd;
-  delete toDS_cmd;
-  delete rDSpUS_cmd;
 
   delete onlyP_cmd;
   delete onlyR_cmd;
@@ -177,33 +162,13 @@ void Primary_Generator_Messenger::SetNewValue(G4UIcommand* command, G4String new
     generator->Optimize();
     G4cout << "Ensuring a particle will always enter S3!" << G4endl;
   }
-
-  else if(command == toUS_cmd) {
-    generator->Optimize();
-    generator->OnlyUpstream();
-    G4cout << "Ensuring the projectile will always enter the upstream S3 detector!" << G4endl;
-  }
-
-  else if(command == toDS_cmd) {
-    generator->Optimize();
-    generator->OnlyDownstream();
-    G4cout << "Ensuring a particle will always enter the downstream S3 detector!" << G4endl;
-  }
-
-  else if(command == rDSpUS_cmd) {
-    generator->Optimize();
-    generator->RecDS_ProjUS();
-    G4cout << "Sending the recoil to downstream S3 and the projectile to upstream S3!" << G4endl;
-  }
-
+  
   else if(command == onlyP_cmd) {
-    generator->Optimize();
     generator->OnlyProjectile();
     G4cout << "Only considering the projectile nucleus when determining the desired scattering angle ranges!" << G4endl;
   }
 
   else if(command == onlyR_cmd) {
-    generator->Optimize();
     generator->OnlyRecoil();
     G4cout << "Only considering the recoil nucleus when determining the desired scattering angle ranges!" << G4endl;
   }

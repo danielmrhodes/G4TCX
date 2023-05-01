@@ -40,10 +40,6 @@ private:
 
   //Scattering angle commands
   G4UIcmdWithoutParameter* toS3_cmd;
-  G4UIcmdWithoutParameter* toUS_cmd;
-  G4UIcmdWithoutParameter* toDS_cmd;
-  G4UIcmdWithoutParameter* rDSpUS_cmd;
-
   G4UIcmdWithoutParameter* onlyR_cmd;
   G4UIcmdWithoutParameter* onlyP_cmd;
 
