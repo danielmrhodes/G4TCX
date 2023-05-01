@@ -11,7 +11,7 @@
 #include "TVector3.h"
 #include "TMath.h"
 
-#include "Data_Format.hh"
+#include "/path/to/G4TCX/include/Data_Format.hh"
 
 ////These should match the parameters defined in the simulation input////
 //These correspond to the input file Examples/Macros/full.mac

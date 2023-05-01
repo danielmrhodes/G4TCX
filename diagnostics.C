@@ -1,7 +1,7 @@
-#include "/opt/G4TCX/include/Data_Format.hh"
+#include "/path/to/G4TCX/include/Data_Format.hh"
 
-void diagnostics(std::string input_filename = "tmp-info.dat",
-		 std::string output_filename = "tmp-info.root") {
+void diagnostics(std::string input_filename = "output-info.dat",
+		 std::string output_filename = "output-info.root") {
 
   if(!strcmp(input_filename.c_str(),output_filename.c_str())) {
     std::cout << "Give your input and output files different names" << std::endl;
