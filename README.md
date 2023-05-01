@@ -24,7 +24,7 @@ The correlator is a small program compiled with ROOT libraries. To compile the c
 
 If you want the Doppler correction to work, the correlator.cc file needs to be edited and recompiled. Immediately after the inlcude statements there are several variables which need to be changed to match the simulation input.
 
-Additionally, the simulation will output a file, output-info.dat, along with the simulated data file. This file contains information on the CM scatttering angles and exicted state population distributions. This file can be unpacked using the diagnostics.C ROOT script.
+Additionally, the simulation will output a file, output-info.dat, along with the simulated data file. This file contains information on the CM scatttering angles and exicted state population distributions. This file can be unpacked using the diagnostics.C ROOT script, found in the Helpers folder.
 
 
 Functionality
