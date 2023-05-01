@@ -3,6 +3,7 @@
  
 #include "globals.hh"
 #include "Randomize.hh"
+#include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 #include "Reaction_Messenger.hh"
 
@@ -22,38 +23,22 @@ public:
   G4double KE_LAB(G4double thetaCM, G4double Ep, G4double Ex=0.0*MeV);
   G4double Recoil_KE_LAB(G4double thetaCM, G4double Ep, G4double Ex=0.0*MeV);
 
-  //G4double Theta_LAB_Max(G4double Ep, G4double Ex0.0*MeV);
-  //G4double Recoil_Theta_LAB_Max(G4double Ep, G4double Ex=0.0.*MeV);
-
-  //G4double Theta_CM_FP(G4double ThetaLAB, G4double Ep, G4bool sol2=false, G4double Ex=0.0*MeV);
-  //G4double Theta_CM_FR(G4double ThetaLAB, G4double Ep, G4bool sol2=false, G4double Ex=0.0*MeV);
-
   G4double RutherfordCM(G4double thetaCM, G4double Ep, G4double Ex=0.0*MeV);
   ////////////////////////////////////////
 
-  ///These build the desired scattering angle distribution///
+  //This defines the desired scattering angles//
+  void AddThetaLAB(G4double T) {good_LAB_thetas.push_back(T);}
+  
+  ///This builds the desired scattering angle distribution///
   void ConstructRutherfordCM(G4double Ep, G4double Ex=0.0*MeV);
-  void FullRutherfordCM(G4double Ep, G4double Ex=0.0*MeV);
-  void TruncatedRutherfordCM(G4double Ep, G4double Ex=0.0*MeV);
-  ///////////////////////////////////////////////////////////
 
-  //////////These define desired angles//////////
-  //void AddThetaLABRange(G4double Tmin, G4double Tmax);
-  void AddThetaLAB(G4double T);
-
-  //void S3Thetas();
-  //void UpstreamThetas();
-  //void DownstreamThetas();
+  //Shoots the RNG
+  G4double SampleRutherfordCM() {return AngleGenerator->shoot()*pi;}
   
-  void SetOnlyP();
-  void SetOnlyR();
-  //void SetRecDS_ProjUS() {rDSpUS = true;}
-  //////////////////////////////////////////////
-  
-  G4double SampleRutherfordCM();
-  //G4double SampleRutherfordCM_2();
-
   ////////Getters and setters////////
+  void SetOnlyP() {onlyR = false; onlyP = true;}
+  void SetOnlyR() {onlyR = true; onlyP = false;}
+  
   void SetBeamZ(G4int Z) {beamZ = Z;}
   void SetBeamA(G4int A) {beamA = A;}
   void SetBeamMass(G4double M) {beam_mass = M;}
@@ -97,10 +82,10 @@ private:
 
   G4bool onlyP;
   G4bool onlyR;
-  //G4bool rDSpUS;
 
   G4double recThresh;
 
+  //desired scattering angles
   std::vector<G4double> good_LAB_thetas;
   
   //Random generator for CM scattering angle
