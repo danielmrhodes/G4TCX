@@ -1,0 +1,8 @@
+/Mode Source
+/Geometry/Update
+#
+/Source/Energy 1.0 MeV
+#
+/Output/FileName source.dat
+#
+/run/beamOn 1000000

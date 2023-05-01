@@ -1,0 +1,26 @@
+/Mode Full
+/Geometry/Tigress/SetConfiguration 1
+/Geometry/Tigress/SetFrameConfiguration 0
+/Geometry/Target/StandardTarget 48Ti
+/Geometry/Update
+#
+/Reaction/ProjectileZ 48
+/Reaction/ProjectileA 106
+/Reaction/RecoilZ 22
+/Reaction/RecoilA 48
+/Reaction/AddThetaLAB 16 deg
+/Reaction/AddThetaLAB 58 deg
+/Reaction/Optimize
+#
+/Beam/Energy 318 MeV
+#
+/Excitation/Projectile/LevelScheme Examples/LevelSchemes/Full/cd106.lvl
+/Excitation/Projectile/Probabilities Examples/Probabilities/cd106_on_ti48.prb
+/Excitation/Projectile/StatisticalTensors Examples/StatisticalTensors/cd106_on_ti48.ten
+/Excitation/Recoil/LevelScheme Examples/LevelSchemes/Full/ti48.lvl
+/Excitation/Recoil/Probabilities Examples/Probabilities/ti48_by_cd106.prb
+/Excitation/Recoil/StatisticalTensors Examples/StatisticalTensors/ti48_by_cd106.ten
+#
+/Output/FileName full.dat
+#
+/run/beamOn 10000000

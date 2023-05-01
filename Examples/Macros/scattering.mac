@@ -1,0 +1,28 @@
+/Mode Scattering
+/Geometry/S3/UpstreamOffset 3.0 cm
+/Geometry/S3/DownstreamOffset 3.0 cm
+/Geometry/Target/StandardTarget 208Pb
+/Geometry/Target/Construct
+/Geometry/Update
+#
+/Reaction/ProjectileZ 48
+/Reaction/ProjectileA 106
+/Reaction/RecoilZ 82
+/Reaction/RecoilA 208
+/Reaction/DeltaE 0.0 MeV
+/Reaction/AddThetaLAB 16 deg
+/Reaction/AddThetaLAB 58 deg
+/Reaction/Optimize
+#
+/Beam/Energy 462.2 MeV
+/Beam/SigmaEn 0.981 MeV
+/Beam/SigmaAX 0.0126 deg
+/Beam/SigmaAY 0.0126 deg
+/Beam/PositionX 0.2 mm
+/Beam/PositionY -0.6 mm
+/Beam/SigmaX 0.85 mm
+/Beam/SigmaY 0.85 mm
+#
+/Output/FileName scattering.dat
+#
+/run/beamOn 1000000

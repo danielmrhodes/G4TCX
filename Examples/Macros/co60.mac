@@ -1,0 +1,8 @@
+/Mode Source
+/Geometry/Update
+#
+/Source/LevelScheme inputs/co60.lvl
+#
+/Output/FileName co60.dat
+#
+/run/beamOn 1000000
