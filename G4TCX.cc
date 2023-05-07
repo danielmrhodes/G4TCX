@@ -39,8 +39,8 @@ int main(int argc, char** argv) {
        
     UI->ApplyCommand("/vis/open OGLSX");
     UI->ApplyCommand("/vis/drawVolume");
-    UI->ApplyCommand("/vis/scene/add/trajectories");
-    UI->ApplyCommand("/vis/viewer/zoom 2");
+    //UI->ApplyCommand("/vis/scene/add/trajectories");
+    //UI->ApplyCommand("/vis/viewer/zoom 2");
     //UI->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 70 20");
     UI->ApplyCommand("/Geometry/S3/Construct");
     UI->ApplyCommand("/Geometry/Target/Construct");
