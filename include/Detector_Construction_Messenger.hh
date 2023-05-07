@@ -55,6 +55,7 @@ private:
   G4UIcmdWithADoubleAndUnit* thickness_cmd;
   G4UIcmdWithADoubleAndUnit* radius_cmd;
   G4UIcmdWithAString* target_cmd;
+  G4UIcmdWithADoubleAndUnit* step_cmd;
   G4UIcmdWithoutParameter* print_targ_cmd;
   
 };

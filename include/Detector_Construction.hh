@@ -35,6 +35,7 @@ public:
   void SetTargetMass(G4double mass)  {target_mass = mass;}
   void SetTargetThickness(G4double thick)  {target_thickness = thick;}
   void SetTargetRadius(G4double r)  {target_radius = r;}
+  void SetTargetStepSize(G4double step) {target_step = step;}
 
   void SetTarget(G4String target);
   void PrintTarget();
@@ -85,6 +86,7 @@ private:
   G4double target_thickness;
   G4double target_radius;
   G4Material* target_mat;
+  G4double target_step;
   
   G4bool place_s3;
   G4bool place_spice;

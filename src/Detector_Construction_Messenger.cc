@@ -84,6 +84,10 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
   target_cmd->SetCandidates("48Ti Ti48 48ti ti48 208Pb Pb208 208pb pb208 196Pt Pt196 196pt pt196 110Pd Pd110 110pd pd110 197Au Au197 197au au197");
   target_cmd->SetGuidance("Construct a standard target: 208Pb, 48Ti, 196Pt, 110Pd, or 197Au");
 
+  step_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/Target/StepSize",this);
+  step_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  step_cmd->SetGuidance("Set simulation step size in the target");
+  
   print_targ_cmd = new G4UIcmdWithoutParameter("/Geometry/Target/Print",this);
   print_targ_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
   print_targ_cmd->SetGuidance("Print target parameters");
@@ -117,6 +121,7 @@ Detector_Construction_Messenger::~Detector_Construction_Messenger() {
   delete thickness_cmd;
   delete radius_cmd;
   delete target_cmd;
+  delete step_cmd;
   
 }
 
@@ -195,6 +200,11 @@ void Detector_Construction_Messenger::SetNewValue(G4UIcommand* command, G4String
   else if(command == radius_cmd) {
     construction->SetTargetRadius(radius_cmd->GetNewDoubleValue(newValue));
     G4cout << "Setting target radius to " << newValue << G4endl;
+  }
+
+  else if(command == step_cmd) {
+    G4cout << "Setting step size in the target to " << newValue << G4endl;
+    construction->SetTargetStepSize(step_cmd->GetNewDoubleValue(newValue));
   }
 
   else if(command == target_cmd) {

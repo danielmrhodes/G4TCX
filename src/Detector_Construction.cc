@@ -35,6 +35,7 @@ Detector_Construction::Detector_Construction() {
   target_thickness = 882*nm;
   target_radius = 0.5*cm;
   target_mat = NULL;
+  target_step = 0.0*um;
   
   place_s3 = false;
   place_spice = false;
@@ -92,6 +93,11 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
       place_s3 = true;
       place_target = true;
       sens_s3 = true;
+
+      if(target_step > 0.0)
+	uLim = new G4UserLimits(target_step);
+      else
+	uLim = new G4UserLimits(0.05*target_thickness);
       
       break;
   
@@ -113,7 +119,12 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
       sens_s3 = true;
       sens_tig = true;
       
-      uLim = new G4UserLimits(0.05*target_thickness);
+      if(target_step > 0.0)
+	uLim = new G4UserLimits(target_step);
+      else
+	uLim = new G4UserLimits(0.05*target_thickness);
+      
+      break;
       
       break;
 
