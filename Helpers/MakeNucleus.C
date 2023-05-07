@@ -4,18 +4,18 @@ void MakeNucleus() {
   //This script takes a GOSIA output file and creates a CYGNUS nucleus file
 
   //Change these
-  int Z = 36;
-  int A = 78;
-  int nStates = 18;
+  int Z = 46;
+  int A = 110;
+  int nStates = 14;
 
-  //This is which printout of matrix elements you want from the GOSIA output. There can be up to three printouts.
-  int nBlock = 0; //zero means the first printout, normally what is input to OP,ME
+  //This is which printout of matrix elements you want from the GOSIA output. There can be up to three printouts (I think).
+  int nBlock = 0; //zero means the first printout, normally what is input to OP,ME. Increment for the next one
 
   std::ifstream inFile;
-  inFile.open("GOSIA.out",std::ios::in); //GOSIA output, must already exist
+  inFile.open("/home/drhodes/Analysis/78Kr/MyGosia/RoughMini/Rings00-10/110PdCalc/pd110.out",std::ios::in); //GOSIA output, must already exist
   
   std::ofstream outFile;
-  outFile.open("kr78.txt",std::ios::out); //New file will be created with this name
+  outFile.open("pd110.txt",std::ios::out); //New file will be created with this name
   ////////////////
   
   if(!inFile.is_open() ) {	
@@ -55,7 +55,7 @@ void MakeNucleus() {
     if(parity.compare("-")==0)
       par=-1;
     
-    outFile << index << "\t" << par << "\t" << spin << "\t" << energy << "\n";
+    outFile << index-1 << "\t" << energy << "\t" << spin << "\t" << par << "\n";
     
   }
   
