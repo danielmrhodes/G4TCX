@@ -1,6 +1,6 @@
 /Mode Full
-/Geometry/Tigress/SetConfiguration 1
-/Geometry/Tigress/SetFrameConfiguration 0
+/Geometry/Tigress/Configuration 1
+/Geometry/Tigress/FrameConfiguration 0
 /Geometry/Target/StandardTarget 48Ti
 /Geometry/Update
 #
