@@ -67,12 +67,13 @@ The /Geometry commands are common across all modes. With the exception of /Geome
 | --- | --- |
 | /Geometry/S3/Construct | Include the silicon detectors in the simulation |
 | /Geometry/Target/Construct | Include the target in the simulation |
-| /Geometry/Tigress/SetConfiguration *int* | Set whether Tigress is in its high efficiency (0) or high peak-to-total (1) configuration (default: 0) |
-| /Geometry/Tigress/SetFrameConfiguration *int* | Set the Tigress frame configuration. See text below for an explanation (default: 0) |
+| /Geometry/Tigress/Configuration *int* | Set whether Tigress is in its high efficiency (0) or high peak-to-total (1) configuration (default: 0) |
+| /Geometry/Tigress/FrameConfiguration *int* | Set the Tigress frame configuration. See text below for an explanation (default: 0) |
 | /Geometry/Tigress/RemoveDetector *int* |Remove a Tigress detector (clover) from the simulation |
 | /Geometry/S3/UpstreamOffset *double unit* | Set (positive) z-offset of upstream silicon detector. (Default: 3 cm) |
 | /Geometry/S3/DownstreamOffset *double unit* | Set (positive) z-offset of downstream silicon detector. (Default: 3 cm) |
 | /Geometry/Target/StandardTarget *string* | Set parameters for a standard target: 208Pb, 48Ti, 196Pt, 197Au, or 110Pd. |
+| /Geometry/Target/StepSize *double unit* | Set simulation step size inside the target. (Default: 0.05*target_width) |
 | /Geometry/Target/Z *int* | Set Z of target nucleus. (Default: 82) |
 | /Geometry/Target/N *int* | Set N of target nucleus. (Default: 126) |
 | /Geometry/Target/Density *double unit* | Set (volume) density of target material. (Default: 11.382 g/cm<sup>3</sup>) |

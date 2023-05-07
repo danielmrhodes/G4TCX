@@ -18,11 +18,11 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
   removeTigDet_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
   removeTigDet_cmd->SetGuidance("Remove a tigress detector from the simulation");
 
-  tigConfig_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/SetConfiguration",this);
+  tigConfig_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/Configuration",this);
   tigConfig_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
   tigConfig_cmd->SetGuidance("Set Tigress configuration. High-Eff (0) or High P/T (1).");
 
-  tigFrameConfig_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/SetFrameConfiguration",this);
+  tigFrameConfig_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/FrameConfiguration",this);
   tigFrameConfig_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
   tigFrameConfig_cmd->SetGuidance("Set Tigress frame configuration. Full structure (0), upstream lampshades (1), downstream lampshades (2),or corona only (3).");
   
