@@ -17,9 +17,9 @@ public:
   
   G4VPhysicalVolume* Construct();
 
-  void PlaceTigress(G4bool sensitive);
+  void PlaceTigress();
   void PlaceSpice();
-  void PlaceS3(G4bool sensitive);
+  void PlaceS3();
   void PlaceTarget(G4UserLimits* uLim);
   
   void SetPlaceS3() {place_s3 = true;}
@@ -55,6 +55,8 @@ public:
   
 private:
 
+  void ConstructSDandField();
+  
   void DefineSuppressedParameters();
   void DefineMaterials();
 

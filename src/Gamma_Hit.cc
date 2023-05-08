@@ -1,6 +1,6 @@
 #include "Gamma_Hit.hh"
 
-G4Allocator<Gamma_Hit>* Gamma_Hit_Allocator = 0;
+G4ThreadLocal G4Allocator<Gamma_Hit>* Gamma_Hit_Allocator = 0;
 
 void Gamma_Hit::SetDetSeg(G4int id) {
 

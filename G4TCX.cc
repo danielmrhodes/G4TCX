@@ -1,31 +1,24 @@
-#include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
 #include "G4UImanager.hh"
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
 #include "G4VisManager.hh"
 #include "G4VisExecutive.hh"
-
+#include "Action_Initialization.hh"
 #include "Detector_Construction.hh"
-#include "Primary_Generator.hh"
 #include "Physics_List.hh"
-#include "Run_Action.hh"
-#include "Event_Action.hh"
-#include "Tracking_Action.hh"
 
 int main(int argc, char** argv) {
   
   //Construct the run manager
-  G4RunManager* runManager = new G4RunManager();
+  G4MTRunManager* runManager = new G4MTRunManager();
+  runManager->SetNumberOfThreads(1);
   
   //Set mandatory classes
   runManager->SetUserInitialization(new Detector_Construction());
   runManager->SetUserInitialization(new Physics_List());
-  runManager->SetUserAction(new Primary_Generator());
 
-  //Set optional classes
-  runManager->SetUserAction(new Run_Action());
-  runManager->SetUserAction(new Event_Action());
-  runManager->SetUserAction(new Tracking_Action());
+  runManager->SetUserInitialization(new Action_Initialization());
 
   //Initialize
   runManager->Initialize();

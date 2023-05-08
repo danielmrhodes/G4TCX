@@ -8,6 +8,7 @@
 #include "Primary_Generator.hh"
 #include "GammaSD.hh"
 #include "SuppressorSD.hh"
+#include "IonSD.hh"
 
 #include "G4RunManager.hh"
 #include "G4SDManager.hh"
@@ -84,15 +85,12 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
   Primary_Generator* gen = (Primary_Generator*)Rman->GetUserPrimaryGeneratorAction();
 
   G4bool place_tigress = false;
-  G4bool sens_tig = false;
-  G4bool sens_s3 = false;
   G4UserLimits* uLim = NULL;
   switch(gen->GetMode()) {
     case Primary_Generator::MODE::Scattering: {
       
       place_s3 = true;
       place_target = true;
-      sens_s3 = true;
 
       if(target_step > 0.0)
 	uLim = new G4UserLimits(target_step);
@@ -105,7 +103,6 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
     case Primary_Generator::MODE::Source: {
 
       place_tigress = true;
-      sens_tig = true;
       
       break;
 
@@ -115,9 +112,6 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
       place_tigress = true;
       place_s3 = true;
       place_target = true;
-
-      sens_s3 = true;
-      sens_tig = true;
       
       if(target_step > 0.0)
 	uLim = new G4UserLimits(target_step);
@@ -133,7 +127,7 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
   
   //Make Tigress Array
   if(place_tigress)
-    PlaceTigress(sens_tig);
+    PlaceTigress();
 
   //Make SPICE
   if(place_spice)
@@ -141,7 +135,7 @@ G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
 
   //Make S3 Detectors
   if(place_s3)
-    PlaceS3(sens_s3); 
+    PlaceS3(); 
 
   //Make the target
   if(place_target)
@@ -164,23 +158,23 @@ void Detector_Construction::Update() {
 
 }
 
-void Detector_Construction::PlaceTigress(G4bool make_sensitive) {
+void Detector_Construction::ConstructSDandField() {
+  
+  SetSensitiveDetector("GermaniumLogical",new GammaSD("GammaTracker"));
+  SetSensitiveDetector("SuppressorLogical",new SuppressorSD("SuppressorTracker"));
+  SetSensitiveDetector("S3Logical",new IonSD("IonTracker"));
+ 
+  return;
+  
+}
+
+void Detector_Construction::PlaceTigress() {
   
   ApparatusTigressStructure* structure = new ApparatusTigressStructure(check);
   structure->Build();
   structure->Place(logic_world,frame_config);
 
-  //Sensitive Detector
-  GammaSD* TrackerGamma = NULL;
-  SuppressorSD* TrackerSuppressor = NULL;
-  if(make_sensitive) {
-    TrackerGamma = new GammaSD("GammaTracker");
-    G4SDManager::GetSDMpointer()->AddNewDetector(TrackerGamma);
-
-    TrackerSuppressor = new SuppressorSD("SuppressorTracker");
-    G4SDManager::GetSDMpointer()->AddNewDetector(TrackerSuppressor);
-  }
-
+  
   for(G4int detNum : tigressDets) {
     
     DetectionSystemTigress* tig = new DetectionSystemTigress(tigress_config,1,
@@ -191,17 +185,17 @@ void Detector_Construction::PlaceTigress(G4bool make_sensitive) {
     tig->BuildEverythingButCrystals(detNum);
     tig->PlaceEverythingButCrystals(logic_world,detNum,true);
     
-    tig->PlaceSegmentedCrystal(logic_world,detNum,TrackerGamma);
-    tig->PlaceSuppressors(logic_world,detNum,TrackerSuppressor);
+    tig->PlaceSegmentedCrystal(logic_world,detNum);
+    tig->PlaceSuppressors(logic_world,detNum);
     
   }
 
   return;
 }
 
-void Detector_Construction::PlaceS3(G4bool make_sensitive) {
+void Detector_Construction::PlaceS3() {
 
-  S3* s3 = new S3(make_sensitive);
+  S3* s3 = new S3();
   s3->Placement(logic_world,US_Offset,DS_Offset,check);
   
   return;

@@ -16,7 +16,6 @@ public:
   ~Event_Action();
 
   void BeginOfEventAction(const G4Event* evt);
-  void EndOfEventAction(const G4Event* evt);
 
   G4String GetOutputFileName() {return fname;}
   FILE* GetOutputFile() {return output;}

@@ -34,9 +34,9 @@ void Run_Action::BeginOfRunAction(const G4Run* run) {
   evtAct->SetOutputFile(fopen(name.c_str(),"wb"));
 
   //Must have .dat extension fot this to work
-  G4String dname = name.substr(0,name.length()-4) + "-info.dat";
-  evtAct->SetDiagnosticsFileName(dname);
-  evtAct->SetDiagnosticsFile(fopen(evtAct->GetDiagnosticsFileName().c_str(),"wb"));
+  //G4String dname = name.substr(0,name.length()-4) + "-info.dat";
+  //evtAct->SetDiagnosticsFileName(dname);
+  //evtAct->SetDiagnosticsFile(fopen(evtAct->GetDiagnosticsFileName().c_str(),"wb"));
 
   evtAct->SetNEvents(nEvents);
   evtAct->SetPerEvent(nEvents);

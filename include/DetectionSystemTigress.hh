@@ -35,9 +35,6 @@
 #ifndef DETECTIONSYSTEMTIGRESS_HH
 #define DETECTIONSYSTEMTIGRESS_HH
 
-#include "GammaSD.hh"
-#include "SuppressorSD.hh"
-
 #include "G4AssemblyVolume.hh"
 #include "G4Box.hh"
 #include "G4Trap.hh"
@@ -62,12 +59,12 @@ public:
 
   void Build();
 
-  void PlaceCrystal(G4LogicalVolume* exp_hall_log, G4int det, GammaSD* sd);
-  void PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log, G4int det, GammaSD* sd);
-  void PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4int det, SuppressorSD* sd);
+  void PlaceCrystal(G4LogicalVolume* exp_hall_log, G4int det);
+  void PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log, G4int det);
+  void PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4int det);
   
   // For detector specific dead layers
-  void BuildDeadLayerSpecificCrystal(G4int det, GammaSD* sd);
+  void BuildDeadLayerSpecificCrystal(G4int det);
 
   void BuildEverythingButCrystals(G4int det);
   G4double GetCrystalDistanceFromOrigin() {return fCrystalDistFromOrigin;}
@@ -309,8 +306,7 @@ private:
   void ConstructComplexDetectorBlockWithDeadLayer();
 
   // For detector specific dead layers
-  void ConstructComplexDetectorBlockWithDetectorSpecificDeadLayer(G4int det, G4int cry,
-								  GammaSD* sd);
+  void ConstructComplexDetectorBlockWithDetectorSpecificDeadLayer(G4int det, G4int cry);
   void ConstructNewSuppressorCasingDetectorSpecificDeadLayer(G4int det, G4int cry);
   void ConstructDetector();
   void ConstructComplexDetectorBlock();

@@ -10,7 +10,7 @@
 #include "G4Box.hh"
 #include "G4SubtractionSolid.hh"
 
-S3::S3(G4bool make_sensitive) {
+S3::S3() {
 
   innerRadius = 1.1*cm;
   outerRadius = 3.5*cm;
@@ -18,13 +18,6 @@ S3::S3(G4bool make_sensitive) {
 
   nRings = 24;
   nSectors = 32;
-  
-  //Sensitive Detector
-  TrackerIon = NULL;
-  if(make_sensitive) {
-    TrackerIon = new IonSD("IonTracker");; 
-    G4SDManager::GetSDMpointer()->AddNewDetector(TrackerIon);
-  }
   
 }
 
@@ -60,7 +53,7 @@ void S3::Placement(G4LogicalVolume* world, G4double USoff, G4double DSoff, G4boo
         G4double in = innerRadius + ring*dr;
 
         G4Tubs* segs = new G4Tubs("SegS",in,in+dr,thickness/2.0,(sec-0.5)*dphi,dphi);
-        G4LogicalVolume* segl = new G4LogicalVolume(segs,mat,"SegL",0,TrackerIon);
+        G4LogicalVolume* segl = new G4LogicalVolume(segs,mat,"S3Logical");
 	
 	if(ring%2) {
 	  if(sec%2) {

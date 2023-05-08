@@ -1,6 +1,6 @@
 #include "Ion_Hit.hh"
 
-G4Allocator<Ion_Hit>* Ion_Hit_Allocator = 0;
+G4ThreadLocal G4Allocator<Ion_Hit>* Ion_Hit_Allocator = 0;
 
 Ion_Hit::Ion_Hit() : proj(false),rec(false) {}
 

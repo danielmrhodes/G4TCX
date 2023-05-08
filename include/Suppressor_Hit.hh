@@ -38,7 +38,7 @@ private:
 
 typedef G4THitsCollection<Suppressor_Hit> Suppressor_Hit_Collection;
 
-extern G4Allocator<Suppressor_Hit>* Suppressor_Hit_Allocator;
+extern G4ThreadLocal G4Allocator<Suppressor_Hit>* Suppressor_Hit_Allocator;
 
 inline void* Suppressor_Hit::operator new(size_t) {
   

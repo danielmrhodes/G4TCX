@@ -46,7 +46,7 @@ private:
 
 typedef G4THitsCollection<Gamma_Hit> Gamma_Hit_Collection;
 
-extern G4Allocator<Gamma_Hit>* Gamma_Hit_Allocator;
+extern G4ThreadLocal G4Allocator<Gamma_Hit>* Gamma_Hit_Allocator;
 
 inline void* Gamma_Hit::operator new(size_t) {
   

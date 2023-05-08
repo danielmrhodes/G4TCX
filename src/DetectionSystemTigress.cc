@@ -493,8 +493,7 @@ G4int DetectionSystemTigress::PlaceDeadLayerSpecificCrystal(G4LogicalVolume* exp
 	return 1;
 } // end PlaceDeadLayerSpecificCrystal()
 
-void DetectionSystemTigress::PlaceCrystal(G4LogicalVolume* exp_hall_log, G4int detectorNumber,
-					  GammaSD* sd) {
+void DetectionSystemTigress::PlaceCrystal(G4LogicalVolume* exp_hall_log, G4int detectorNumber) {
 
   G4Material* materialGe = G4Material::GetMaterial("G4_Ge");
   if(!materialGe) {
@@ -572,7 +571,7 @@ void DetectionSystemTigress::PlaceCrystal(G4LogicalVolume* exp_hall_log, G4int d
     germaniumBlock1VisAtt->SetVisibility(true);
     germaniumBlock1VisAtt->SetForceSolid(true);
 
-    G4LogicalVolume* ge_log = new G4LogicalVolume(detector1,materialGe,"germaniumLogical",0,sd);
+    G4LogicalVolume* ge_log = new G4LogicalVolume(detector1,materialGe,"GermaniumLogical");
     ge_log->SetVisAttributes(germaniumBlock1VisAtt);
     
     rotateGermanium[i] = new G4RotationMatrix;
@@ -611,8 +610,7 @@ void DetectionSystemTigress::PlaceCrystal(G4LogicalVolume* exp_hall_log, G4int d
   return;
 }
 
-void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log, G4int detectorNumber,
-						   GammaSD* sd) {
+void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log, G4int detectorNumber) {
 
   G4Material* materialGe = G4Material::GetMaterial("G4_Ge");
   if(!materialGe) {
@@ -721,7 +719,7 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
 
     for(G4int j=0;j<8;j++) {
 
-      G4LogicalVolume* ge_log = new G4LogicalVolume(segments.at(j),materialGe,"germaniumLogical",0,sd);
+      G4LogicalVolume* ge_log = new G4LogicalVolume(segments.at(j),materialGe,"GermaniumLogical");
       if(j<4) {
 	if(j%2)
 	  ge_log->SetVisAttributes(germaniumBlock1VisAtt);
@@ -745,7 +743,7 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
   return;
 }
 
-void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4int detectorNumber, SuppressorSD* sd) {
+void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4int detectorNumber) {
 
   G4Material* backMaterial = G4Material::GetMaterial(fBackSuppressorMaterial);
   if(!backMaterial) {
@@ -815,7 +813,7 @@ void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4i
 
     G4SubtractionSolid* backQuarterSuppressor = BackSuppressorQuarter();
     fBackQuarterSuppressorLog = new G4LogicalVolume(backQuarterSuppressor,backMaterial,
-						    "BackSuppressorLog",0,sd,0);
+						    "SuppressorLogical",0,0,0);
     fBackQuarterSuppressorLog->SetVisAttributes(supVisAtt);
     
     x0 = (fDetectorTotalWidth/4.0);
@@ -894,11 +892,11 @@ void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4i
 	  + fAppliedBackShift - fSuppressorShellThickness/2.0 + distFromOriginDet);
 
     G4SubtractionSolid* rightSuppressor = FrontSlantSuppressor("right", false); // Right, non-chopping.
-    fRightSuppressorLog = new G4LogicalVolume(rightSuppressor,materialBGO,"RightSideSuppressorLog", 0, sd, 0);
+    fRightSuppressorLog = new G4LogicalVolume(rightSuppressor,materialBGO,"SuppressorLogical", 0, 0, 0);
     fRightSuppressorLog->SetVisAttributes(supVisAtt);
 
     G4SubtractionSolid* leftSuppressor = FrontSlantSuppressor("left", false); // Left, non-chopping.
-    fLeftSuppressorLog = new G4LogicalVolume(leftSuppressor, materialBGO,"LeftSideSuppressorLog", 0, sd, 0);
+    fLeftSuppressorLog = new G4LogicalVolume(leftSuppressor, materialBGO,"SuppressorLogical", 0, 0, 0);
     fLeftSuppressorLog->SetVisAttributes(supVisAtt);
 
     for(i=start; i<stop; i++) {
@@ -982,12 +980,12 @@ void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4i
 
   G4SubtractionSolid* rightSuppressorExtension = SideSuppressorExtension("right", false); // Right, non-chopping // CALLED
   fRightSuppressorExtensionLog = new G4LogicalVolume(rightSuppressorExtension, materialBGO,
-						     "RightFrontSuppressorLog", 0, sd, 0);
+						     "SuppressorLogical", 0, 0, 0);
   fRightSuppressorExtensionLog->SetVisAttributes(supVisAtt);
   
   G4SubtractionSolid* leftSuppressorExtension = SideSuppressorExtension("left", false); // Left, Non-chopping // CALLED
   fLeftSuppressorExtensionLog = new G4LogicalVolume(leftSuppressorExtension, materialBGO,
-						    "LeftFrontSuppressorLog", 0, sd, 0);
+						    "SuppressorLogical", 0, 0, 0);
   fLeftSuppressorExtensionLog->SetVisAttributes(supVisAtt);
   
   if(!(fSuppressorPositionSelector) && fIncludeExtensionSuppressors)
@@ -1199,14 +1197,14 @@ void DetectionSystemTigress::BuildEverythingButCrystals(G4int det) {
 } // end BuildEverythingButCrystals()
 
 
-void DetectionSystemTigress::BuildDeadLayerSpecificCrystal(G4int det, GammaSD* sd) {
+void DetectionSystemTigress::BuildDeadLayerSpecificCrystal(G4int det) {
 	fGermaniumAssemblyCry[0] = new G4AssemblyVolume();
 	fGermaniumAssemblyCry[1] = new G4AssemblyVolume();
 	fGermaniumAssemblyCry[2] = new G4AssemblyVolume();
 	fGermaniumAssemblyCry[3] = new G4AssemblyVolume();
 
 	for(G4int i=0; i<4; i++)
-	  ConstructComplexDetectorBlockWithDetectorSpecificDeadLayer(det,i,sd);
+	  ConstructComplexDetectorBlockWithDetectorSpecificDeadLayer(det,i);
 
 	return;
 }
@@ -1362,8 +1360,7 @@ void DetectionSystemTigress::ConstructComplexDetectorBlockWithDeadLayer() {
 }//end ::ConstructComplexDetectorBlockWithDeadLayer
 
 void DetectionSystemTigress::ConstructComplexDetectorBlockWithDetectorSpecificDeadLayer(G4int det,
-											G4int cry,
-											GammaSD* sd
+											G4int cry
 											) {
 	G4String strdet = G4UIcommand::ConvertToString(det);
 	G4String strcry = G4UIcommand::ConvertToString(cry);
@@ -1393,9 +1390,10 @@ void DetectionSystemTigress::ConstructComplexDetectorBlockWithDetectorSpecificDe
 
 	G4SubtractionSolid* detector1 = QuarterSpecificDeadLayerDetector(det, cry);
 
-	G4String germaniumBlock1Name = "germaniumDlsBlock1_" + strdet + "_" + strcry + "_log" ;
-
-	fGermaniumBlock1Log = new G4LogicalVolume(detector1, materialGe,germaniumBlock1Name,0,sd);
+	//G4String germaniumBlock1Name = "germaniumDlsBlock1_" + strdet + "_" + strcry + "_log" ;
+	G4String germaniumBlock1Name = "GermaniumLogical";
+	
+	fGermaniumBlock1Log = new G4LogicalVolume(detector1, materialGe,germaniumBlock1Name);
 	fGermaniumBlock1Log->SetVisAttributes(germaniumBlock1VisAtt);
 
 	fGermaniumAssemblyCry[cry]->AddPlacedVolume(fGermaniumBlock1Log, fMoveNull, fRotateNull);

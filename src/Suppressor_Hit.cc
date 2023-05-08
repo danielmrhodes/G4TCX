@@ -1,6 +1,6 @@
 #include "Suppressor_Hit.hh"
 
-G4Allocator<Suppressor_Hit>* Suppressor_Hit_Allocator = 0;
+G4ThreadLocal G4Allocator<Suppressor_Hit>* Suppressor_Hit_Allocator = 0;
 
 void Suppressor_Hit::SetDetSeg(G4int id) {
 

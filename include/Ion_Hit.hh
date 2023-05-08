@@ -58,13 +58,12 @@ private:
 
 typedef G4THitsCollection<Ion_Hit> Ion_Hit_Collection;
 
-extern G4Allocator<Ion_Hit>* Ion_Hit_Allocator;
+extern G4ThreadLocal G4Allocator<Ion_Hit>* Ion_Hit_Allocator;
 
 inline void* Ion_Hit::operator new(size_t) {
   
-  if(!Ion_Hit_Allocator) {
+  if(!Ion_Hit_Allocator)
     Ion_Hit_Allocator = new G4Allocator<Ion_Hit>;
-  }
   
   return (void*)Ion_Hit_Allocator->MallocSingle();
 }
