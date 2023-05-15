@@ -1,22 +1,22 @@
-#ifndef Event_Action_Messenger_h
-#define Event_Action_Messenger_h 1
+#ifndef Run_Action_Messenger_h
+#define Run_Action_Messenger_h 1
 
-#include "Event_Action.hh"
+#include "Run_Action.hh"
 #include "G4UImessenger.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UIcmdWithAString.hh"
 
-class Event_Action;
-class Event_Action_Messenger : public G4UImessenger {
+class Run_Action;
+class Run_Action_Messenger : public G4UImessenger {
 
 public:
   
-  Event_Action_Messenger(Event_Action* eAct);
-  ~Event_Action_Messenger();
+  Run_Action_Messenger(Run_Action* runAct);
+  ~Run_Action_Messenger();
   
 private:
 
-  Event_Action* eventAction;
+  Run_Action* runAct;
 
   void SetNewValue(G4UIcommand* command, G4String newValue);
 

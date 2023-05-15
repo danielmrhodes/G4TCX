@@ -7,7 +7,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 #include "G4PhysicalConstants.hh"
-#include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
+#include "G4WorkerRunManager.hh"
 
 Polarization::Polarization(G4bool prj) : proj(prj) {
   
@@ -15,10 +16,20 @@ Polarization::Polarization(G4bool prj) : proj(prj) {
   
   fn = "";
   calcGk = true;
+
+  threadID = G4Threading::G4GetThreadId();
+
+  /*
+  polarization = new std::vector< std::vector<G4complex> >();
+  unpolarized = new std::vector< std::vector<G4complex> >();
+
+  polarization->clear();
+  unpolarized->clear();
+  */
   
   unpolarized.resize(1);
   unpolarized[0].push_back(1.0);
-
+  
   //deorientation effect model parameters
   //default values
   Avji = 3.0;
@@ -37,6 +48,9 @@ Polarization::Polarization(G4bool prj) : proj(prj) {
 Polarization::~Polarization() {
 
   delete messenger;
+  //delete polarization;
+  //delete unpolarized;
+  
   for(unsigned int i=0;i<interps.size();i++)
     gsl_spline2d_free(interps.at(i));
   
@@ -94,8 +108,9 @@ void Polarization::ReadTensorFile() {
   file.open(fn.c_str(),std::ios::in);
 
   if(!file.is_open()) {
-    G4cout << " \033[1;31mCould not open " << nuc << " statistical tensor file " << fn
-	   << "! No polarization will occur! \033[m" << G4endl;
+    if(!threadID)
+      std::cout << " \033[1;31mCould not open " << nuc << " statistical tensor file " << fn
+		<< "! No polarization will occur! \033[m" << std::endl;
     spins.clear();
     return;
   }
@@ -164,10 +179,13 @@ void Polarization::BuildStatisticalTensors() {
     nuc = "recoil";
   
   if(fn == "") {
-    G4cout << "\nNo " << nuc << " polarization\n";
+    if(!threadID)
+      std::cout << "\nNo " << nuc << " polarization\n";
     return;
   }
-  G4cout << "\nBuilding " << nuc << " statistical tensors from " << fn  << "\n";
+  
+  if(!threadID)
+    std::cout << "\nBuilding " << nuc << " statistical tensors from " << fn  << "\n";
 
   SetSpins();
   ReadTensorFile();
@@ -178,10 +196,13 @@ void Polarization::BuildStatisticalTensors() {
   G4int numS = spins.size();
   G4int numV = values.size();
 
-  if(numE && numT && numS && numV)
-    G4cout << "All " << nuc << " statistical tensors successfully built!" << G4endl;
+  if(numE && numT && numS && numV) {
+    if(!threadID)
+      std::cout << "All " << nuc << " statistical tensors successfully built!" << std::endl;
+  }
   else {
-    G4cout << "\033[1;31mFailed :( No polarization for the " << nuc << "\033[m\n";
+    if(!threadID)
+      std::cout << "\033[1;31mFailed :( No polarization for the " << nuc << "\033[m\n";
     spins.clear();
     return;
   }
@@ -209,7 +230,7 @@ void Polarization::BuildStatisticalTensors() {
 
 void Polarization::SetSpins() {
 
-  G4RunManager* Rman = G4RunManager::GetRunManager();
+  G4WorkerRunManager* Rman = (G4WorkerRunManager*)G4MTRunManager::GetRunManager();
   Primary_Generator* gen = (Primary_Generator*)Rman->GetUserPrimaryGeneratorAction();
   std::vector<G4double> sps = gen->GetExcitedStateSpins(proj);
   
@@ -222,14 +243,17 @@ void Polarization::SetSpins() {
 
 void Polarization::ApplyGk() {
 
-  if(calcGk)
-    G4cout << " Gk coefficients will be applied\n";
+  if(calcGk) {
+    if(!threadID)
+      std::cout << " Gk coefficients will be applied\n";
+  }
   else {
-    G4cout << " No Gk coefficients\n";
+    if(!threadID)
+      std::cout << " No Gk coefficients\n";
     return;
   }
 
-  G4RunManager* Rman = G4RunManager::GetRunManager();
+  G4WorkerRunManager* Rman = (G4WorkerRunManager*)G4MTRunManager::GetRunManager();
   Primary_Generator* gen = (Primary_Generator*)Rman->GetUserPrimaryGeneratorAction();
   
   G4int Z = gen->GetZ(proj);
@@ -281,7 +305,7 @@ void Polarization::ApplyGk() {
 void Polarization::Clean() {
 
   if(!polarization.empty()) {
-    for(auto& pol : polarization) {
+    for(std::vector<G4complex> pol : polarization) {
       pol.clear();
     }
     polarization.clear();
@@ -290,8 +314,8 @@ void Polarization::Clean() {
   return;
 }
 
-std::vector< std::vector<G4complex> >& Polarization::GetPolarization(G4int state, G4double en,
-								     G4double th, G4double ph) {
+std::vector< std::vector<G4complex> > Polarization::GetPolarization(G4int state, G4double en,
+								    G4double th, G4double ph) {
 
   if((unsigned int)state >= spins.size())
     return unpolarized;
@@ -387,7 +411,7 @@ std::vector< std::vector<G4complex> >& Polarization::GetPolarization(G4int state
   
 }
 
-void Polarization::Print(const std::vector< std::vector<G4complex> >& polar) {
+void Polarization::Print(const std::vector< std::vector<G4complex> > polar) {
 
   G4cout << " P = [ {";
   size_t kk = polar.size();

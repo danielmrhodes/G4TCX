@@ -31,7 +31,7 @@ G4bool SuppressorSD::ProcessHits(G4Step* step, G4TouchableHistory*) {
 }
 
 void SuppressorSD::EndOfEvent(G4HCofThisEvent* HCE) {
-
+  
  label:
 
   for(unsigned int i=0;i<HC->entries();i++) {

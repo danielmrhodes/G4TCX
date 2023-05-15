@@ -9,10 +9,14 @@
 #include "G4UnitsTable.hh"
 #include "G4HadronicException.hh"
 
-Gamma_Decay::Gamma_Decay(Polarized_Particle* Parent, Polarized_Particle* daughter, G4double BR,
-			 G4int L0, G4int Lp, G4double del, G4double cc, G4bool emit) : Gamma_Decay(Parent->GetDefinition(), daughter->GetDefinition(),BR) {
+#include "G4RandomDirection.hh"
 
-  trans = new G4PolarizationTransition();
+Gamma_Decay::Gamma_Decay(Polarized_Particle* Parent, Polarized_Particle* daughter, G4double BR,
+			 G4int L0, G4int Lp, G4double del, G4double cc, G4bool emit) :
+  Gamma_Decay(Parent->GetDefinition(), daughter->GetDefinition(),BR) {
+
+  //trans = new G4PolarizationTransition();
+  trans = new Polarization_Transition();
   
   pParent = Parent;
   pDaughter = daughter;
@@ -68,16 +72,27 @@ G4DecayProducts* Gamma_Decay::DecayIt(G4double) {
 
   //calculate daughter momentum
   daughtermomentum = Pmx(parentmass,daughtermass[0],daughtermass[1]);
+
+  //G4double costheta;
+  //G4double phi;
+  //trans->SampleGammaTransition(pParent->GetNuclearPolarization(),pParent->TwoJ(),
+  //trans->SampleGammaTransition(pParent,pParent->TwoJ(),pDaughter->TwoJ(),transL,transLp,delta,
+  //			       costheta,phi);
+
+  /*
+  std::array<G4double,2> vals = trans->SampleGammaTransition(pParent,pParent->TwoJ(),pDaughter->TwoJ(),
+  							     transL,transLp,delta);
   
-  G4double costheta;
-  G4double phi;
-  trans->SampleGammaTransition(pParent->GetNuclearPolarization(),pParent->TwoJ(),
-			       pDaughter->TwoJ(),transL,transLp,delta,costheta,phi);
-
   pDaughter->SetPolarization(pParent->GetPolarization());
-
+  
+  G4double costheta = vals[0];
+  G4double phi = vals[1];
+  
   G4double sintheta = std::sqrt((1.0 - costheta)*(1.0 + costheta));
-  G4ParticleMomentum direction(sintheta*std::cos(phi),sintheta*std::sin(phi),costheta);
+  G4ParticleMomentum direction(sintheta*std::cos(phi),sintheta*std::sin(phi),costheta);  
+  */
+  
+  G4ParticleMomentum direction(G4RandomDirection());
 
   //create daughter G4DynamicParticle
   G4double Etotal= std::sqrt(daughtermass[0]*daughtermass[0] + daughtermomentum*daughtermomentum); 

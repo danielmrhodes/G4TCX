@@ -37,7 +37,7 @@ G4bool GammaSD::ProcessHits(G4Step* step, G4TouchableHistory*) {
 }
 
 void GammaSD::EndOfEvent(G4HCofThisEvent* HCE) {
-
+  
  label:
 
   for(unsigned int i=0;i<HC->entries();i++) {
@@ -109,7 +109,7 @@ void GammaSD::EndOfEvent(G4HCofThisEvent* HCE) {
 	  
       }
     }
-      
+    
     HC->insert(hit);
      
   }

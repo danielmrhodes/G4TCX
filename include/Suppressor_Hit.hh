@@ -14,7 +14,7 @@ public:
   ~Suppressor_Hit() {;}
 
   inline void* operator new(size_t);
-  inline void operator delete(void *aHit);
+  inline void operator delete(void*);
 
   //inline void SetEdep(G4double de) {edep = de;}
   //inline void SetPos(G4ThreeVector vec) {pos = vec;}

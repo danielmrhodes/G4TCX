@@ -340,7 +340,7 @@ void Primary_Generator::Update() {
       projGS = exciteP->GetDefinition(0);
       recoilGS = exciteR->GetDefinition(0);
       UpdateReaction();
-
+      
       exciteP->BuildStatisticalTensors();
       exciteR->BuildStatisticalTensors();
       

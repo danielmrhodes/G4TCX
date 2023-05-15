@@ -48,6 +48,8 @@ private:
   Excitation_Messenger* messenger;
   Polarization* polar;
   const G4bool proj;
+
+  G4int threadID;
   
   G4String lfn; //Level scheme file name
   G4String pfn; //Probabilities file name

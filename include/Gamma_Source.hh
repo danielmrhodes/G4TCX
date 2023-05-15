@@ -32,6 +32,8 @@ private:
   G4double source_energy;
   G4double GSS; //ground state spin
   G4String file_name;
+
+  G4int threadID;
   
   std::vector<Polarized_Particle*> levels;
   std::vector<G4double> probs;

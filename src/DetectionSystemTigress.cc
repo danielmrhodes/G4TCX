@@ -719,7 +719,10 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
 
     for(G4int j=0;j<8;j++) {
 
-      G4LogicalVolume* ge_log = new G4LogicalVolume(segments.at(j),materialGe,"GermaniumLogical");
+      G4int copy = 10*(detectorNumber*4 + i + 1) + segNums[j];
+      G4String nameLV = "GeLog" + std::to_string(copy);
+	
+      G4LogicalVolume* ge_log = new G4LogicalVolume(segments.at(j),materialGe,nameLV);
       if(j<4) {
 	if(j%2)
 	  ge_log->SetVisAttributes(germaniumBlock1VisAtt);
@@ -733,7 +736,7 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
 	  ge_log->SetVisAttributes(germaniumBlock1VisAtt);
       }
       
-      G4int copy = 10*(detectorNumber*4 + i + 1) + segNums[j];
+      
       new G4PVPlacement(rotateGermanium[i],moveGermanium[i],ge_log,"GeCrys",exp_hall_log,0,copy,
 			fSurfCheck);
     }
@@ -812,8 +815,9 @@ void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4i
   if(fIncludeBackSuppressors) {
 
     G4SubtractionSolid* backQuarterSuppressor = BackSuppressorQuarter();
-    fBackQuarterSuppressorLog = new G4LogicalVolume(backQuarterSuppressor,backMaterial,
-						    "SuppressorLogical",0,0,0);
+
+    G4String nameLV = "SupLog" + std::to_string(10*(detectorNumber + 1) + 5);
+    fBackQuarterSuppressorLog = new G4LogicalVolume(backQuarterSuppressor,backMaterial,nameLV);
     fBackQuarterSuppressorLog->SetVisAttributes(supVisAtt);
     
     x0 = (fDetectorTotalWidth/4.0);
@@ -891,12 +895,16 @@ void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4i
 	  +(fBGOCanSeperation + fBGOChoppedTip)/tan(fBentEndAngle) + fShift
 	  + fAppliedBackShift - fSuppressorShellThickness/2.0 + distFromOriginDet);
 
+    
     G4SubtractionSolid* rightSuppressor = FrontSlantSuppressor("right", false); // Right, non-chopping.
-    fRightSuppressorLog = new G4LogicalVolume(rightSuppressor,materialBGO,"SuppressorLogical", 0, 0, 0);
+    G4SubtractionSolid* leftSuppressor = FrontSlantSuppressor("left", false); // Left, non-chopping.
+
+    G4String nameLVR = "SupLog" + std::to_string(10*(detectorNumber + 1) + 3);
+    fRightSuppressorLog = new G4LogicalVolume(rightSuppressor,materialBGO,nameLVR);
     fRightSuppressorLog->SetVisAttributes(supVisAtt);
 
-    G4SubtractionSolid* leftSuppressor = FrontSlantSuppressor("left", false); // Left, non-chopping.
-    fLeftSuppressorLog = new G4LogicalVolume(leftSuppressor, materialBGO,"SuppressorLogical", 0, 0, 0);
+    G4String nameLVL = "SupLog" + std::to_string(10*(detectorNumber + 1) + 4);
+    fLeftSuppressorLog = new G4LogicalVolume(leftSuppressor, materialBGO,nameLVL);
     fLeftSuppressorLog->SetVisAttributes(supVisAtt);
 
     for(i=start; i<stop; i++) {
@@ -979,13 +987,15 @@ void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4i
 
 
   G4SubtractionSolid* rightSuppressorExtension = SideSuppressorExtension("right", false); // Right, non-chopping // CALLED
-  fRightSuppressorExtensionLog = new G4LogicalVolume(rightSuppressorExtension, materialBGO,
-						     "SuppressorLogical", 0, 0, 0);
+  G4SubtractionSolid* leftSuppressorExtension = SideSuppressorExtension("left", false); // Left, Non-chopping // CALLED
+
+  
+  G4String nameLVR = "SupLog" + std::to_string(10*(detectorNumber + 1) + 1);
+  fRightSuppressorExtensionLog = new G4LogicalVolume(rightSuppressorExtension, materialBGO,nameLVR);
   fRightSuppressorExtensionLog->SetVisAttributes(supVisAtt);
   
-  G4SubtractionSolid* leftSuppressorExtension = SideSuppressorExtension("left", false); // Left, Non-chopping // CALLED
-  fLeftSuppressorExtensionLog = new G4LogicalVolume(leftSuppressorExtension, materialBGO,
-						    "SuppressorLogical", 0, 0, 0);
+  G4String nameLVL = "SupLog" + std::to_string(10*(detectorNumber + 1) + 2);
+  fLeftSuppressorExtensionLog = new G4LogicalVolume(leftSuppressorExtension, materialBGO,nameLVL);
   fLeftSuppressorExtensionLog->SetVisAttributes(supVisAtt);
   
   if(!(fSuppressorPositionSelector) && fIncludeExtensionSuppressors)

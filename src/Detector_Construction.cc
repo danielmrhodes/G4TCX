@@ -24,8 +24,6 @@ Detector_Construction::Detector_Construction() {
 
   messenger = new Detector_Construction_Messenger(this);
 
-  updated = false;
-
   US_Offset = 3.0*cm;
   DS_Offset = 3.0*cm;
   
@@ -37,7 +35,8 @@ Detector_Construction::Detector_Construction() {
   target_radius = 0.5*cm;
   target_mat = NULL;
   target_step = 0.0*um;
-  
+
+  place_tigress = false;
   place_s3 = false;
   place_spice = false;
   place_target = false;
@@ -76,93 +75,75 @@ G4VPhysicalVolume* Detector_Construction::Construct() {
   logic_world = new G4LogicalVolume(solid_world,world_mat,"World_Logical");
   world = new G4PVPlacement(0,G4ThreeVector(),logic_world,"World",0,false,0,false);
 
-  return world;
-}
-
-G4VPhysicalVolume* Detector_Construction::PlaceVolumes() {
-
-  G4RunManager* Rman = G4RunManager::GetRunManager();
-  Primary_Generator* gen = (Primary_Generator*)Rman->GetUserPrimaryGeneratorAction();
-
-  G4bool place_tigress = false;
-  G4UserLimits* uLim = NULL;
-  switch(gen->GetMode()) {
-    case Primary_Generator::MODE::Scattering: {
-      
-      place_s3 = true;
-      place_target = true;
-
-      if(target_step > 0.0)
-	uLim = new G4UserLimits(target_step);
-      else
-	uLim = new G4UserLimits(0.05*target_thickness);
-      
-      break;
-  
-    }
-    case Primary_Generator::MODE::Source: {
-
-      place_tigress = true;
-      
-      break;
-
-    }
-    case Primary_Generator::MODE::Full: {
-
-      place_tigress = true;
-      place_s3 = true;
-      place_target = true;
-      
-      if(target_step > 0.0)
-	uLim = new G4UserLimits(target_step);
-      else
-	uLim = new G4UserLimits(0.05*target_thickness);
-      
-      break;
-      
-      break;
-
-    }
-  }
-  
-  //Make Tigress Array
   if(place_tigress)
     PlaceTigress();
 
-  //Make SPICE
+  if(place_s3)
+    PlaceS3();
+
   if(place_spice)
     PlaceSpice();
+  
+  if(place_target) {
 
-  //Make S3 Detectors
-  if(place_s3)
-    PlaceS3(); 
-
-  //Make the target
-  if(place_target)
+    G4UserLimits* uLim = NULL;
+    if(target_step > 0.0)
+      uLim = new G4UserLimits(target_step);
+    else
+      uLim = new G4UserLimits(0.05*target_thickness);
+    
     PlaceTarget(uLim);
+    
+  }
   
   return world;
 }
 
-void Detector_Construction::Update() {
-
-  if(!updated) {
-    G4cout << "Updating geometry with input parameters." << G4endl;
-    G4RunManager::GetRunManager()->DefineWorldVolume(PlaceVolumes());
-    updated = true;
-  }
-  else
-    G4cout << "Geometry has already been updated. Cannot make additional changes." << G4endl;
-
-  return;
-
-}
-
 void Detector_Construction::ConstructSDandField() {
+
+  G4SDManager* SDman = G4SDManager::GetSDMpointer();
+
+  if(place_tigress) {
+    G4String gSDname = "GammaTracker";
+    GammaSD* gSD = (GammaSD*)SDman->FindSensitiveDetector(gSDname,false);
+    if(!gSD) {
+      gSD = new GammaSD(gSDname);
+      SDman->AddNewDetector(gSD);
+    }
+
+    G4String sSDname = "SuppressorTracker";
+    SuppressorSD* sSD = (SuppressorSD*)SDman->FindSensitiveDetector(sSDname,false);
+    if(!sSD) {
+      sSD = new SuppressorSD(sSDname);
+      SDman->AddNewDetector(sSD);
+    }
+
+    for(G4int det : tigressDets)
+      for(G4int i=0;i<4;i++)
+	for(G4int j=1;j<9;j++)
+	  SetSensitiveDetector("GeLog" + std::to_string(10*(det*4 + i + 1) + j),gSD);
   
-  SetSensitiveDetector("GermaniumLogical",new GammaSD("GammaTracker"));
-  SetSensitiveDetector("SuppressorLogical",new SuppressorSD("SuppressorTracker"));
-  SetSensitiveDetector("S3Logical",new IonSD("IonTracker"));
+    for(G4int det : tigressDets)
+      for(G4int i=1;i<6;i++)
+	SetSensitiveDetector("SupLog" + std::to_string(10*(det + 1) + i),sSD);
+
+  }
+  
+  if(place_s3) {
+
+    G4String iSDname = "IonTracker";
+    IonSD* iSD = (IonSD*)SDman->FindSensitiveDetector(iSDname,false);
+    if(!iSD) {
+      iSD = new IonSD(iSDname);
+      SDman->AddNewDetector(iSD);
+    }
+    
+    for(G4int det=0;det<2;det++)
+      for(G4int ring=0;ring<24;ring++)
+	for(G4int sec=0;sec<32;sec++)
+	  SetSensitiveDetector("S3Log" + std::to_string(det*10000 + (ring+1)*100 + sec + 1),iSD);
+
+  }
  
   return;
   

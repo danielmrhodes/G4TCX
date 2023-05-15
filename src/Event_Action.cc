@@ -1,33 +1,10 @@
 #include "Event_Action.hh"
-#include "G4Event.hh"
-
-Event_Action::Event_Action() {
-
-  messenger = new Event_Action_Messenger(this);
-
-  nEvents = 0;
-  
-  fname = "output.dat";
-  output = NULL;
-
-  dname = "info.dat";
-  diagnostics = NULL;
-
-  owc = false;
-  
-}
-
-Event_Action::~Event_Action() {
-
-  delete messenger;
-  
-}
 
 void Event_Action::BeginOfEventAction(const G4Event* evt) {
-
+  
   G4int id = evt->GetEventID();
   if(!(id%perEvent))
-    G4cout << "Event " << id << " (" << G4int(100 * G4double(id)/G4double(nEvents)) << "%)\r"
+    std::cout << "Event " << id << " (" << G4int(100 * G4double(id)/G4double(nEvents)) << "%)\r"
 	   << std::flush;
 
   return;
@@ -43,8 +20,10 @@ void Event_Action::SetPerEvent(G4int num) {
     perEvent = 500;
   else if(num < 1000001)
     perEvent = 1000;
-  else
+  else if(num < 10000001)
     perEvent = 2000;
+  else
+    perEvent = 3000;
   
   return;
 }

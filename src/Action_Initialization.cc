@@ -6,9 +6,9 @@
 
 void Action_Initialization::Build() const {
 
-
-  //Thread-local user classs
+  //Thread-local user classes
   SetUserAction(new Primary_Generator());
+  SetUserAction(new Run_Action());
   SetUserAction(new Event_Action());
   SetUserAction(new Tracking_Action());
   

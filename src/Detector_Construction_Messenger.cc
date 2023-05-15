@@ -7,89 +7,104 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
   //All geometries accessed through this directory
   geometry_dir = new G4UIdirectory("/Geometry/");
 
-  update_cmd = new G4UIcmdWithoutParameter("/Geometry/Update",this);
-  update_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
-  update_cmd->SetGuidance("Mandatory command for updating all geometry");
-
   //Tigress directory
   tigress_dir = new G4UIdirectory("/Geometry/Tigress/");
 
+  placeTig_cmd = new G4UIcmdWithoutParameter("/Geometry/Tigress/Construct",this);
+  placeTig_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				   G4ApplicationState::G4State_Idle);
+  placeTig_cmd->SetGuidance("Place the Tigress array");
+
   removeTigDet_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/RemoveDetector",this);
-  removeTigDet_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  removeTigDet_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				       G4ApplicationState::G4State_Idle);
   removeTigDet_cmd->SetGuidance("Remove a tigress detector from the simulation");
 
   tigConfig_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/Configuration",this);
-  tigConfig_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  tigConfig_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				    G4ApplicationState::G4State_Idle);
   tigConfig_cmd->SetGuidance("Set Tigress configuration. High-Eff (0) or High P/T (1).");
 
   tigFrameConfig_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/FrameConfiguration",this);
-  tigFrameConfig_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  tigFrameConfig_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+					 G4ApplicationState::G4State_Idle);
   tigFrameConfig_cmd->SetGuidance("Set Tigress frame configuration. Full structure (0), upstream lampshades (1), downstream lampshades (2),or corona only (3).");
   
   //S3 directory
   s3_dir = new G4UIdirectory("/Geometry/S3/");
 
   placeSi_cmd = new G4UIcmdWithoutParameter("/Geometry/S3/Construct",this);
-  placeSi_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  placeSi_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
   placeSi_cmd->SetGuidance("Place the S3 detectors");
 
   offsetUS_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/S3/UpstreamOffset",this);
-  offsetUS_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  offsetUS_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				   G4ApplicationState::G4State_Idle);
   offsetUS_cmd->SetGuidance("Set (positive) z-offset of upstream detector (Default: 3 cm)");
   
   offsetDS_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/S3/DownstreamOffset",this);
-  offsetDS_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  offsetDS_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				   G4ApplicationState::G4State_Idle);
   offsetDS_cmd->SetGuidance("Set (positive) z-offset of downstream detector (Default: 3 cm)");
 
   //Spice directory
   spice_dir = new G4UIdirectory("/Geometry/Spice/");
 
   placeSp_cmd = new G4UIcmdWithoutParameter("/Geometry/Spice/Construct",this);
-  placeSp_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  placeSp_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				  G4ApplicationState::G4State_Idle);
   placeSp_cmd->SetGuidance("Place the Spice detector");
   
   //Target directory
   target_dir = new G4UIdirectory("/Geometry/Target/");
 
   placeTarg_cmd = new G4UIcmdWithoutParameter("/Geometry/Target/Construct",this);
-  placeTarg_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  placeTarg_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				    G4ApplicationState::G4State_Idle);
   placeTarg_cmd->SetGuidance("Place the target");
   
   Z_cmd = new G4UIcmdWithAnInteger("/Geometry/Target/Z",this);
-  Z_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  Z_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+			    G4ApplicationState::G4State_Idle);
   Z_cmd->SetGuidance("Set target Z");
 
   N_cmd = new G4UIcmdWithAnInteger("/Geometry/Target/N",this);
-  N_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  N_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
   N_cmd->SetGuidance("Set target N");
   
   density_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/Target/Density",this);
-  density_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  density_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				  G4ApplicationState::G4State_Idle);
   density_cmd->SetGuidance("Set target density");
   
   mass_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/Target/Mass",this);
-  mass_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  mass_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
   mass_cmd->SetGuidance("Set target mass");
   
   thickness_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/Target/Thickness",this);
-  thickness_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  thickness_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				    G4ApplicationState::G4State_Idle);
   thickness_cmd->SetGuidance("Set target linear thickness (length)");
   
   radius_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/Target/Radius",this);
-  radius_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  radius_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				 G4ApplicationState::G4State_Idle);
   radius_cmd->SetGuidance("Set target radius");
   
   target_cmd = new G4UIcmdWithAString("/Geometry/Target/StandardTarget",this);
-  target_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  target_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				 G4ApplicationState::G4State_Idle);
   target_cmd->SetCandidates("48Ti Ti48 48ti ti48 208Pb Pb208 208pb pb208 196Pt Pt196 196pt pt196 110Pd Pd110 110pd pd110 197Au Au197 197au au197");
   target_cmd->SetGuidance("Construct a standard target: 208Pb, 48Ti, 196Pt, 110Pd, or 197Au");
 
   step_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/Target/StepSize",this);
-  step_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  step_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+			       G4ApplicationState::G4State_Idle);
   step_cmd->SetGuidance("Set simulation step size in the target");
   
   print_targ_cmd = new G4UIcmdWithoutParameter("/Geometry/Target/Print",this);
-  print_targ_cmd->AvailableForStates(G4ApplicationState::G4State_Idle);
+  print_targ_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				     G4ApplicationState::G4State_Idle);
   print_targ_cmd->SetGuidance("Print target parameters");
   
 }
@@ -97,9 +112,9 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
 Detector_Construction_Messenger::~Detector_Construction_Messenger() {
 
   delete geometry_dir;
-  delete update_cmd;
 
   delete tigress_dir;
+  delete placeTig_cmd;
   delete removeTigDet_cmd;
   delete tigConfig_cmd;
   delete tigFrameConfig_cmd;
@@ -128,7 +143,11 @@ Detector_Construction_Messenger::~Detector_Construction_Messenger() {
 void Detector_Construction_Messenger::SetNewValue(G4UIcommand* command, G4String newValue) {
   
   /////TIGRESS commands/////
-  if(command == removeTigDet_cmd) {
+  if(command == placeTig_cmd) {
+    construction->SetPlaceTigress();
+    G4cout << "Simulation will include the Tigress array" << G4endl;
+  }
+  else if(command == removeTigDet_cmd) {
     construction->RemoveTigressDetector(removeTigDet_cmd->GetNewIntValue(newValue));
     G4cout << "Removing Tigress detector " << newValue << " from the simulation"  << G4endl;
   }
@@ -160,7 +179,7 @@ void Detector_Construction_Messenger::SetNewValue(G4UIcommand* command, G4String
   ///////////////////////////
 
   /////Spice commands/////
-  if(command == placeSp_cmd) {
+  else if(command == placeSp_cmd) {
     construction->SetPlaceSpice();
     G4cout << "Simulation will include the Spice detector" << G4endl;
   }
@@ -216,13 +235,6 @@ void Detector_Construction_Messenger::SetNewValue(G4UIcommand* command, G4String
     construction->PrintTarget();
   }
   /////////////////////////
-
-
-  /////Update command/////
-  else if(command == update_cmd) {
-    construction->Update();
-  }
-  ////////////////////////
 
   return;
 }

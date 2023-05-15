@@ -46,14 +46,22 @@ void S3::Placement(G4LogicalVolume* world, G4double USoff, G4double DSoff, G4boo
   G4double dr = (outerRadius - innerRadius)/(double)nRings;
   G4double dphi = 2.0*pi/(double)nSectors;
   
-  for(int det=0;det<2;det++) {
-    for(int ring=0;ring<nRings;ring++) {
-      for(int sec=0;sec<nSectors;sec++) {
+  for(G4int det=0;det<2;det++) {
+    for(G4int ring=0;ring<nRings;ring++) {
+      for(G4int sec=0;sec<nSectors;sec++) {
       
         G4double in = innerRadius + ring*dr;
 
         G4Tubs* segs = new G4Tubs("SegS",in,in+dr,thickness/2.0,(sec-0.5)*dphi,dphi);
-        G4LogicalVolume* segl = new G4LogicalVolume(segs,mat,"S3Logical");
+
+	G4int copy = det*10000 + (ring+1)*100;
+	if(sec<9)
+	  copy += 9-sec; 
+	else
+	  copy += 32-(sec-9);
+	
+	G4String nameLV = "S3Log" + std::to_string(copy);
+        G4LogicalVolume* segl = new G4LogicalVolume(segs,mat,nameLV);
 	
 	if(ring%2) {
 	  if(sec%2) {
@@ -71,12 +79,6 @@ void S3::Placement(G4LogicalVolume* world, G4double USoff, G4double DSoff, G4boo
 	    segl->SetVisAttributes(vis1);
 	  }
 	}
-
-	G4int copy = det*10000 + (ring+1)*100;
-	if(sec<9)
-	  copy += 9-sec; 
-	else
-	  copy += 32-(sec-9);
 	
 	if(det==0) //Upstream 
 	  new G4PVPlacement(0,G4ThreeVector(0,0,-USoff),segl,"S3",world,false,copy,check);

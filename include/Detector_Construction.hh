@@ -21,7 +21,8 @@ public:
   void PlaceSpice();
   void PlaceS3();
   void PlaceTarget(G4UserLimits* uLim);
-  
+
+  void SetPlaceTigress() {place_tigress = true;}
   void SetPlaceS3() {place_s3 = true;}
   void SetPlaceSpice() {place_spice = true;}
   void SetPlaceTarget() {place_target = true;} 
@@ -50,17 +51,12 @@ public:
   void SetTigressFrameConfig(G4int config);
   void RemoveTigressDetector(G4int detNum);
   
-  void Update();
-  G4VPhysicalVolume* PlaceVolumes();
-  
 private:
 
   void ConstructSDandField();
   
   void DefineSuppressedParameters();
   void DefineMaterials();
-
-  G4bool updated;
 
   Detector_Construction_Messenger* messenger;
   G4LogicalVolume* logic_world;
@@ -89,7 +85,8 @@ private:
   G4double target_radius;
   G4Material* target_mat;
   G4double target_step;
-  
+
+  G4bool place_tigress;
   G4bool place_s3;
   G4bool place_spice;
   G4bool place_target;

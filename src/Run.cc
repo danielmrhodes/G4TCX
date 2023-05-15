@@ -7,19 +7,17 @@
 
 Run::Run() {
 
-  fname = "output.dat";
+  gen = NULL;
   output = NULL;
-  
-  dname = "output-info.dat";
   diagnostics = NULL;
 
   owc = false;
-
+  
 }
 
 void Run::RecordEvent(const G4Event* evt) {
 
-  //RawData data;
+  RawData data;
   G4int nS = 0;
   G4int nT = 0;
 
@@ -101,13 +99,13 @@ void Run::RecordEvent(const G4Event* evt) {
       }
     }
   }
-
+ 
   for(G4int i=0;i<nT;i++)
     data.tData[i].sup = sup[data.tData[i].det-1];
   
   G4int num = evt->GetEventID();
 
-  //INFO info;
+  INFO info;
   info.evtNum = num;
   info.indexP = gen->GetProjectileIndex();
   info.indexR = gen->GetRecoilIndex();
@@ -119,34 +117,34 @@ void Run::RecordEvent(const G4Event* evt) {
   info.projUS = pFlagUS;
   info.rec = rFlag;
   
-  //Header header;
+  Header header;
   header.evtNum = num;
   header.nSdata = nS;
   header.nTdata = nT;
-  
-  G4Run::RecordEvent(evt);
-  
-  return;
-}
-
-void Run::Merge(const G4Run* run) {
 
   fwrite(&info,info.bytes(),1,diagnostics);
-
-  const G4int nS = header.nSdata;
-  const G4int nT = header.nTdata;
+  G4Run::RecordEvent(evt);
   
   if(nS == 0 && nT == 0)
     return;
 
   if(owc && (nS == 0 || nT == 0))
     return;
-
+  
   fwrite(&header,header.bytes(),1,output);
   fwrite(&data.sData,sizeof(S3Data),nS,output);
   fwrite(&data.tData,sizeof(TigressData),nT,output);
   
-  G4Run::Merge(run);
+  return;
+}
+
+void Run::Merge(const G4Run* aRun) {
+
+  const Run* run = static_cast<const Run*>(aRun);
+  fclose(run->GetOutputFile());
+  fclose(run->GetDiagnosticsFile());
+  
+  G4Run::Merge(aRun);
   
   return;
 }

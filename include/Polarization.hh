@@ -16,8 +16,8 @@ public:
   void BuildStatisticalTensors();
   void SetSpins();
 
-  std::vector< std::vector<G4complex> >& GetPolarization(G4int state, G4double en, G4double th,
-							 G4double ph);
+  std::vector< std::vector<G4complex> > GetPolarization(G4int state, G4double en, G4double th,
+							G4double ph);
 
   void SetFileName(G4String n) {fn = n;}
   void SetCalcGk(G4bool calc) {calcGk = calc;}
@@ -29,7 +29,7 @@ public:
   void SetFieldCoef(G4double coef) {Field = coef;}
   void SetFieldExp(G4double ex) {Power = ex;}
 
-  static void Print(const std::vector< std::vector<G4complex> >& polar);
+  static void Print(const std::vector< std::vector<G4complex> > polar);
 
 private:
 
@@ -50,6 +50,8 @@ private:
 
   Polarization_Messenger* messenger;
   const G4bool proj;
+
+  G4int threadID;
 
   //Energy-theta grid with values
   std::vector<G4double> energies;

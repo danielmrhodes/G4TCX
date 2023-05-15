@@ -17,7 +17,8 @@ Gamma_Source::Gamma_Source() {
   source_energy = -1.0*MeV;
   GSS = 0.0;
   file_name = "";
-  
+
+  threadID = G4Threading::G4GetThreadId();
 }
 
 Gamma_Source::~Gamma_Source() {
@@ -29,16 +30,19 @@ Gamma_Source::~Gamma_Source() {
 void Gamma_Source::BuildLevelScheme() {
   
   if(source_energy > 0.0*MeV) {
-    
-    G4cout << "\nSimple isotropic gamma-ray of " << source_energy/keV
-	   << " keV will be emitted each event" << G4endl;
+
+    if(!threadID)
+      std::cout << "Simple isotropic gamma-ray of " << source_energy/keV
+	     << " keV will be emitted each event" << std::endl;
 
     return;
   }
 
   if(file_name == "") {
-    G4cout << "\033[1;31mNeither the source level scheme file nor the source energy is set!"
-	   << " The simulation will break now...\033[m" << G4endl;
+
+    if(!threadID)
+      std::cout << "\033[1;31mNeither the source level scheme file nor the source energy is set!"
+	     << " The simulation will break now...\033[m" << std::endl;
 
     return;
   }
@@ -55,12 +59,14 @@ void Gamma_Source::BuildLevelScheme() {
   file.open(file_name.c_str(),std::ios::in);
   
   if(!file.is_open()) {
-    G4cout << "\n\033[1;31mCould not open source level scheme file " << file_name
-	   << "! The simulation won't do anything...\033[m" << G4endl;
+    if(!threadID)
+      std::cout << "\n\033[1;31mCould not open source level scheme file " << file_name
+	     << "! The simulation won't do anything...\033[m" << std::endl;
     return;
   }
 
-  G4cout << "\nBuilding source level scheme from " << file_name << G4endl;
+  if(!threadID)
+    std::cout << "\nBuilding source level scheme from " << file_name << std::endl;
   
   std::string line, word;
   while(std::getline(file,line)) {
@@ -75,21 +81,26 @@ void Gamma_Source::BuildLevelScheme() {
     lifetime *= ps;
     probs.push_back(prob);
 
-    G4cout << " " << state_index << " " << energy/keV << " " << spin << " " << lifetime/ps << " "
-	   << prob << " " << nbr;
+    if(!threadID)
+      std::cout << " " << state_index << " " << energy/keV << " " << spin << " " << lifetime/ps << " "
+		<< prob << " " << nbr;
 
     G4ParticleDefinition* part = table->GetIon(82,208,energy);
     if(nbr) {
-      part->SetPDGLifeTime(lifetime);
-      part->SetDecayTable(new G4DecayTable());
+      if(!threadID) {
+	part->SetPDGLifeTime(lifetime);
+	part->SetDecayTable(new G4DecayTable());
+      }
       part->GetProcessManager()->SetParticleType(part);
       part->GetProcessManager()->AddProcess(new G4Decay(),0,-1,0);
     }
     else {
-      G4cout << " \033[1;36m Warning: State " << state_index << " has no decay branches.\033[m";
+      if(!threadID)
+	std::cout << " \033[1;36m Warning: State " << state_index << " has no decay branches.\033[m";
       part->SetPDGLifeTime(-1.0);
     }
-    G4cout << G4endl;
+    if(!threadID)
+      std::cout << std::endl;
     
     Polarized_Particle* ppart = new Polarized_Particle(part,82,208,spin,energy);
     for(int i=0;i<nbr;i++) {
@@ -100,28 +111,33 @@ void Gamma_Source::BuildLevelScheme() {
       std::getline(file,line);
       std::stringstream ss2(line);
       ss2 >> index >> BR >> L0 >> Lp >> del >> cc;
-      
-      G4cout << "  " << index << " " << BR << " " << L0 << " " << Lp << " " << del << " " << cc
-	     << G4endl;
-      
-      part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,true));
+
+      if(!threadID)
+	std::cout << "  " << index << " " << BR << " " << L0 << " " << Lp << " " << del << " " << cc
+		  << std::endl;
+
+      if(!threadID)
+	part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,true));
       
     }
 
-    if((unsigned int)state_index != levels.size()) {
-      G4cout << "States are out of order in source level scheme file " << file_name << "!" << G4endl;
-    }
-
+    if((unsigned int)state_index != levels.size())
+      if(!threadID)
+	std::cout << "States are out of order in source level scheme file " << file_name << "!" << std::endl;
+    
     levels.push_back(ppart);
     
   }
 
-  if(levels.size()-1 == probs.size())
-    G4cout << levels.size()-1  << " excited states built for the source!" << G4endl;
+  if(levels.size()-1 == probs.size()) {
+    if(!threadID)
+      std::cout << levels.size()-1  << " excited states built for the source!" << std::endl;
+  }
   else
-    G4cout << "There are " << levels.size()-1 << " excited states but " << probs.size()
-	   << " population probabilities!" << G4endl;
-
+    if(!threadID)
+      std::cout << "There are " << levels.size()-1 << " excited states but " << probs.size()
+	     << " population probabilities!" << std::endl;
+  
   G4double sum = 0.0;
   for(auto p : probs)
     sum += p;

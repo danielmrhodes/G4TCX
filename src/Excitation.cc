@@ -2,7 +2,8 @@
 #include "Gamma_Decay.hh"
 #include "Primary_Generator.hh"
 
-#include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
+#include "G4WorkerRunManager.hh"
 #include "G4ProcessManager.hh"
 #include "G4IonTable.hh"
 #include "G4Decay.hh"
@@ -13,7 +14,7 @@
 #include "G4PhysicalConstants.hh"
 
 Excitation::Excitation(G4bool prj) : proj(prj) {
-
+  
   messenger = new Excitation_Messenger(this, proj);
   polar = new Polarization(proj);
   
@@ -24,6 +25,8 @@ Excitation::Excitation(G4bool prj) : proj(prj) {
   considered = 0;
   gss = 0.0;
   simple_considered = false;
+
+  threadID = G4Threading::G4GetThreadId();
   
   xacc = gsl_interp_accel_alloc();
   yacc = gsl_interp_accel_alloc();
@@ -61,7 +64,7 @@ void Excitation::BuildLevelScheme() {
   else
     nuc = "recoil";
 
-  G4RunManager* Rman = G4RunManager::GetRunManager();
+  G4WorkerRunManager* Rman = (G4WorkerRunManager*)G4MTRunManager::GetRunManager();
   Primary_Generator* gen = (Primary_Generator*)Rman->GetUserPrimaryGeneratorAction();
   
   G4int Z = gen->GetZ(proj);
@@ -73,15 +76,19 @@ void Excitation::BuildLevelScheme() {
   
   Polarized_Particle* polGS = new Polarized_Particle(GS,Z,A,gss,0.0*MeV);
   levels.push_back(polGS);
-
+  
   if(lfn == "") {
-    G4cout << "\nNo " << nuc << " excitations." << G4endl;
+    if(!threadID)
+      std::cout << "\nNo " << nuc << " excitations." << std::endl;
     return;
   }
-  G4cout << "\nBuilding " << nuc << " level scheme from " << lfn << G4endl;
+
+  if(!threadID)
+    std::cout << "\nBuilding " << nuc << " level scheme from " << lfn << std::endl;
   
   ReadLevelSchemeFile(Z,A);
-  G4cout << levels.size()-1  << " excited states built for the " << nuc << "!" << G4endl;
+  if(!threadID)
+    std::cout << levels.size()-1  << " excited states built for the " << nuc << "!" << std::endl;
 
   return;
   
@@ -99,8 +106,9 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
   file.open(lfn.c_str(),std::ios::in);
   
   if(!file.is_open()) {
-    G4cout << " \033[1;31mCould not open " << nuc << " level scheme file " << lfn
-	   << "! No levels will be built! \033[m" << G4endl;
+    if(!threadID)
+      std::cout << " \033[1;31mCould not open " << nuc << " level scheme file " << lfn
+		<< "! No levels will be built! \033[m" << std::endl;
     return;
   }
   
@@ -118,22 +126,27 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
     energy *= keV;
     lifetime *= ps;
 
-    G4cout << " " << state_index << " " << energy/keV << " " << spin << " " << lifetime/ps
-	   << " " << nbr;
+    if(!threadID)
+      std::cout << " " << state_index << " " << energy/keV << " " << spin << " " << lifetime/ps
+	     << " " << nbr;
     
     G4ParticleDefinition* part = table->GetIon(Z,A,energy);
     if(nbr) {
-      part->SetPDGLifeTime(lifetime);
-      part->SetDecayTable(new G4DecayTable());
+      if(!threadID) {
+	part->SetPDGLifeTime(lifetime);
+	part->SetDecayTable(new G4DecayTable());
+      }
       part->GetProcessManager()->SetParticleType(part);
       part->GetProcessManager()->AddProcess(new G4Decay(),0,-1,0);
     }
     else {
-      G4cout << " \033[1;36m Warning: " << nuc << " state " << state_index
-	     << " has no decay branches.\033[m";
+      if(!threadID)
+	std::cout << " \033[1;36m Warning: " << nuc << " state " << state_index
+		  << " has no decay branches.\033[m";
       part->SetPDGLifeTime(-1.0);
     }
-    G4cout << G4endl;
+    if(!threadID)
+      std::cout << std::endl;
     
     Polarized_Particle* ppart = new Polarized_Particle(part,Z,A,spin,energy);
     for(int i=0;i<nbr;i++) {
@@ -145,21 +158,25 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
       G4double BR, del, cc;
       ss2 >> index >> BR >> L0 >> Lp >> del >> cc;
 
-      G4cout << "  " << index << " " << BR << " " << L0 << " " << Lp << " " << del << " " << cc
-	     << G4endl;
+      if(!threadID)
+	std::cout << "  " << index << " " << BR << " " << L0 << " " << Lp << " " << del << " " << cc
+		  << std::endl;
 
       bool emit_gamma = false;
       if(!considered || state_index == considered)
 	emit_gamma = true;
-      
-      part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,emit_gamma));
+
+      //if(!threadID)
+      part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,
+						    emit_gamma));
       
     }
 
     if((unsigned int)state_index != levels.size())
-      G4cout << "\033[1;31m" << nuc << " states are out of order in level scheme file " << lfn
-	     << "\033[m" << G4endl;
-
+      if(!threadID)
+	std::cout << "\033[1;31m" << nuc << " states are out of order in level scheme file " << lfn
+		  << "\033[m" << std::endl;
+    
     levels.push_back(ppart);
     
   }
@@ -179,20 +196,24 @@ void Excitation::BuildProbabilities() {
     nuc = "recoil";
   
   if(selected > -1) {
-    G4cout << "\nState " << selected << " will always be populated in the " << nuc << G4endl;
+    if(!threadID)
+      std::cout << "\nState " << selected << " will always be populated in the " << nuc << std::endl;
     return;
   }
 
   if(pfn == "") {
-    G4cout << "\nNo " << nuc << " probabilities." << G4endl;
+    if(!threadID)
+      std::cout << "\nNo " << nuc << " probabilities." << std::endl;
     return;
   }
-  
-  G4cout << "\nBuilding " << nuc << " excitation probabilities from " << pfn << G4endl;
+
+  if(!threadID)
+    std::cout << "\nBuilding " << nuc << " excitation probabilities from " << pfn << std::endl;
   ReadProbFile();
   
   if(considered) {
-    G4cout << " Renormalizing for " << nuc << " considered state " << considered << G4endl;
+    if(!threadID)
+      std::cout << " Renormalizing for " << nuc << " considered state " << considered << std::endl;
 
     if(simple_considered)
       RenormalizeSimple();
@@ -210,18 +231,27 @@ void Excitation::BuildProbabilities() {
     gsl_spline2d_init(interps.back(),&energies[0],&thetas[0],&probs[i*numE*numT],numE,numT);
   }
   
-  if(!simple_considered)
-    if(numP == numS*numE*numT)
-      G4cout << "All " << nuc << " excitation probabilities successfully built!" << G4endl;
-    else
-      G4cout << "\033[1;31mThere was a problem building the excitation grids for the " << nuc
-	     << "!\033[m" << G4endl;
+  if(!simple_considered) {
+    if(numP == numS*numE*numT) {
+      if(!threadID)
+	std::cout << "All " << nuc << " excitation probabilities successfully built!" << std::endl;
+    }
+    else {
+      if(!threadID)
+	std::cout << "\033[1;31mThere was a problem building the excitation grids for the " << nuc
+		  << "!\033[m" << std::endl;
+    }
+  }
   else
-    if(numP == 2*numE*numT)
-      G4cout << "Both " << nuc << " excitation probabilities successfully built!" << G4endl;
-    else
-      G4cout << "\033[1;31mThere was a problem building the excitation probabilities for the "
-	     << nuc << "!\033[m" << G4endl;
+    if(numP == 2*numE*numT) {
+      if(!threadID)
+	std::cout << "Both " << nuc << " excitation probabilities successfully built!" << std::endl;
+    }
+    else {
+      if(!threadID)
+	std::cout << "\033[1;31mThere was a problem building the excitation probabilities for the "
+		  << nuc << "!\033[m" << std::endl;
+    }
   
   return;
   
@@ -243,8 +273,9 @@ void Excitation::ReadProbFile() {
     nuc = "recoil";
   
   if(!file.is_open()) {
-    G4cout << "\n\033[1;31mCould not open " << nuc << " excitation probability file " << pfn
-	   << "! No probabilities will be built!\033[m" << G4endl;
+    if(!threadID)
+      std::cout << "\n\033[1;31mCould not open " << nuc << " excitation probability file " << pfn
+		<< "! No probabilities will be built!\033[m" << std::endl;
     return;
   }
 
@@ -337,8 +368,9 @@ void Excitation::RenormalizeSimple() {
   for(auto p : tmp1)
     probs.push_back(p);
 
-  G4cout << " Feeding is not included. " << nuc << " state " << considered
-	 << " excitation probabilites rescaled by " << 1.0/max << G4endl;
+  if(!threadID)
+    std::cout << " Feeding is not included. " << nuc << " state " << considered
+	      << " excitation probabilites rescaled by " << 1.0/max << std::endl;
   
   return;
 }
@@ -387,19 +419,22 @@ void Excitation::Renormalize() {
   for(G4int j=0;j<numE;j++)
       for(G4int k=0;k<numT;k++)
 	probs.at(j*numT + k) = 1.0 - sum_probs.at(j*numT + k);
-  
-  G4cout << " Found " << feeders.size() - 1 << " possible feeder(s) of state " << considered << " (";
+
+  if(!threadID)
+    std::cout << " Found " << feeders.size() - 1 << " possible feeder(s) of state " << considered << " (";
   for(G4int i=0;i<(G4int)feeders.size();i++) {
 
     if(feeders.at(i) == considered)
       continue;
     
-    G4cout << feeders.at(i);
+    std::cout << feeders.at(i);
     if(i < (G4int)feeders.size()-1)
-      G4cout << " ";
+      std::cout << " ";
     
   }
-  G4cout << "). Probabilities rescaled by " << 1.0/max << G4endl;
+
+  if(!threadID)
+    std::cout << "). Probabilities rescaled by " << 1.0/max << std::endl;
   
   return;
 }
@@ -563,7 +598,8 @@ G4double Excitation::GetExcitation(G4int index) {
   if(!index)
     return 0.0*MeV;
 
-  return levels[index]->GetDefinition()->GetPDGMass() - levels[0]->GetDefinition()->GetPDGMass();
+  return levels[index]->GetExcitationEnergy();
+  //return levels[index]->GetDefinition()->GetPDGMass() - levels[0]->GetDefinition()->GetPDGMass();
   
 }
 

@@ -29,10 +29,8 @@ private:
   G4UIdirectory* s3_dir;
   G4UIdirectory* spice_dir;
 
-  //Update command
-  G4UIcmdWithoutParameter* update_cmd;
-
   //Tigress commands
+  G4UIcmdWithoutParameter* placeTig_cmd;
   G4UIcmdWithAnInteger* removeTigDet_cmd;
   G4UIcmdWithAnInteger* tigConfig_cmd;
   G4UIcmdWithAnInteger* tigFrameConfig_cmd;

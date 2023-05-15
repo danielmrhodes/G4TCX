@@ -1,7 +1,12 @@
 #ifndef Run_Action_h
 #define Run_Action_h 1
 
+#include "Run_Action_Messenger.hh"
+#include "Run.hh"
 #include "G4UserRunAction.hh"
+#include "G4Run.hh"
+
+class Run_Action_Messenger;
 class Run_Action : public G4UserRunAction {
   
 public:
@@ -12,9 +17,23 @@ public:
   void BeginOfRunAction(const G4Run*);
   void EndOfRunAction(const G4Run*);
 
-private:
+  G4String GetOutputFileName() const {return fname;}
+  G4String GetDiagnosticsFileName() const {return dname;}
 
-  G4int nEvents;
+  void SetOutputFileName(G4String n) {fname = n;}
+  void SetDiagnosticsFileName(G4String n) {dname = n;}
+  
+  void OWC() {owc = true;}
+
+private:
+  
+  G4Run* GenerateRun() {return new Run();}
+  
+  Run_Action_Messenger* messenger;
+  
+  G4bool owc;
+  G4String fname;
+  G4String dname;
 
 };
   

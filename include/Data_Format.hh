@@ -1,6 +1,8 @@
 #ifndef DATA_FORMAT_h
 #define DATA_FORMAT_h 1
 
+#include <cstddef>
+
 struct INFO { //Diagnostic info
   
   int evtNum, indexP, indexR;
