@@ -3,6 +3,8 @@
 
 #include "Run_Action_Messenger.hh"
 #include "Run.hh"
+
+#include "G4AutoLock.hh"
 #include "G4UserRunAction.hh"
 #include "G4Run.hh"
 
@@ -36,5 +38,9 @@ private:
   G4String dname;
 
 };
+
+namespace {
+  G4Mutex aMutex = G4MUTEX_INITIALIZER;
+}
   
 #endif

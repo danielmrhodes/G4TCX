@@ -166,9 +166,14 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
       if(!considered || state_index == considered)
 	emit_gamma = true;
 
-      //if(!threadID)
-      part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,
-						    emit_gamma));
+      if(!threadID)
+	part->GetDecayTable()->Insert(new Gamma_Decay(ppart->GetDefinition(),
+						      levels.at(index)->GetDefinition(),BR,energy,
+						      levels.at(index)->GetExcitationEnergy(),
+						      ppart->TwoJ(),levels.at(index)->TwoJ(),
+						      L0,Lp,del,cc,emit_gamma));
+	//part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,
+	//					      emit_gamma));
       
     }
 
@@ -461,7 +466,8 @@ G4bool Excitation::CanFeedConsidered(G4int index) {
     if(dec->GetDaughterExcitation() < con_exc)
       continue;
 
-    G4ParticleDefinition* ddef = dec->GetDaughter()->GetDefinition();
+    //G4ParticleDefinition* ddef = dec->GetDaughter()->GetDefinition();
+    G4ParticleDefinition* ddef = dec->GetDaughter(0);
     if(ddef == cdef)
       return true;
 
@@ -487,7 +493,8 @@ G4bool Excitation::CanFeedConsidered(G4int index) {
 	if(ddec->GetDaughterExcitation() < con_exc)
 	  continue;
 
-	G4ParticleDefinition* gdef = ddec->GetDaughter()->GetDefinition();
+	//G4ParticleDefinition* gdef = ddec->GetDaughter()->GetDefinition();
+	G4ParticleDefinition* gdef = ddec->GetDaughter(0);
 	if(gdef == cdef)
 	  return true;
 

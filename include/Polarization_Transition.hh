@@ -18,15 +18,16 @@ public:
   ~Polarization_Transition() {;}
 
   /*
-  void SampleGammaTransition(Polarized_Particle* np, 
-			     G4int twoJ1, G4int twoJ2, 
-			     G4int L0, G4int Lp, G4double mpRatio, 
-			     G4double& cosTheta, G4double& phi);
+  void SampleGammaTransition(Polarized_Particle* np, G4int twoJ1, G4int twoJ2, G4int L0, G4int Lp, 
+                             G4double mpRatio, G4double& cosTheta, G4double& phi);
+  
+
+  std::array<G4double,2> SampleGammaTransition(Polarized_Particle* np, G4int twoJ1, G4int twoJ2, 
+					       G4int L0, G4int Lp, G4double mpRatio);
   */
 
-  std::array<G4double,2> SampleGammaTransition(Polarized_Particle* np, 
-					       G4int twoJ1, G4int twoJ2, 
-					       G4int L0, G4int Lp, G4double mpRatio);
+  std::array<G4double,2> SampleGammaTransition(const POLAR pol, G4int twoJ1, G4int twoJ2, G4int L0,
+					       G4int Lp, G4double mpRatio);
   
   // generic static functions
   G4double FCoefficient(G4int K, G4int L, G4int Lprime, 

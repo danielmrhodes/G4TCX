@@ -1,9 +1,11 @@
 #include "Worker_Initialization.hh"
+#include "Run_Action.hh"
 #include "globals.hh"
 #include "G4UImanager.hh"
 
 void Worker_Initialization::WorkerStart() const {
 
+  G4AutoLock l(&aMutex);
   if(filename == "")
     return;
   
@@ -22,5 +24,6 @@ void Worker_Initialization::WorkerStart() const {
     
   }
   
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
   return;
 }

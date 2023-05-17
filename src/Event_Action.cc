@@ -2,8 +2,8 @@
 
 void Event_Action::BeginOfEventAction(const G4Event* evt) {
   
-  G4int id = evt->GetEventID();
-  if(!(id%perEvent))
+  G4int id = evt->GetEventID() + 1;
+  if(!((id)%perEvent))
     std::cout << "Event " << id << " (" << G4int(100 * G4double(id)/G4double(nEvents)) << "%)\r"
 	   << std::flush;
 

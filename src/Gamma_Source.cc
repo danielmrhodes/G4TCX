@@ -87,10 +87,10 @@ void Gamma_Source::BuildLevelScheme() {
 
     G4ParticleDefinition* part = table->GetIon(82,208,energy);
     if(nbr) {
-      if(!threadID) {
-	part->SetPDGLifeTime(lifetime);
+      if(!(part->GetDecayTable())) {	
 	part->SetDecayTable(new G4DecayTable());
-      }
+	part->SetPDGLifeTime(lifetime);
+      }   
       part->GetProcessManager()->SetParticleType(part);
       part->GetProcessManager()->AddProcess(new G4Decay(),0,-1,0);
     }
@@ -116,8 +116,14 @@ void Gamma_Source::BuildLevelScheme() {
 	std::cout << "  " << index << " " << BR << " " << L0 << " " << Lp << " " << del << " " << cc
 		  << std::endl;
 
-      if(!threadID)
-	part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,true));
+      //if(!threadID)
+      if(part->GetDecayTable()->entries() <= i)
+	part->GetDecayTable()->Insert(new Gamma_Decay(ppart->GetDefinition(),
+						      levels.at(index)->GetDefinition(),BR,energy,
+						      levels.at(index)->GetExcitationEnergy(),
+						      ppart->TwoJ(),levels.at(index)->TwoJ(),
+						      L0,Lp,del,cc,true));
+	//part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,true));
       
     }
 

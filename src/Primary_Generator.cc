@@ -1,4 +1,6 @@
 #include "Primary_Generator.hh"
+#include "Detector_Construction.hh"
+#include "Gamma_Decay.hh"
 
 #include "G4GenericIon.hh"
 #include "G4Gamma.hh"
@@ -9,7 +11,6 @@
 #include "G4PhysicalConstants.hh"
 
 #include "G4RunManager.hh"
-#include "Detector_Construction.hh"
 #include "G4EmCalculator.hh"
 
 Primary_Generator::Primary_Generator() {
@@ -204,8 +205,9 @@ void Primary_Generator::GenerateSourcePrimaries(G4Event* evt) {
   }
 
   //Remove polarization
-  source->Unpolarize();
-
+  //source->Unpolarize();
+  Gamma_Decay::Unpolarize();
+  
   //Choose excited state
   pI = source->ChooseState();
 

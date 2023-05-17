@@ -1,4 +1,5 @@
 #include "Polarization_Transition.hh"
+#include "Gamma_Decay.hh"
 
 #include "G4Clebsch.hh"
 #include "G4PolynomialPDF.hh"
@@ -16,10 +17,12 @@ using namespace std;
 
 Polarization_Transition::Polarization_Transition() 
   : fVerbose(1), fTwoJ1(0), fTwoJ2(0), fLbar(1), fL(0), fDelta(0), 
-    kEps(1.e-15), kPolyPDF(0, nullptr, -1, 1) {}
+    kEps(1.e-15), kPolyPDF(0, nullptr, -1, 1) {
+  
+  for(G4int i=0;i<30;i++)
+    fgLegendrePolys.GetCoefficient(0,i);
+}
 
-//Polarization_Transition::~Polarization_Transition() 
-//{}
 
 G4double Polarization_Transition::FCoefficient(G4int K, G4int LL, G4int Lprime,  G4int twoJ2,
 					       G4int twoJ1) const {
@@ -194,15 +197,15 @@ G4double Polarization_Transition::GenerateGammaPhi(const G4double cosTheta, cons
 //						    G4int twoJ2, G4int L0, G4int Lp, G4double mpRatio,
 //						    G4double& cosTheta, G4double& phi) {
 
-std::array<G4double,2> Polarization_Transition::SampleGammaTransition(Polarized_Particle* pol_part,
-								      G4int twoJ1,G4int twoJ2,
-								      G4int L0, G4int Lp,
+std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLAR pol, G4int twoJ1,
+								      G4int twoJ2, G4int L0, G4int Lp,
 								      G4double mpRatio) {
 
   G4double cosTheta = 1.0;
   G4double phi = 0.0;
   //return {cosTheta,phi};
-  
+
+  /*
   if(pol_part == nullptr) {
     if(fVerbose > 1) {
       G4cout << "G4PolarizationTransition::SampleGammaTransition ERROR: "
@@ -214,6 +217,8 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(Polarized_
     
     return {cosTheta,phi};
   }
+  */
+  
   fTwoJ1 = twoJ1;  // add abs to remove negative J
   fTwoJ2 = twoJ2;
   fLbar  = L0;
@@ -226,10 +231,11 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(Polarized_
     //G4cout << *pol_part << G4endl;
   }
 
-  const POLAR pol = pol_part->GetPolarization();
+  //const POLAR pol = pol_part->GetPolarization();
   
   if(fTwoJ1 == 0) {
-    pol_part->Unpolarize();
+    //pol_part->Unpolarize();
+    Gamma_Decay::Unpolarize();
     cosTheta = 2*G4UniformRand() - 1.0;
     phi = CLHEP::twopi*G4UniformRand();
   }
@@ -247,7 +253,8 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(Polarized_
   }
 
   if(fTwoJ2 == 0) {
-    pol_part->Unpolarize();
+    //pol_part->Unpolarize();
+    Gamma_Decay::Unpolarize();
     return {cosTheta,phi};
   }
 
@@ -309,14 +316,16 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(Polarized_
     //G4cout << "Old pol is: " << *pol_part << G4endl;
     DumpTransitionData(newPol);
     G4cout << "Unpolarizing..." << G4endl;
-    pol_part->Unpolarize();
+    //pol_part->Unpolarize();
+    Gamma_Decay::Unpolarize();
     return {cosTheta,phi};
   }
   if(fVerbose > 2 && std::abs((newPol[0])[0].imag()) > kEps) {
     G4cout << "G4PolarizationTransition::SampleGammaTransition WARNING: \n"
 	   << " P[0][0] has a non-zero imaginary part! Unpolarizing..." 
 	   << G4endl;
-    pol_part->Unpolarize();
+    //pol_part->Unpolarize();
+    Gamma_Decay::Unpolarize();
     return {cosTheta,phi};
   }
   if(fVerbose > 2) {
@@ -345,7 +354,9 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(Polarized_
   while(newPol.size() != lastNonEmptyK2+1) { newPol.pop_back(); }
   (newPol[0])[0] = 1.0;
 
-  pol_part->SetPolarization(newPol);
+  //pol_part->SetPolarization(newPol);
+  Gamma_Decay::SetPolarization(newPol);
+  
   //if(fVerbose > 2) {
   //G4cout << "Updated polarization: " << *pol_part << G4endl;
   //}

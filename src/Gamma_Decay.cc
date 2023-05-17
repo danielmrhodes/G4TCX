@@ -10,7 +10,7 @@
 #include "G4HadronicException.hh"
 
 #include "G4RandomDirection.hh"
-
+/*
 Gamma_Decay::Gamma_Decay(Polarized_Particle* Parent, Polarized_Particle* daughter, G4double BR,
 			 G4int L0, G4int Lp, G4double del, G4double cc, G4bool emit) :
   Gamma_Decay(Parent->GetDefinition(), daughter->GetDefinition(),BR) {
@@ -21,10 +21,35 @@ Gamma_Decay::Gamma_Decay(Polarized_Particle* Parent, Polarized_Particle* daughte
   pParent = Parent;
   pDaughter = daughter;
 
+  twoJi = pParent->TwoJ();
+  twoJf = pDaughter->TwoJ();
+  
   transL = L0;
   transLp = Lp;
   delta = del;
 
+  convCoef = cc;
+
+  emit_gamma = emit;
+  
+}
+*/
+Gamma_Decay::Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* daughter, G4double BR,
+			 G4double Ei, G4double Ef, G4int twoJP, G4int twoJD, G4int L0, G4int Lp,
+			 G4double del, G4double cc, G4bool emit) : Gamma_Decay(Parent,daughter,BR) {
+
+  //trans = new G4PolarizationTransition();
+  trans = new Polarization_Transition();
+  
+  twoJi = twoJP;
+  twoJf = twoJD;
+  
+  transL = L0;
+  transLp = Lp;
+  delta = del;
+
+  EnI = Ei;
+  EnF = Ef;
   convCoef = cc;
 
   emit_gamma = emit;
@@ -92,7 +117,16 @@ G4DecayProducts* Gamma_Decay::DecayIt(G4double) {
   G4ParticleMomentum direction(sintheta*std::cos(phi),sintheta*std::sin(phi),costheta);  
   */
   
-  G4ParticleMomentum direction(G4RandomDirection());
+  std::array<G4double,2> vals = trans->SampleGammaTransition(polarization,twoJi,twoJf,transL,transLp,
+							     delta);
+
+  G4double costheta = vals[0];
+  G4double phi = vals[1];
+  
+  G4double sintheta = std::sqrt((1.0 - costheta)*(1.0 + costheta));
+  G4ParticleMomentum direction(sintheta*std::cos(phi),sintheta*std::sin(phi),costheta);
+  
+  //G4ParticleMomentum direction(G4RandomDirection());
 
   //create daughter G4DynamicParticle
   G4double Etotal= std::sqrt(daughtermass[0]*daughtermass[0] + daughtermomentum*daughtermomentum); 
@@ -132,3 +166,33 @@ inline G4double Gamma_Decay::Pmx(G4double e, G4double p1, G4double p2) {
 
   
 }
+
+void Gamma_Decay::SetPolarization(std::vector< std::vector<G4complex> > polar) {
+
+  Clean(); 
+  for(std::vector<G4complex> pol : polar)
+    polarization.push_back(pol);
+
+  return;
+}
+
+void Gamma_Decay::Unpolarize() {
+
+  Clean(); 
+  polarization.resize(1);
+  polarization[0].push_back(1.0);
+  
+  return;
+}
+
+void Gamma_Decay::Clean() {
+
+  if(!polarization.empty()) {
+    for(std::vector<G4complex> pol : polarization)
+      pol.clear();
+    polarization.clear();
+  }
+  
+  return;
+}
+
