@@ -30,7 +30,7 @@ Run_Action::~Run_Action() {
 
 void Run_Action::BeginOfRunAction(const G4Run* aRun) {
 
-  G4AutoLock l(&aMutex);
+  //G4AutoLock l(&aMutex);
   if(IsMaster())
     return;
   
@@ -76,7 +76,6 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
   G4String message = "";
-  bool wait = true;
   switch(mode) {
     case Primary_Generator::MODE::Scattering: {
 
@@ -85,7 +84,6 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
       iSD->SetRecoilName(gen->GetRecoilName());
 
       message = "Simulating " + std::to_string(nEvents) + " two-body scattering events";
-      wait = false;
       
       break;
   
@@ -116,13 +114,12 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
       break;
 
     }
-  }
+  } 
   
   if(!threadID)
     std::cout << "\nStarting run!\n" << message << std::endl;
-
-  if(wait)
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  else
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
   return;
 }

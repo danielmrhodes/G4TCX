@@ -69,7 +69,7 @@ G4double Polarization_Transition::GammaTransF3Coefficient(G4int K, G4int K2,  G4
   return transF3Coeff;
 }
 
-G4double Polarization_Transition::GenerateGammaCosTheta(const POLAR pol) {
+G4double Polarization_Transition::GenerateGammaCosTheta(const POLAR& pol) {
   
   std::size_t length = pol.size();
   // Isotropic case
@@ -108,7 +108,7 @@ G4double Polarization_Transition::GenerateGammaCosTheta(const POLAR pol) {
   return kPolyPDF.GetRandomX();
 }
 
-G4double Polarization_Transition::GenerateGammaPhi(const G4double cosTheta, const POLAR pol) {
+G4double Polarization_Transition::GenerateGammaPhi(const G4double cosTheta, const POLAR& pol) {
   
   G4int length = (G4int)pol.size();
   // Isotropic case
@@ -197,27 +197,13 @@ G4double Polarization_Transition::GenerateGammaPhi(const G4double cosTheta, cons
 //						    G4int twoJ2, G4int L0, G4int Lp, G4double mpRatio,
 //						    G4double& cosTheta, G4double& phi) {
 
-std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLAR pol, G4int twoJ1,
-								      G4int twoJ2, G4int L0, G4int Lp,
-								      G4double mpRatio) {
+//std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLAR pol, G4int twoJ1,
+//								      G4int twoJ2, G4int L0, G4int Lp,
+//								      G4double mpRatio) {
 
-  G4double cosTheta = 1.0;
-  G4double phi = 0.0;
-  //return {cosTheta,phi};
-
-  /*
-  if(pol_part == nullptr) {
-    if(fVerbose > 1) {
-      G4cout << "G4PolarizationTransition::SampleGammaTransition ERROR: "
-             << "cannot update NULL nuclear polarization" << G4endl;
-    }
-
-    cosTheta = 2*G4UniformRand() - 1.0;
-    phi = CLHEP::twopi*G4UniformRand();
-    
-    return {cosTheta,phi};
-  }
-  */
+void Polarization_Transition::SampleGammaTransition(G4bool proj, G4int twoJ1, G4int twoJ2,
+						    G4int L0, G4int Lp, G4double mpRatio,
+						    G4double& cosTheta, G4double& phi) {
   
   fTwoJ1 = twoJ1;  // add abs to remove negative J
   fTwoJ2 = twoJ2;
@@ -228,14 +214,21 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLA
     G4cout << "G4PolarizationTransition: 2J1= " << fTwoJ1 << " 2J2= " << fTwoJ2
 	   << " Lbar= " << fLbar << " delta= " << fDelta << " Lp= " << fL 
            << G4endl;
-    //G4cout << *pol_part << G4endl;
   }
 
-  //const POLAR pol = pol_part->GetPolarization();
+  POLAR pol;
+  if(proj)
+    pol = Gamma_Decay::GetProjectilePolarization();
+  else
+    pol = Gamma_Decay::GetRecoilPolarization();
   
   if(fTwoJ1 == 0) {
-    //pol_part->Unpolarize();
-    Gamma_Decay::Unpolarize();
+    
+    if(proj)
+      Gamma_Decay::UnpolarizeProjectile();
+    else
+      Gamma_Decay::UnpolarizeRecoil();
+    
     cosTheta = 2*G4UniformRand() - 1.0;
     phi = CLHEP::twopi*G4UniformRand();
   }
@@ -253,9 +246,11 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLA
   }
 
   if(fTwoJ2 == 0) {
-    //pol_part->Unpolarize();
-    Gamma_Decay::Unpolarize();
-    return {cosTheta,phi};
+    if(proj)
+      Gamma_Decay::UnpolarizeProjectile();
+    else
+      Gamma_Decay::UnpolarizeRecoil();
+    return;
   }
 
   std::size_t newlength = fTwoJ2+1;
@@ -311,22 +306,31 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLA
 
   // sanity checks
   if(fVerbose > 2 && 0.0 == newPol[0][0]) {
+    
     G4cout << "G4PolarizationTransition::SampleGammaTransition WARNING:"
 	   << " P[0][0] is zero!" << G4endl;
-    //G4cout << "Old pol is: " << *pol_part << G4endl;
+    
     DumpTransitionData(newPol);
     G4cout << "Unpolarizing..." << G4endl;
-    //pol_part->Unpolarize();
-    Gamma_Decay::Unpolarize();
-    return {cosTheta,phi};
+    if(proj)
+      Gamma_Decay::UnpolarizeProjectile();
+    else
+      Gamma_Decay::UnpolarizeRecoil();
+    
+    return;
   }
   if(fVerbose > 2 && std::abs((newPol[0])[0].imag()) > kEps) {
+    
     G4cout << "G4PolarizationTransition::SampleGammaTransition WARNING: \n"
 	   << " P[0][0] has a non-zero imaginary part! Unpolarizing..." 
 	   << G4endl;
-    //pol_part->Unpolarize();
-    Gamma_Decay::Unpolarize();
-    return {cosTheta,phi};
+    
+    if(proj)
+      Gamma_Decay::UnpolarizeProjectile();
+    else
+      Gamma_Decay::UnpolarizeRecoil();
+    return;
+    
   }
   if(fVerbose > 2) {
     G4cout << "Before normalization: " << G4endl;
@@ -354,16 +358,16 @@ std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLA
   while(newPol.size() != lastNonEmptyK2+1) { newPol.pop_back(); }
   (newPol[0])[0] = 1.0;
 
-  //pol_part->SetPolarization(newPol);
-  Gamma_Decay::SetPolarization(newPol);
+  if(proj)
+    Gamma_Decay::SetProjectilePolarization(newPol);
+  else
+    Gamma_Decay::SetRecoilPolarization(newPol);
   
-  //if(fVerbose > 2) {
-  //G4cout << "Updated polarization: " << *pol_part << G4endl;
-  //}
-  return {cosTheta,phi};
+  return;
+  
 }
 
-void Polarization_Transition::DumpTransitionData(const POLAR pol) const {
+void Polarization_Transition::DumpTransitionData(const POLAR& pol) const {
   
   G4cout << "G4PolarizationTransition: ";
   (fTwoJ1 % 2) ? G4cout << fTwoJ1 << "/2" : G4cout << fTwoJ1/2;

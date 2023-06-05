@@ -16,8 +16,8 @@ public:
   void BuildStatisticalTensors();
   void SetSpins();
 
-  std::vector< std::vector<G4complex> > GetPolarization(G4int state, G4double en, G4double th,
-							G4double ph);
+  std::vector< std::vector<G4complex> >& GetPolarization(G4int state, G4double en, G4double th,
+							 G4double ph);
 
   void SetFileName(G4String n) {fn = n;}
   void SetCalcGk(G4bool calc) {calcGk = calc;}

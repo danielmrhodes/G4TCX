@@ -47,13 +47,15 @@ void Gamma_Source::BuildLevelScheme() {
     return;
   }
 
+  std::vector<G4double> spins;
   G4IonTable* table = (G4IonTable*)(G4ParticleTable::GetParticleTable()->GetIonTable());
 
   G4ParticleDefinition* ground_state = table->GetIon(82,208,0.0*MeV);
   ground_state->SetPDGLifeTime(-1.0);
   
-  Polarized_Particle* polGS = new Polarized_Particle(ground_state,82,208,GSS,0.0*MeV);
-  levels.push_back(polGS);
+  //Polarized_Particle* polGS = new Polarized_Particle(ground_state,82,208,GSS,0.0*MeV);
+  levels.push_back(ground_state);
+  spins.push_back(GSS);
  
   std::ifstream file;
   file.open(file_name.c_str(),std::ios::in);
@@ -80,6 +82,7 @@ void Gamma_Source::BuildLevelScheme() {
     energy *= keV;
     lifetime *= ps;
     probs.push_back(prob);
+    spins.push_back(spin);
 
     if(!threadID)
       std::cout << " " << state_index << " " << energy/keV << " " << spin << " " << lifetime/ps << " "
@@ -102,7 +105,7 @@ void Gamma_Source::BuildLevelScheme() {
     if(!threadID)
       std::cout << std::endl;
     
-    Polarized_Particle* ppart = new Polarized_Particle(part,82,208,spin,energy);
+    //Polarized_Particle* ppart = new Polarized_Particle(part,82,208,spin,energy);
     for(int i=0;i<nbr;i++) {
 
       G4int index, L0, Lp;
@@ -116,13 +119,13 @@ void Gamma_Source::BuildLevelScheme() {
 	std::cout << "  " << index << " " << BR << " " << L0 << " " << Lp << " " << del << " " << cc
 		  << std::endl;
 
-      //if(!threadID)
-      if(part->GetDecayTable()->entries() <= i)
-	part->GetDecayTable()->Insert(new Gamma_Decay(ppart->GetDefinition(),
-						      levels.at(index)->GetDefinition(),BR,energy,
-						      levels.at(index)->GetExcitationEnergy(),
-						      ppart->TwoJ(),levels.at(index)->TwoJ(),
-						      L0,Lp,del,cc,true));
+      if(!threadID)
+      //if(part->GetDecayTable()->entries() <= i)
+	part->GetDecayTable()->Insert(new Gamma_Decay(part,
+						      levels.at(index),BR,energy,
+						      ((G4Ions*)(levels.at(index)))->GetExcitationEnergy(),
+						      G4int(2.0*spin + 0.01),G4int(2.0*spins.at(index) + 0.01),
+						      L0,Lp,del,cc,true,true));
 	//part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,true));
       
     }
@@ -131,7 +134,7 @@ void Gamma_Source::BuildLevelScheme() {
       if(!threadID)
 	std::cout << "States are out of order in source level scheme file " << file_name << "!" << std::endl;
     
-    levels.push_back(ppart);
+    levels.push_back(part);
     
   }
 
@@ -170,6 +173,7 @@ G4int Gamma_Source::ChooseState() {
   return 0;
 }
 
+/*
 void Gamma_Source::Unpolarize() {
 
   for(auto& lvl : levels)
@@ -177,3 +181,4 @@ void Gamma_Source::Unpolarize() {
   
   return;
 }
+*/

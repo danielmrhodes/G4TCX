@@ -17,7 +17,7 @@ public:
 
   Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* daughter, G4double BR, G4double Ei,
 	      G4double Ef, G4int twoJP, G4int twoJD, G4int L0, G4int Lp, G4double del, G4double cc,
-	      G4bool emit);
+	      G4bool emit, G4bool prj);
   ~Gamma_Decay();
 
   G4DecayProducts* DecayIt(G4double);
@@ -28,8 +28,14 @@ public:
 
   //Polarized_Particle* GetDaughter() {return pDaughter;}
   G4double GetDaughterExcitation() {return EnF;}
-  static void SetPolarization(std::vector< std::vector<G4complex> > polar);
-  static void Unpolarize();
+
+  static std::vector< std::vector<G4complex> >& GetProjectilePolarization() {return polarizationP;}
+  static void SetProjectilePolarization(const std::vector< std::vector<G4complex> >& polar);
+  static void UnpolarizeProjectile();
+
+  static std::vector< std::vector<G4complex> >& GetRecoilPolarization() {return polarizationR;}
+  static void SetRecoilPolarization(const std::vector< std::vector<G4complex> >& polar);
+  static void UnpolarizeRecoil();
   
   static G4double Pmx(G4double e, G4double p1, G4double p2);
   
@@ -37,7 +43,8 @@ private:
 
   Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* daughter, G4double BR);
   
-  static void Clean();
+  static void CleanProjectile();
+  static void CleanRecoil();
   
   G4double parentmass;
   const G4double* theDaughterMasses;
@@ -48,8 +55,11 @@ private:
   //Polarized_Particle* pParent;
   //Polarized_Particle* pDaughter;
 
-  static inline G4ThreadLocal std::vector< std::vector<G4complex> > polarization;
+  static inline G4ThreadLocal std::vector< std::vector<G4complex> > polarizationP;
+  static inline G4ThreadLocal std::vector< std::vector<G4complex> > polarizationR;
 
+  G4bool proj;
+  
   G4int twoJi;
   G4int twoJf;
   G4int transL;

@@ -18,14 +18,6 @@ Polarization::Polarization(G4bool prj) : proj(prj) {
   calcGk = true;
 
   threadID = G4Threading::G4GetThreadId();
-
-  /*
-  polarization = new std::vector< std::vector<G4complex> >();
-  unpolarized = new std::vector< std::vector<G4complex> >();
-
-  polarization->clear();
-  unpolarized->clear();
-  */
   
   unpolarized.resize(1);
   unpolarized[0].push_back(1.0);
@@ -48,8 +40,6 @@ Polarization::Polarization(G4bool prj) : proj(prj) {
 Polarization::~Polarization() {
 
   delete messenger;
-  //delete polarization;
-  //delete unpolarized;
   
   for(unsigned int i=0;i<interps.size();i++)
     gsl_spline2d_free(interps.at(i));
@@ -314,9 +304,12 @@ void Polarization::Clean() {
   return;
 }
 
-std::vector< std::vector<G4complex> > Polarization::GetPolarization(G4int state, G4double en,
-								    G4double th, G4double ph) {
+std::vector< std::vector<G4complex> >& Polarization::GetPolarization(G4int state, G4double en,
+								     G4double th, G4double ph) {
 
+  if(!state)
+    return unpolarized;
+  
   if((unsigned int)state >= spins.size())
     return unpolarized;
 

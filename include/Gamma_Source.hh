@@ -1,7 +1,7 @@
 #ifndef Gamma_Source_h
 #define Gamma_Source_h 1
 
-#include "Polarized_Particle.hh"
+//#include "Polarized_Particle.hh"
 #include "G4ParticleDefinition.hh"
 #include "Gamma_Source_Messenger.hh"
 
@@ -14,13 +14,14 @@ public:
   ~Gamma_Source();
 
   void BuildLevelScheme();
-  void Unpolarize();
+  //void Unpolarize();
   
   G4int ChooseState();
   G4double GetEnergy() {return source_energy;}
   
-  G4ParticleDefinition* GetDefinition(G4int index) {return levels.at(index)->GetDefinition();}
-  
+  //G4ParticleDefinition* GetDefinition(G4int index) {return levels.at(index)->GetDefinition();}
+  G4ParticleDefinition* GetDefinition(G4int index) {return levels[index];}
+     
   void SetEnergy(G4double En) {source_energy = En;}
   void SetFileName(G4String name) {file_name = name;}
   void SetGroundStateSpin(G4double spin) {GSS = spin;} 
@@ -35,7 +36,7 @@ private:
 
   G4int threadID;
   
-  std::vector<Polarized_Particle*> levels;
+  std::vector<G4ParticleDefinition*> levels;
   std::vector<G4double> probs;
   
 };

@@ -26,8 +26,11 @@ public:
 					       G4int L0, G4int Lp, G4double mpRatio);
   */
 
-  std::array<G4double,2> SampleGammaTransition(const POLAR pol, G4int twoJ1, G4int twoJ2, G4int L0,
-					       G4int Lp, G4double mpRatio);
+  //std::array<G4double,2> SampleGammaTransition(const POLAR pol, G4int twoJ1, G4int twoJ2, G4int L0,
+  //					       G4int Lp, G4double mpRatio);
+
+  void SampleGammaTransition(G4bool proj, G4int twoJ1, G4int twoJ2, G4int L0, G4int Lp,
+			     G4double mpRatio, G4double& cosTheta, G4double& phi);
   
   // generic static functions
   G4double FCoefficient(G4int K, G4int L, G4int Lprime, 
@@ -39,7 +42,7 @@ public:
   G4double GammaTransFCoefficient(G4int K) const;
   G4double GammaTransF3Coefficient(G4int K, G4int K2, G4int K1) const;
 
-  void DumpTransitionData(const POLAR pol) const;
+  void DumpTransitionData(const POLAR& pol) const;
 
   inline void SetVerbose(G4int val) { fVerbose = val; };
 
@@ -50,8 +53,8 @@ private:
 
   // Gamma angle generation and decay: call these functions in this order!
   // All angles are in the same coordinate system: user may choose any axis
-  G4double GenerateGammaCosTheta(const POLAR);
-  G4double GenerateGammaPhi(const G4double cosTheta, const POLAR);
+  G4double GenerateGammaCosTheta(const POLAR& pol);
+  G4double GenerateGammaPhi(const G4double cosTheta, const POLAR& pol);
 
   inline G4double LnFactorial(int k) const { return G4Pow::GetInstance()->logfactorial(k); }
 

@@ -206,7 +206,7 @@ void Primary_Generator::GenerateSourcePrimaries(G4Event* evt) {
 
   //Remove polarization
   //source->Unpolarize();
-  Gamma_Decay::Unpolarize();
+  Gamma_Decay::UnpolarizeProjectile();
   
   //Choose excited state
   pI = source->ChooseState();
@@ -281,11 +281,13 @@ void Primary_Generator::GenerateFullPrimaries(G4Event* evt) {
   }
 
   //Align excited states
-  exciteP->Unpolarize(); //remove old polarization
-  exciteP->Polarize(pI,en,th,phiB);
+  //Gamma_Decay::UnpolarizeProjectile(); //remove old polarization
+  Gamma_Decay::SetProjectilePolarization(exciteP->GetPolarization(pI,en,th,phiB));
+  //exciteP->Polarize(pI,en,th,phiB);
 
-  exciteR->Unpolarize(); //remove old polarization
-  exciteR->Polarize(rI,en,th,phiB);
+  //exciteR->Unpolarize(); //remove old polarization
+  Gamma_Decay::SetRecoilPolarization(exciteR->GetPolarization(rI,en,th,phiB));
+  //exciteR->Polarize(rI,en,th,phiB);
   
   //Beam vertex
   gun->SetParticleDefinition(exciteP->GetDefinition(pI));
@@ -513,13 +515,15 @@ std::vector<G4double> Primary_Generator::GetExcitedStateSpins(G4bool proj) {
   if(proj) {
 
     for(unsigned int i=1;i<exciteP->GetLevels().size();i++)
-      spins.push_back(exciteP->GetLevels().at(i)->GetSpin());
+      spins.push_back(exciteP->GetSpin(i));
+      //spins.push_back(exciteP->GetDefinition(i)->GetPDGSpin());
 
   }
   else {
 
     for(unsigned int i=1;i<exciteR->GetLevels().size();i++)
-      spins.push_back(exciteR->GetLevels().at(i)->GetSpin());
+      spins.push_back(exciteR->GetSpin(i));
+      //spins.push_back(exciteR->GetDefinition(i)->GetPDGSpin());
   
   }
 

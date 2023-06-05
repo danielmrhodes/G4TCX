@@ -73,9 +73,13 @@ void Excitation::BuildLevelScheme() {
   G4IonTable* table = (G4IonTable*)(G4ParticleTable::GetParticleTable()->GetIonTable());
   G4ParticleDefinition* GS = table->GetIon(Z,A,0.0*MeV);
   GS->SetPDGLifeTime(-1.0);
+
+  levels.push_back(GS);
+  spins.clear();
+  spins.push_back(gss);
   
-  Polarized_Particle* polGS = new Polarized_Particle(GS,Z,A,gss,0.0*MeV);
-  levels.push_back(polGS);
+  //Polarized_Particle* polGS = new Polarized_Particle(GS,Z,A,gss,0.0*MeV);
+  //levels.push_back(polGS);
   
   if(lfn == "") {
     if(!threadID)
@@ -125,6 +129,7 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
 
     energy *= keV;
     lifetime *= ps;
+    spins.push_back(spin);
 
     if(!threadID)
       std::cout << " " << state_index << " " << energy/keV << " " << spin << " " << lifetime/ps
@@ -132,12 +137,14 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
     
     G4ParticleDefinition* part = table->GetIon(Z,A,energy);
     if(nbr) {
-      if(!threadID) {
-	part->SetPDGLifeTime(lifetime);
+      
+      if(!threadID)
 	part->SetDecayTable(new G4DecayTable());
-      }
+      
+      part->SetPDGLifeTime(lifetime);
       part->GetProcessManager()->SetParticleType(part);
       part->GetProcessManager()->AddProcess(new G4Decay(),0,-1,0);
+      
     }
     else {
       if(!threadID)
@@ -148,7 +155,7 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
     if(!threadID)
       std::cout << std::endl;
     
-    Polarized_Particle* ppart = new Polarized_Particle(part,Z,A,spin,energy);
+    //Polarized_Particle* ppart = new Polarized_Particle(part,Z,A,spin,energy);
     for(int i=0;i<nbr;i++) {
 
       std::getline(file,line);
@@ -167,11 +174,10 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
 	emit_gamma = true;
 
       if(!threadID)
-	part->GetDecayTable()->Insert(new Gamma_Decay(ppart->GetDefinition(),
-						      levels.at(index)->GetDefinition(),BR,energy,
-						      levels.at(index)->GetExcitationEnergy(),
-						      ppart->TwoJ(),levels.at(index)->TwoJ(),
-						      L0,Lp,del,cc,emit_gamma));
+	part->GetDecayTable()->Insert(new Gamma_Decay(part,levels.at(index),BR,energy,
+						      ((G4Ions*)(levels.at(index)))->GetExcitationEnergy(),
+						      G4int(2.0*spin + 0.01),G4int(2.0*spins.at(index) + 0.01),
+						      L0,Lp,del,cc,emit_gamma,proj));
 	//part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,
 	//					      emit_gamma));
       
@@ -182,8 +188,8 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
 	std::cout << "\033[1;31m" << nuc << " states are out of order in level scheme file " << lfn
 		  << "\033[m" << std::endl;
     
-    levels.push_back(ppart);
-    
+    //levels.push_back(ppart);
+    levels.push_back(part);
   }
   
   return;
@@ -604,12 +610,12 @@ G4double Excitation::GetExcitation(G4int index) {
   
   if(!index)
     return 0.0*MeV;
-
-  return levels[index]->GetExcitationEnergy();
-  //return levels[index]->GetDefinition()->GetPDGMass() - levels[0]->GetDefinition()->GetPDGMass();
+  
+  return ((G4Ions*)(levels[index]))->GetExcitationEnergy();
   
 }
 
+/*
 void Excitation::Polarize(G4int index, G4double en, G4double th, G4double ph) {
 
   if(index)
@@ -617,7 +623,15 @@ void Excitation::Polarize(G4int index, G4double en, G4double th, G4double ph) {
   
   return;
 }
+*/
 
+std::vector< std::vector<G4complex> >& Excitation::GetPolarization(G4int index, G4double en, G4double th, G4double ph) {
+
+  return polar->GetPolarization(index,en,th,ph);
+  
+}
+
+/*
 void Excitation::Unpolarize() {
 
   for(auto& lvl : levels)
@@ -625,3 +639,4 @@ void Excitation::Unpolarize() {
   
   return;
 }
+*/

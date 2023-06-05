@@ -36,7 +36,7 @@ Gamma_Decay::Gamma_Decay(Polarized_Particle* Parent, Polarized_Particle* daughte
 */
 Gamma_Decay::Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* daughter, G4double BR,
 			 G4double Ei, G4double Ef, G4int twoJP, G4int twoJD, G4int L0, G4int Lp,
-			 G4double del, G4double cc, G4bool emit) : Gamma_Decay(Parent,daughter,BR) {
+			 G4double del, G4double cc, G4bool emit, G4bool prj) : Gamma_Decay(Parent,daughter,BR) {
 
   //trans = new G4PolarizationTransition();
   trans = new Polarization_Transition();
@@ -52,6 +52,7 @@ Gamma_Decay::Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* dau
   EnF = Ef;
   convCoef = cc;
 
+  proj = prj;
   emit_gamma = emit;
   
 }
@@ -117,11 +118,14 @@ G4DecayProducts* Gamma_Decay::DecayIt(G4double) {
   G4ParticleMomentum direction(sintheta*std::cos(phi),sintheta*std::sin(phi),costheta);  
   */
   
-  std::array<G4double,2> vals = trans->SampleGammaTransition(polarization,twoJi,twoJf,transL,transLp,
-							     delta);
+  //std::array<G4double,2> vals = trans->SampleGammaTransition(polarization,twoJi,twoJf,transL,transLp,
+  //							     delta);
+  //G4double costheta = vals[0];
+  //G4double phi = vals[1];
 
-  G4double costheta = vals[0];
-  G4double phi = vals[1];
+  G4double costheta;
+  G4double phi;
+  trans->SampleGammaTransition(proj,twoJi,twoJf,transL,transLp,delta,costheta,phi);
   
   G4double sintheta = std::sqrt((1.0 - costheta)*(1.0 + costheta));
   G4ParticleMomentum direction(sintheta*std::cos(phi),sintheta*std::sin(phi),costheta);
@@ -167,32 +171,60 @@ inline G4double Gamma_Decay::Pmx(G4double e, G4double p1, G4double p2) {
   
 }
 
-void Gamma_Decay::SetPolarization(std::vector< std::vector<G4complex> > polar) {
+void Gamma_Decay::SetProjectilePolarization(const std::vector< std::vector<G4complex> >& polar) {
 
-  Clean(); 
+  CleanProjectile(); 
   for(std::vector<G4complex> pol : polar)
-    polarization.push_back(pol);
-
-  return;
-}
-
-void Gamma_Decay::Unpolarize() {
-
-  Clean(); 
-  polarization.resize(1);
-  polarization[0].push_back(1.0);
+    polarizationP.push_back(pol);
   
   return;
 }
 
-void Gamma_Decay::Clean() {
+void Gamma_Decay::UnpolarizeProjectile() {
 
-  if(!polarization.empty()) {
-    for(std::vector<G4complex> pol : polarization)
+  CleanProjectile();
+  polarizationP.resize(1);
+  polarizationP[0].push_back(1.0);
+  
+  return;
+}
+
+void Gamma_Decay::CleanProjectile() {
+
+  if(!polarizationP.empty()) {
+    for(std::vector<G4complex> pol : polarizationP)
       pol.clear();
-    polarization.clear();
+    polarizationP.clear();
   }
   
   return;
 }
 
+void Gamma_Decay::SetRecoilPolarization(const std::vector< std::vector<G4complex> >& polar) {
+
+  CleanRecoil(); 
+  for(std::vector<G4complex> pol : polar)
+    polarizationR.push_back(pol);
+  
+  return;
+}
+
+void Gamma_Decay::UnpolarizeRecoil() {
+
+  CleanRecoil();
+  polarizationR.resize(1);
+  polarizationR[0].push_back(1.0);
+  
+  return;
+}
+
+void Gamma_Decay::CleanRecoil() {
+
+  if(!polarizationR.empty()) {
+    for(std::vector<G4complex> pol : polarizationR)
+      pol.clear();
+    polarizationR.clear();
+  }
+  
+  return;
+}
