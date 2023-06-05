@@ -2,7 +2,7 @@
 #define Polarization_h 1
 
 #include "Polarization_Messenger.hh"
-#include "Polarized_Particle.hh"
+#include "G4ParticleDefinition.hh"
 #include <gsl/gsl_spline2d.h>
 
 class Polarization_Messenger;

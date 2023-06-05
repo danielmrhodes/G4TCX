@@ -1,8 +1,6 @@
 #ifndef Polarization_Transition_h
 #define Polarization_Transition_h
 
-#include "Polarized_Particle.hh"
-
 #include "globals.hh"
 #include "G4LegendrePolynomial.hh"
 #include "G4PolynomialPDF.hh"
@@ -16,18 +14,6 @@ public:
   
   explicit Polarization_Transition();
   ~Polarization_Transition() {;}
-
-  /*
-  void SampleGammaTransition(Polarized_Particle* np, G4int twoJ1, G4int twoJ2, G4int L0, G4int Lp, 
-                             G4double mpRatio, G4double& cosTheta, G4double& phi);
-  
-
-  std::array<G4double,2> SampleGammaTransition(Polarized_Particle* np, G4int twoJ1, G4int twoJ2, 
-					       G4int L0, G4int Lp, G4double mpRatio);
-  */
-
-  //std::array<G4double,2> SampleGammaTransition(const POLAR pol, G4int twoJ1, G4int twoJ2, G4int L0,
-  //					       G4int Lp, G4double mpRatio);
 
   void SampleGammaTransition(G4bool proj, G4int twoJ1, G4int twoJ2, G4int L0, G4int Lp,
 			     G4double mpRatio, G4double& cosTheta, G4double& phi);

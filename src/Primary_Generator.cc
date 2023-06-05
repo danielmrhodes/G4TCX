@@ -516,14 +516,12 @@ std::vector<G4double> Primary_Generator::GetExcitedStateSpins(G4bool proj) {
 
     for(unsigned int i=1;i<exciteP->GetLevels().size();i++)
       spins.push_back(exciteP->GetSpin(i));
-      //spins.push_back(exciteP->GetDefinition(i)->GetPDGSpin());
 
   }
   else {
 
     for(unsigned int i=1;i<exciteR->GetLevels().size();i++)
       spins.push_back(exciteR->GetSpin(i));
-      //spins.push_back(exciteR->GetDefinition(i)->GetPDGSpin());
   
   }
 

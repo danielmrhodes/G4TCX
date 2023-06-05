@@ -78,9 +78,6 @@ void Excitation::BuildLevelScheme() {
   spins.clear();
   spins.push_back(gss);
   
-  //Polarized_Particle* polGS = new Polarized_Particle(GS,Z,A,gss,0.0*MeV);
-  //levels.push_back(polGS);
-  
   if(lfn == "") {
     if(!threadID)
       std::cout << "\nNo " << nuc << " excitations." << std::endl;
@@ -155,7 +152,6 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
     if(!threadID)
       std::cout << std::endl;
     
-    //Polarized_Particle* ppart = new Polarized_Particle(part,Z,A,spin,energy);
     for(int i=0;i<nbr;i++) {
 
       std::getline(file,line);
@@ -178,8 +174,6 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
 						      ((G4Ions*)(levels.at(index)))->GetExcitationEnergy(),
 						      G4int(2.0*spin + 0.01),G4int(2.0*spins.at(index) + 0.01),
 						      L0,Lp,del,cc,emit_gamma,proj));
-	//part->GetDecayTable()->Insert(new Gamma_Decay(ppart,levels.at(index),BR,L0,Lp,del,cc,
-	//					      emit_gamma));
       
     }
 
@@ -188,7 +182,6 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
 	std::cout << "\033[1;31m" << nuc << " states are out of order in level scheme file " << lfn
 		  << "\033[m" << std::endl;
     
-    //levels.push_back(ppart);
     levels.push_back(part);
   }
   
@@ -472,7 +465,6 @@ G4bool Excitation::CanFeedConsidered(G4int index) {
     if(dec->GetDaughterExcitation() < con_exc)
       continue;
 
-    //G4ParticleDefinition* ddef = dec->GetDaughter()->GetDefinition();
     G4ParticleDefinition* ddef = dec->GetDaughter(0);
     if(ddef == cdef)
       return true;
@@ -498,8 +490,7 @@ G4bool Excitation::CanFeedConsidered(G4int index) {
 	Gamma_Decay* ddec = (Gamma_Decay*)dtab->GetDecayChannel(j);
 	if(ddec->GetDaughterExcitation() < con_exc)
 	  continue;
-
-	//G4ParticleDefinition* gdef = ddec->GetDaughter()->GetDefinition();
+	
 	G4ParticleDefinition* gdef = ddec->GetDaughter(0);
 	if(gdef == cdef)
 	  return true;
@@ -615,28 +606,8 @@ G4double Excitation::GetExcitation(G4int index) {
   
 }
 
-/*
-void Excitation::Polarize(G4int index, G4double en, G4double th, G4double ph) {
-
-  if(index)
-    levels[index]->SetPolarization(polar->GetPolarization(index,en,th,ph));
-  
-  return;
-}
-*/
-
 std::vector< std::vector<G4complex> >& Excitation::GetPolarization(G4int index, G4double en, G4double th, G4double ph) {
 
   return polar->GetPolarization(index,en,th,ph);
   
 }
-
-/*
-void Excitation::Unpolarize() {
-
-  for(auto& lvl : levels)
-    lvl->Unpolarize();
-  
-  return;
-}
-*/

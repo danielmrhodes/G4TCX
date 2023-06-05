@@ -5,7 +5,6 @@
 
 #include "G4ParticleDefinition.hh"
 #include "Polarization.hh"
-//#include "Polarized_Particle.hh"
 #include "Excitation_Messenger.hh"
 
 class Excitation_Messenger;
@@ -24,11 +23,6 @@ public:
   G4double GetExcitation(G4int index);
 
   std::vector< std::vector<G4complex> >& GetPolarization(G4int index, G4double en, G4double th, G4double ph); 
-  //void Polarize(G4int index, G4double en, G4double th, G4double ph);
-  //void Unpolarize();
-
-  //G4ParticleDefinition* GetDefinition(G4int index) {return levels[index]->GetDefinition();}
-  //std::vector<Polarized_Particle*> GetLevels() {return levels;}
 
   G4ParticleDefinition* GetDefinition(G4int index) {return levels[index];}
   std::vector<G4ParticleDefinition*> GetLevels() {return levels;}
@@ -65,7 +59,6 @@ private:
   std::vector<G4double> probs;
   std::vector<gsl_spline2d*> interps;
   
-  //std::vector<Polarized_Particle*> levels; //States
   std::vector<G4ParticleDefinition*> levels;
   std::vector<G4double> spins;
   G4int selected;
