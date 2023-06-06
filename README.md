@@ -29,11 +29,11 @@ Additionally, the simulation will output a file, output-info.dat, along with the
 
 Functionality
 -----------------
-The G4TCX simultation has three modes: Source, Scattering, and Full. Each mode has different functionality and input requirements. 
+The G4TCX simulation has three modes: Source, Scattering, and Full. Each mode has different functionality and input requirements. 
 
 - Source: Simulates either a simple isotropic gamma-ray, or a user-definable gamma-ray cascade. No massive particles involved.
 - Scattering: Simulates two-body scattering events. No gamma-rays involved. 
-- Full: Simulates Coulomb excitation events with user-definable level schemes, excitation probabilities, and statistical tensors. Both the angle and energy dependence of Coulbomb excitation are accounted for with these inputs.
+- Full: Simulates Coulomb excitation events with user-definable level schemes, excitation probabilities, and statistical tensors. Both the scattering angle and beam energy dependence of Coulbomb excitation are accounted for with these inputs.
 
 Macro Files
 -----------------
@@ -42,13 +42,12 @@ The three simulation modes require different commands in their macro files. Howe
 <pre>
 /Mode mode
 <i>(optional geometry commands)</i>
-/Geometry/Update
 <i>(mode specific commands)</i>
 <i>(optional output commands)</i>
 /run/beamOn nEvents
 </pre>
 
-The /Mode command must come first, and the parameter (mode) can be Source, Scattering, or Full. The /Geometry/Update command is mandatory. Example macros for each mode are in the Examples/Macros folder.
+The /Mode command must come first, and the parameter (mode) can be Source, Scattering, or Full. Example macros for each mode are in the Examples/Macros folder.
 
 Output Commands
 -----------------
@@ -65,6 +64,7 @@ The /Geometry commands are common across all modes. With the exception of /Geome
 
 | Command | Description |
 | --- | --- |
+| /Geometry/Tigress/Construct | Include the Tigress array in the simulation |
 | /Geometry/S3/Construct | Include the silicon detectors in the simulation |
 | /Geometry/Target/Construct | Include the target in the simulation |
 | /Geometry/Tigress/Configuration *int* | Set whether Tigress is in its high efficiency (0) or high peak-to-total (1) configuration (default: 0) |
@@ -82,9 +82,11 @@ The /Geometry commands are common across all modes. With the exception of /Geome
 | /Geometry/Target/Radius *double unit* | Set radius of target. (Default: 0.5 cm) |
 | /Geometry/Update | Update the simulation with your desired geometry. |
 
-The /Geometry/Tigress/SetFrameConfiguration has four possible parameters, 0-3. Choose 0 for the full structure, 1 for the upstream lampshade only, 2 for the downstream lampshade only, or 3 for only the corona. Note the corresponding Tigress detectors will be removed from the simulation if you choose a non-zero frame configuration.
+The various /Construct commands are mandatory if you need to include that particular piece of the setup.
 
-Note that the /Geometry/Target/ commands do **NOT** define the recoiling nucleus for the kinematics or excitation, it only defines "bulk" material properties of the target. The two /Construct commands are only applicable for a Source simulation; they control whether the silicon detectors and target will be included. They are included automatically for a Scattering or Full simulation. 
+The /Geometry/Tigress/SetFrameConfiguration has four possible parameters, 0-3. Choose 0 for the full structure, 1 for the upstream lampshade only, 2 for the downstream lampshade only, or 3 for only the corona. Note the appropriate Tigress detectors will be automatically removed from the simulation if you choose a non-zero frame configuration.
+
+Note that the /Geometry/Target/ commands do **NOT** define the recoiling nucleus for the kinematics or excitation, it only defines "bulk" material properties of the target.
 
 Source Mode Commands
 -----------------
@@ -126,7 +128,7 @@ The Scattering mode commands are divided into two categories: /Beam and /Reactio
 
 The /Reaction/Optimize and /Reaction/AddThetaLAB commands can be used together. Doing this ensures every simulatd event will result in particle entering a silicon detector.
 
-The use of optional /Reaction commands is strongly recommended. If you do not add a desired scattering angle range, a large scattering angle range of 13 to 180 degrees will be sampled according the Rutheford scattering distribution. Without the /Reaction/Optimize command, there will be useless simulated events where nothing is detected in an S3 detector.
+The use of optional /Reaction commands is strongly recommended. If you do not add a desired scattering angle range, a large scattering angle range of 13 to 180 degrees will be sampled according the Rutheford scattering distribution. Without the /Reaction/Optimize command, there will be useless simulated events where no particle is detected in an S3 detector.
 
 There are no "safety checks" for these commands. For example, you could add an angle range corresponding the upstream S3 detector, and then call /Reaction/OnlyRecoils. This would set the entire scattering angle distribution to zero since the recoils can't scatter backwards. If you call /Reaction/Optimize in such a scenario, you will put the simulation in an infinite loop.
 
@@ -167,25 +169,21 @@ For the Full CoulEx simulation, all Scattering mode commands still apply. Additi
 
 The recoiling target nucleus can be controlled with identical commands. Simply replace /Projectile/ with /Recoil/ in any of the above commands.
 
-The statistical tensors [1] and deorientation effect coefficients G<sub>k</sub> are critical for reproducing the LAB frame gamma-ray spectra. See [2] for details on 
-the two-state model, and the meaning of its parameters, which is used to describe the deorientation effect.
+The statistical tensors [1] and deorientation effect coefficients G<sub>k</sub> are needed to generate the particle-gamma angular distributions which occur in Coulomb excitation. They are also critical for reproducing the LAB frame gamma-ray spectra. See [2] for details on the two-state model, and the meaning of its parameters, which is used to describe the deorientation effect.
 
 *If you input a level scheme, you must also input the probabilities or choose a state to populate. Otherwise the level scheme won't be used.*
 
-*In a Full simulation, the /Reaction/DeltaE command only affects what CM angles will be sampled. The Q-value and LAB scattering anlges for each event are calculated 
-based on which excited states get populated.*
+*In a Full simulation, the /Reaction/DeltaE command only affects what CM angles will be sampled. The Q-value and LAB scattering anlges for each event are calculated based on which excited states get populated.*
 
 Input Preparation
 -----------------
-The ROOT script MakeInput.C will make the probabilities file and statistical tensors file that can be given to JANUS. You will need to edit the script with your part
-icular reaction parameters. The script uses the Coulomb excitation code Cygnus [3] for the calculations. The Cygnus libraries must be loaded into the ROOT session be
-fore loading MakeInput.C, and the Cygnus nucleus file must already be created. See [3] for details.
+The ROOT script MakeInput.C, found in the Helpers folder, will make the probabilities file and statistical tensors file that can be given to G4TCX. You will need to edit the script with your particular reaction parameters. The script uses the Coulomb excitation code Cygnus [3] for the calculations. The Cygnus libraries must be loaded into the ROOT session before loading MakeInput.C, and the Cygnus nucleus file must already be created. See [3] for details.
 
-You can inspect the probabilities and statistical tensors calculated for the various states using the scripts prob_reader.C and tensor_reader.C. You must edit the te
-nsor_reader.C file with the excited state spins for the nucleus you are looking at.
+You can inspect the probabilities and statistical tensors calculated for the various states using the scripts prob_reader.C and tensor_reader.C. You must edit the tensor_reader.C file with the excited state spins for the nucleus you are looking at.
 
-The level scheme file, for either a Source or Full simulation, must be created manually. The file has a different format depending on the simulation mode; these are 
-described below.
+There are two other scripts in the Helpers folder which can assist in preparing the necessary input files. The script MakeNucleus.C can take a Gosia output file and create a Cygnus nucleus file. The script MakeLevelScheme.C can take a Cygnus nucleus file and create the level scheme file needed by G4TCX for a Full simulation (not Source). Therefore you should only need to make one file manuall: a Gosia file, a Cygnus file, or the level scheme file.
+
+The level scheme file has a different format depending on the simulation mode (Source or Full). These are  described below.
 
 Full Mode Level Scheme File Format
 -----------------
@@ -232,10 +230,6 @@ II<sub>N</sub> En<sub>N</sub> Sp<sub>N</sub> Tau<sub>N</sub> Pop<sub>2</sub> Nb<
 </pre>
 
 The Source level scheme file is the same the Full level schem file (above), but has one additional entry, Pop<sub>i</sub>, which comes before Nb<sub>i</sub>. This is the relative population of the state i. An example level scheme file (co60.lvl) for a Source simulation is in the Examples/LevelSchemes/Source folder.
-
-Probability File and Statistical Tensor File
-----------------
-Use the script MakeInput.C to create these input files.
 
 Notes
 ----------------
