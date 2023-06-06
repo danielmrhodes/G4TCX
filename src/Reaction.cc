@@ -1,6 +1,5 @@
 #include "Reaction.hh"
-#include "G4RunManager.hh"
-#include "Detector_Construction.hh"
+#include "G4Threading.hh"
 
 Reaction::Reaction() : beamZ(48), beamA(106), beam_mass(0.0), targZ(82), targA(208),
 		       targ_mass(0.0), onlyP(false), onlyR(false) {
@@ -29,17 +28,23 @@ Reaction::~Reaction() {
 
 void Reaction::ConstructRutherfordCM(G4double Ep, G4double Ex) {
 
+  G4int threadID = G4Threading::G4GetThreadId();
+  
   if(!good_LAB_thetas.size()) {
-    G4cout << "Desired LAB angle ranges were not defined! Defaulting large LAB angle range of (13,180) deg!"
-	   << G4endl;
+    
+    if(!threadID)
+      std::cout << "Desired LAB angle ranges were not defined!"
+		<< " Defaulting large LAB angle range of (13,180) deg!" << std::endl;
 
     good_LAB_thetas.push_back(13*deg);
     good_LAB_thetas.push_back(180*deg);
     SetOnlyP();
   }
   else if(good_LAB_thetas.size()%2) {
-    G4cout << "There must be an even number desired LAB scattering angles! Defaulting large LAB angle range of (13,180) deg!"
-	   << G4endl;
+    
+    if(!threadID)
+      std::cout << "There must be an even number desired LAB scattering angles!"
+		<< " Defaulting large LAB angle range of (13,180) deg!" << std::endl;
 
     good_LAB_thetas.push_back(13*deg);
     good_LAB_thetas.push_back(180*deg);
@@ -48,8 +53,10 @@ void Reaction::ConstructRutherfordCM(G4double Ep, G4double Ex) {
   else {
     for(unsigned int i=0;i<good_LAB_thetas.size();i+=2) {
       if(good_LAB_thetas.at(i) > good_LAB_thetas.at(i+1)) {
-	G4cout << "Desired LAB angle ranges were improperly defined! Defaulting large LAB angle range of (13,180) deg!"
-	   << G4endl;
+
+	if(!threadID)
+	  std::cout << "Desired LAB angle ranges were improperly defined!"
+		    << " Defaulting large LAB angle range of (13,180) deg!" << std::endl;
 
 	good_LAB_thetas.clear();
 	good_LAB_thetas.push_back(13*deg);
@@ -67,9 +74,11 @@ void Reaction::ConstructRutherfordCM(G4double Ep, G4double Ex) {
   for(G4int i=0;i<nBins;i++) {
 
     probDist[i] = 0.0;
+    if(i < 50) //mandatory CM angle cut of 5 deg to avoid divergence
+      continue;
     
     G4double thetaCM = (pi/(double)nBins)*i;
-    if(KeepThetaCM(thetaCM,Ep,Ex) && i > 49) //mandatory CM angle cut of 5 deg to avoid divergence
+    if(KeepThetaCM(thetaCM,Ep,Ex))
       probDist[i] = 2.0*pi*std::sin(thetaCM)*RutherfordCM(thetaCM,Ep,Ex);    
 
   }
