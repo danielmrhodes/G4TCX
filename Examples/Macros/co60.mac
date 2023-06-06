@@ -1,7 +1,10 @@
 /Mode Source
+/Geometry/Tigress/Construct
+/Geometry/Tigress/SetConfiguration 0
+/Geometry/Tigress/SetFrameConfiguration 0
 /Geometry/Update
 #
-/Source/LevelScheme inputs/co60.lvl
+/Source/LevelScheme Examples/LevelSchemes/Source/co60.lvl
 #
 /Output/FileName co60.dat
 #

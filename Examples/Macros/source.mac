@@ -1,4 +1,7 @@
 /Mode Source
+/Geometry/Tigress/Construct
+/Geometry/Tigress/SetConfiguration 0
+/Geometry/Tigress/SetFrameConfiguration 0
 /Geometry/Update
 #
 /Source/Energy 1.0 MeV

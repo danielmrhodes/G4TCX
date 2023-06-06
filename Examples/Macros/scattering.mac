@@ -1,8 +1,9 @@
 /Mode Scattering
+/Geometry/S3/Construct
 /Geometry/S3/UpstreamOffset 3.0 cm
 /Geometry/S3/DownstreamOffset 3.0 cm
-/Geometry/Target/StandardTarget 208Pb
 /Geometry/Target/Construct
+/Geometry/Target/StandardTarget 208Pb
 /Geometry/Update
 #
 /Reaction/ProjectileZ 48

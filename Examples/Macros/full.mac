@@ -1,6 +1,11 @@
 /Mode Full
+/Geometry/Tigress/Construct
 /Geometry/Tigress/Configuration 1
 /Geometry/Tigress/FrameConfiguration 0
+/Geometry/S3/Construct
+/Geometry/S3/UpstreamOffset 3.0 cm
+/Geometry/S3/DownstreamOffset 3.0 cm
+/Geometry/Target/Construct
 /Geometry/Target/StandardTarget 48Ti
 /Geometry/Update
 #
