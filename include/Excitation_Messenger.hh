@@ -33,7 +33,7 @@ private:
   G4UIcmdWithAnInteger* pSel_cmd; //Selected state to populate every event
   G4UIcmdWithAnInteger* pCon_cmd; //Only consider this excited state
   G4UIcmdWithADouble* pGSS_cmd; //Ground state spin
-  G4UIcmdWithoutParameter* sCon_cmd; //
+  G4UIcmdWithoutParameter* sCon_cmd; //Simple considered state (no feeding)
   
 };
 

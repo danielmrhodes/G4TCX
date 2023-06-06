@@ -230,6 +230,9 @@ void Excitation::BuildProbabilities() {
   G4int numS = levels.size();
   G4int numP = probs.size();
 
+  if(simple_considered)
+    numS = 2;
+  
   for(G4int i=0;i<numS;i++) {
     interps.push_back(gsl_spline2d_alloc(gsl_interp2d_bicubic,numE,numT));  
     gsl_spline2d_init(interps.back(),&energies[0],&thetas[0],&probs[i*numE*numT],numE,numT);
@@ -285,29 +288,26 @@ void Excitation::ReadProbFile() {
 
   std::string line;
   std::getline(file,line);
-
-  G4double en;
   std::stringstream ss1(line);
-
+  
+  G4double en;
   while(ss1 >> en)
     energies.push_back(en);
   G4int numE = energies.size();
 
   std::getline(file,line);
-
-  G4double th;
   std::stringstream ss2(line);
-
+  
+  G4double th;
   while(ss2 >> th)
     thetas.push_back(th);
   G4int numT = thetas.size();
-
-  std::getline(file,line);
   
   G4int indexE = 0;
   G4int indexT = 0;
   G4int indexS = 0;
-  
+
+  std::getline(file,line);
   while(std::getline(file,line)) {
 
     if(line.empty()) {
@@ -319,9 +319,9 @@ void Excitation::ReadProbFile() {
     G4int numP = probs.size();
     if(numP == indexS*numE*numT)
       probs.resize(numP + numE*numT);
-    
-    G4double prb;
+   
     std::stringstream ss3(line);
+    G4double prb;
     while(ss3 >> prb) {
       probs.at(indexS*numE*numT + indexT*numE + indexE) = prb;
       indexT++;
@@ -424,22 +424,24 @@ void Excitation::Renormalize() {
       for(G4int k=0;k<numT;k++)
 	probs.at(j*numT + k) = 1.0 - sum_probs.at(j*numT + k);
 
-  if(!threadID)
-    std::cout << " Found " << feeders.size() - 1 << " possible feeder(s) of state " << considered << " (";
-  for(G4int i=0;i<(G4int)feeders.size();i++) {
-
-    if(feeders.at(i) == considered)
-      continue;
+  if(!threadID) {
+    std::cout << " Found " << feeders.size() - 1 << " possible feeder(s) of state " << considered
+	      << " (";
+  
+    for(G4int i=0;i<(G4int)feeders.size();i++) {
+      
+      if(feeders.at(i) == considered)
+	continue;
+      
+      std::cout << feeders.at(i);
+      if(i < (G4int)feeders.size()-1)
+	std::cout << " ";
+      
+    }
     
-    std::cout << feeders.at(i);
-    if(i < (G4int)feeders.size()-1)
-      std::cout << " ";
-    
+    std::cout << "). Probabilities rescaled by " << 1.0/max << std::endl;
   }
 
-  if(!threadID)
-    std::cout << "). Probabilities rescaled by " << 1.0/max << std::endl;
-  
   return;
 }
 
@@ -515,6 +517,8 @@ G4int Excitation::ChooseState(G4double en, G4double th) {
   G4int numE = energies.size();
   G4int numT = thetas.size();
   G4int numS = levels.size();
+  if(simple_considered)
+    numS = 2;
 
   if(en < energies[0]) {
 

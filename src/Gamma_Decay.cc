@@ -13,9 +13,9 @@
 
 Gamma_Decay::Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* daughter, G4double BR,
 			 G4double Ei, G4double Ef, G4int twoJP, G4int twoJD, G4int L0, G4int Lp,
-			 G4double del, G4double cc, G4bool emit, G4bool prj) : Gamma_Decay(Parent,daughter,BR) {
+			 G4double del, G4double cc, G4bool emit, G4bool prj)
+  : Gamma_Decay(Parent,daughter,BR) {
 
-  //trans = new G4PolarizationTransition();
   trans = new Polarization_Transition();
   
   twoJi = twoJP;
@@ -47,7 +47,11 @@ Gamma_Decay::Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* dau
   
 }
 
-Gamma_Decay::~Gamma_Decay() {}
+Gamma_Decay::~Gamma_Decay() {
+
+  delete trans;
+  
+}
 
 G4DecayProducts* Gamma_Decay::DecayIt(G4double) {
 
