@@ -1,6 +1,6 @@
 /Mode Source
 /Geometry/Tigress/Construct
-/Geometry/Tigress/SetConfiguration 0
+/Geometry/Tigress/SetConfiguration 1
 /Geometry/Tigress/SetFrameConfiguration 0
 /Geometry/Update
 #
@@ -8,4 +8,5 @@
 #
 /Output/FileName co60.dat
 #
-/run/beamOn 1000000
+/run/numberOfThreads 6
+/run/beamOn 5000000

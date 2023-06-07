@@ -26,4 +26,5 @@
 #
 /Output/FileName scattering.dat
 #
+/run/numberOfThreads 6
 /run/beamOn 1000000
