@@ -11,7 +11,8 @@
 #include "TVector3.h"
 #include "TMath.h"
 
-#include "/path/to/G4TCX/include/Data_Format.hh"
+//#include "/path/to/G4TCX/include/Data_Format.hh"
+#include "/opt/G4TCX/include/Data_Format.hh"
 
 ////These should match the parameters defined in the simulation input////
 //These correspond to the input file Examples/Macros/full.mac
@@ -24,8 +25,8 @@ const double beam_mass = 98626.9;
 //MeV
 const double beam_en = 265;
   
-const int targZ = 82;
-const double targ_mass = 193688.0;
+const int targZ = 22;
+const double targ_mass = 44652.0;
 
 //Silicon detector z-offsets (downstream and upstream) (cm)
 double DS_Offset = 3.0;
@@ -35,12 +36,16 @@ double US_Offset = 3.0;
 const double beam_X = 0.0;
 const double beam_Y = 0.0;
 
-//Tigress configuration. 0 for detectors forward, 1 for detectors back
+//Tigress configuration. 0 for high-efficiency (detectors forward), 1 for figh Peak-to-Total (detectors back)
 const int tigConfig = 1;
 
 //Tigress Z-offset (cm)
 double Tigress_Offset = 0.0; 
 /////////////////////////////////////////////////////////////////////////
+
+//Gate on S3 rings (inclusive)
+const int Ri = 1;
+const int Rf = 24;
 
 ////Tigress Resolution////
 double Sigma(double en) {
@@ -161,12 +166,12 @@ TVector3 GetPos(const int det, const int ring, const int sec) {
   else
     clockwise = true;
 
-  double janus_outer_radius = 3.5;
-  double janus_inner_radius = 1.1;
+  double s3_outer_radius = 3.5;
+  double s3_inner_radius = 1.1;
 
   TVector3 pos(1.,0,0);
-  double rad_slope = (janus_outer_radius - janus_inner_radius)/24.;
-  double rad_offset = janus_inner_radius;
+  double rad_slope = (s3_outer_radius - s3_inner_radius)/24.;
+  double rad_offset = s3_inner_radius;
    
   pos.SetPerp((ring - 0.5)*rad_slope + rad_offset);
   
@@ -594,36 +599,46 @@ int main(int argc, char** argv) {
   }
   
   //S3 singles
-  TH2* bSum = new TH2D("Summary","Janus Summary",120,1,121,500,0,500);
-  TH2* pSum = new TH2D("pSummary","Janus Projectile Summary",120,1,121,500,0,500);
-  TH2* rSum = new TH2D("rSummary","Janus Recoil Summary",120,1,121,500,0,500);
+  TH2* bSum = new TH2D("Summary","S3 Summary",120,1,121,500,0,500);
+  TH2* pSum = new TH2D("pSummary","S3 Projectile Summary",120,1,121,500,0,500);
+  TH2* rSum = new TH2D("rSummary","S3 Recoil Summary",120,1,121,500,0,500);
 
+  TH2* pSvRDS = new TH2D("pSvRDS","Downstream projectile Sector vs Ring",24,1,25,32,1,33);
   TH2* pThvPhDS = new TH2D("pThvPhDS","Projectile #phi-#theta surface",1000,0,90,1000,-200,200);
   TH2* pThvPhDS1 = new TH2D("pThvPhDS1","Projectile #phi-#theta surface 1",1000,0,90,1000,-200,200);
   TH2* pThvPhDS2 = new TH2D("pThvPhDS2","Projectile #phi-#theta surface 2",1000,0,90,1000,-200,200);
 
   TH2* rThvPh = new TH2D("rThvPh","Recoil #phi-#theta surface",1000,0,90,1000,-200,200);
   
-  TH1* secD0 = new TH1D("Sectors_Det0","US Sectors",32,1,33);
-  TH1* secD1 = new TH1D("Sectors_Det1","DS Sectors",32,1,33);
+  TH1* secD0 = new TH1D("Sectors_Det0","Upstream Sectors",32,1,33);
+  TH1* secD1 = new TH1D("Sectors_Det1","Downstream Sectors",32,1,33);
 
   TH1* pSecDS = new TH1D("pSecDS","DS Projectile Sectors",32,1,33);
   TH1* rSec = new TH1D("rSec","Recoil Sectors",32,1,33);
   
-  TH2* rPid0 = new TH2D("RingPID_Det0","US RingEn PID",24,1,25,500,0,500);
-  TH2* rPid1 = new TH2D("RingPID_Det1","DS RingEn PID",24,1,25,500,0,500);
+  TH2* rPid0 = new TH2D("RingPID_Det0","Upstream Ring Energy PID",24,1,25,500,0,500);
+  TH2* rPid1 = new TH2D("RingPID_Det1","Downstream Ring Energy PID",24,1,25,500,0,500);
 
-  TH2* sPid0 = new TH2D("SecPID_Det0","US SectorEn PID",24,1,25,500,0,500);
-  TH2* sPid1 = new TH2D("SecPID_Det1","DS SectorEn PID",24,1,25,500,0,500);
+  TH2* sPid0 = new TH2D("SecPID_Det0","Upstream Sector Energy PID",24,1,25,500,0,500);
+  TH2* sPid1 = new TH2D("SecPID_Det1","Downstream Sector Energy PID",24,1,25,500,0,500);
 
-  TH2* sPid1_p = new TH2D("SecPID_Det1_proj","DS SectorEn Projectile PID",24,1,25,500,0,500);
-  TH2* sPid1_r = new TH2D("SecPID_Det1_rec","DS SectorEn Recoil PID",24,1,25,500,0,500);
+  TH2* sPid1_p = new TH2D("SecPID_Det1_proj","Downstream Sector Energy Projectile PID",24,1,25,500,0,500);
+  TH2* sPid1_r = new TH2D("SecPID_Det1_rec","Downsream Sector Energy Recoil PID",24,1,25,500,0,500);
   
   //Tigress singles
   TH1* coreEnergy = new TH1D("Core_Energy","Tigress Core Energy",12000,0,4000);
-  TH1* segEnergy = new TH1D("Seg_Energy","Tigress Segment Energy",12000,0,4000);
-
   TH2* coreSum = new TH2D("Core_Summary","Core Energy Summary",64,1,65,6000,0,4000);
+
+  TH1D* addEnergy = new TH1D("Add_Energy","Tigress Addback Energy",12000,0,4000);
+  TH2D* addSum = new TH2D("Add_Summary","Addback Energy Summary",64,1,65,6000,0,3000);
+
+  TH1D* supEnergy = new TH1D("Sup_Energy","Tigress Suppressed Energy",12000,0,4000);
+  TH2D* supSum = new TH2D("Sup_Summary","Suppressed Energy Summary",64,1,65,6000,0,3000);
+
+  TH1D* addSupEn = new TH1D("AddSup_En","Tigress Suppressed Addback Energy",12000,0,4000);
+  TH2D* addSupSum = new TH2D("AddSup_Sum","Suppressed Addback Energy Summary",64,1,65,6000,0,3000);
+  
+  TH1* segEnergy = new TH1D("Seg_Energy","Tigress Segment Energy",12000,0,4000);
   TH2* segSum = new TH2D("Seg_Summary","Segment Energy Summary",512,1,513,3000,0,3000);
 
   TH1* coreEn_Fep = new TH1D("FEP","Tigress FEP",12000,0,4000);
@@ -641,6 +656,15 @@ int main(int argc, char** argv) {
 
   TH1* pDopEnergyDS = new TH1D("Dop_EnergyDS","Doppler Energy",12000,0,4000);
   TH2* pDopSumDS = new TH2D("Dop_SummaryDS","Doppler Energy Summary",16,1,17,6000,0,3000);
+
+  TH1D* pAddDS = new TH1D("Add_EnergyDS","Addback Energy",12000,0,4000);
+  TH2D* pAddSumDS = new TH2D("Add_SummaryDS","Addback Energy Summary",64,1,65,6000,0,3000);
+
+  TH1D* pAddDopDS = new TH1D("AddDop_EnergyDS","Addback Doppler Energy",12000,0,4000);
+  TH2D* pAddDopSumDS = new TH2D("AddDop_SummaryDS","Addback Doppler Energy Summary",64,1,65,6000,0,3000);
+
+  TH1D* pSupDopDS = new TH1D("SupDop_EnDS","Suppressed Doppler Energy",12000,0,4000);
+  TH1D* pAddSupDopDS = new TH1D("AddSupDop_EnDS","Suppressed Addback Doppler Energy",12000,0,4000);
 
   TH1* pCoreEnergyDS_fep = new TH1D("Core_EnergyDS_fep","Tigress Core Energy FEP",12000,0,4000);
   TH1* pCoreEnergyDS_pfep = new TH1D("Core_EnergyDS_pfep","Tigress Core Energy Projectile FEP",12000,0,4000);
@@ -664,6 +688,10 @@ int main(int argc, char** argv) {
 
   TH1* pReconEnergyDS = new TH1D("Recon_EnergyDS","Recon Energy",12000,0,4000);
   TH2* pReconSumDS = new TH2D("Recon_SummaryDS","Recon Energy Summary",16,1,17,6000,0,3000);
+
+  TH1D* pSupReconEnDS = new TH1D("SupRecon_EnDS","Suppresed Recon Energy",12000,0,4000);
+  TH1D* pAddReconEnDS = new TH1D("AddRecon_EnDS","Addback Recon Energy",12000,0,4000);
+  TH1D* pAddSupReconEnDS = new TH1D("AddSupRecon_EnDS","Addback Suppresed Recon Energy",12000,0,4000);
 
   TH1* pReconEnergyDS_fep = new TH1D("Recon_EnergyDS_fep","Recon Energy FEP",12000,0,4000);
   TH1* pReconEnergyDS_pfep = new TH1D("Recon_EnergyDS_pfep","Recon Energy Projectile FEP",12000,0,4000);
@@ -689,6 +717,10 @@ int main(int argc, char** argv) {
   TH1* pDopEnergyUS = new TH1D("Dop_EnergyUS","Doppler Energy",12000,0,4000);
   TH2* pDopSumUS = new TH2D("Dop_SummaryUS","Doppler Energy Summary",16,1,17,6000,0,3000);
 
+  TH1D* pAddDopUS = new TH1D("AddDop_EnUS","Addback Doppler Energy",12000,0,4000);
+  TH1D* pSupDopUS = new TH1D("SupDop_EnUS","Suppressed Doppler Energy",12000,0,4000);
+  TH1D* pAddSupDopUS = new TH1D("AddSupDop_EnUS","Suppressed Addback Doppler Energy",12000,0,4000);
+
   TH1* pCoreEnergyUS_fep = new TH1D("Core_EnergyUS_fep","Tigress Core Energy FEP",12000,0,4000);
   TH1* pCoreEnergyUS_pfep = new TH1D("Core_EnergyUS_pfep","Tigress Core Energy Projectile FEP",12000,0,4000);
   TH1* pCoreEnergyUS_rfep = new TH1D("Core_EnergyUS_rfep","Tigress Core Energy Recoil FEP",12000,0,4000);
@@ -709,6 +741,10 @@ int main(int argc, char** argv) {
 
   TH1* pReconEnergyUS = new TH1D("Recon_EnergyUS","Recon Energy",12000,0,4000);
   TH2* pReconSumUS = new TH2D("Recon_SummaryUS","Recon Energy Summary",16,1,17,6000,0,3000);
+
+  TH1D* pAddReconUS = new TH1D("AddRecon_EnUS","Addback Recon Energy",12000,0,4000);
+  TH1D* pSupReconUS = new TH1D("SupRecon_EnUS","Suppressed Recon Energy",12000,0,4000);
+  TH1D* pAddSupReconUS = new TH1D("AddSupRecon_EnUS","Suppressed Addback Recon Energy",12000,0,4000);
 
   TH1* pReconEnergyUS_fep = new TH1D("Recon_EnergyUS_fep","Recon Energy FEP",12000,0,4000);
   TH1* pReconEnergyUS_pfep = new TH1D("Recon_EnergyUS_pfep","Recon Energy Projectile FEP",12000,0,4000);
@@ -734,6 +770,10 @@ int main(int argc, char** argv) {
   TH1* rDopEnergy = new TH1D("Dop_EnergyRec","Doppler Energy",12000,0,4000);
   TH2* rDopSum = new TH2D("Dop_SummaryRec","Doppler Energy Summary",16,1,17,6000,0,3000);
 
+  TH1D* rAddDopEn = new TH1D("AddDop_EnRec","Addback Doppler Energy",12000,0,4000);
+  TH1D* rSupDopEn = new TH1D("SupDop_EnRec","Suppressed Doppler Energy",12000,0,4000);
+  TH1D* rAddSupDopEn = new TH1D("AddSupDop_EnRec","Suppressed Addback Doppler Energy",12000,0,4000);
+
   TH1* rCoreEnergy_fep = new TH1D("Core_EnergyRec_fep","Tigress Core Energy FEP",12000,0,4000);
   TH1* rCoreEnergy_pfep = new TH1D("Core_EnergyRec_pfep","Tigress Core Energy Projectile FEP",12000,0,4000);
   TH1* rCoreEnergy_rfep = new TH1D("Core_EnergyRec_rfep","Tigress Core Energy Recoil FEP",12000,0,4000);
@@ -753,6 +793,10 @@ int main(int argc, char** argv) {
 
   TH1* rReconEnergy = new TH1D("Recon_EnergyRec","Recon Energy",12000,0,4000);
   TH2* rReconSum = new TH2D("Recon_SummaryRec","Recon Energy Summary",16,1,17,6000,0,3000);
+
+  TH1D* rRecAddEn = new TH1D("AddRecon_EnRec","Addback Recon Energy",12000,0,4000);
+  TH1D* rRecSupEn = new TH1D("SupRecon_EnRec","Suppressed Recon Energy",12000,0,4000);
+  TH1D* rRecAddSupEn = new TH1D("AddSupRecon_EnRec","Suppressed Addback Recon Energy",12000,0,4000);
 
   TH1* rReconEnergy_fep = new TH1D("Recon_EnergyRec_fep","Recon Energy FEP",12000,0,4000);
   TH1* rReconEnergy_pfep = new TH1D("Recon_EnergyRec_pfep","Recon Energy Projectile FEP",12000,0,4000);
@@ -796,6 +840,9 @@ int main(int argc, char** argv) {
       int ring = data.s3[i].ring;
       int sec = data.s3[i].sector;
 
+      if(ring < Ri || ring > Rf)
+	continue;
+      
       double ring_en = data.s3[i].rEn;
       double sec_en = data.s3[i].sEn;
 
@@ -841,6 +888,7 @@ int main(int argc, char** argv) {
 	  pSum->Fill(ring+96,ring_en);
 
 	  pSecDS->Fill(sec);
+	  pSvRDS->Fill(ring,sec);
 	  pThvPhDS->Fill(pos.Theta()*r2d,pos.Phi()*r2d);
 	  
 	  if(ring%2) {
@@ -883,6 +931,8 @@ int main(int argc, char** argv) {
       int det = data.tigress[i].det;
       double en = data.tigress[i].cEn;
       double core_en = rand->Gaus(en,Sigma(en));
+      bool fep = data.tigress[i].fep;
+      bool sup = data.tigress[i].sup;
       
       coreEnergy->Fill(core_en);
       coreSum->Fill(det,core_en);
@@ -910,14 +960,39 @@ int main(int argc, char** argv) {
 	
       }
       
-      if(data.tigress[i].fep) {
+      if(fep) {
 	coreEn_Fep->Fill(core_en);
       }
       else {
 	coreEn_NotFep->Fill(core_en);
       }
+
+      if(!sup) {
+	supEnergy->Fill(core_en);
+	supSum->Fill(det,core_en);
+      }
       
     } //End Tigress singles
+
+    //Tigress Addback
+    for(unsigned int i=0;i<data.tigressAB.size();i++) {
+
+      int det = data.tigressAB[i].det;
+      //int seg = data.tigressAB[i].MainSeg();
+      bool sup = data.tigressAB[i].sup;
+      
+      double en = data.tigressAB[i].cEn;
+      double coreEn = rand->Gaus(en,Sigma(en));
+      
+      addEnergy->Fill(coreEn);
+      addSum->Fill(det,coreEn);
+
+      if(!sup) {
+	addSupEn->Fill(coreEn);
+	addSupSum->Fill(det,coreEn);
+      }
+      
+    } //end Addback Tigress loop
 
     //Coincidences
     if(data.nS3 > 0 && data.nTi > 0) {
@@ -927,6 +1002,9 @@ int main(int argc, char** argv) {
 	int bDet = data.s3[i].det;
 	int ring = data.s3[i].ring;
 	int sector = data.s3[i].sector;
+
+	if(ring < Ri || ring > Rf)
+	  continue;
 
 	double ring_en = data.s3[i].rEn;
         double sec_en = data.s3[i].sEn;
@@ -941,9 +1019,8 @@ int main(int argc, char** argv) {
 	  rPidDS->Fill(ring,ring_en);
 
 	  bool sol2 = false;
-	  if(sec_en < Sol2_En) {
+	  if(sec_en < Sol2_En)
 	    sol2 = true;
-	  }
 	  
 	  double thetaCM = Theta_CM_FP(bPos.Theta(),beam_en,sol2);
 	  
@@ -959,16 +1036,19 @@ int main(int argc, char** argv) {
 	  rPos.SetTheta(Recoil_Theta_LAB(thetaCM,beam_en));
 	  rPos.SetPhi(bPos.Phi() - TMath::Pi());
 	  
-	  for(int i=0;i<data.nTi;i++) {
+	  for(int j=0;j<data.nTi;j++) {
 
-	    int det = data.tigress[i].det;
-	    int seg = data.tigress[i].MainSeg();
-	    double en = data.tigress[i].cEn;
+	    int det = data.tigress[j].det;
+	    int seg = data.tigress[j].MainSeg();
+	    double en = data.tigress[j].cEn;
 	    double coreEn = rand->Gaus(en,Sigma(en));
-	    bool FEP = data.tigress[i].fep;
-	    bool PFEP = data.tigress[i].pfep;
+	    bool FEP = data.tigress[j].fep;
+	    bool PFEP = data.tigress[j].pfep;
+	    bool SUP = data.tigress[j].sup;
 	  
 	    TVector3 sPos = GetPos(det,seg);
+	    sPos.SetX(sPos.X() - beam_X);
+	    sPos.SetY(sPos.Y() - beam_Y);
 
 	    double theta = bPos.Angle(sPos);
 	    double dopEn = gam*(1 - beta*TMath::Cos(theta))*coreEn;
@@ -977,19 +1057,16 @@ int main(int argc, char** argv) {
 	    TVector3 detPlane = sPos.Cross(incBeam);
 
 	    double reac_phi = reacPlane.Phi();
-	    if(reac_phi < 0) {
+	    if(reac_phi < 0)
 	      reac_phi += TMath::TwoPi();
-	    }
 
 	    double det_phi = detPlane.Phi();
-	    if(det_phi < 0) {
+	    if(det_phi < 0)
 	      det_phi += TMath::TwoPi();
-	    }
 
 	    double planeAng = reac_phi - det_phi;
-	    if(planeAng < 0) {
+	    if(planeAng < 0)
 	      planeAng += TMath::TwoPi();
-	    }
 
 	    double recon_theta = rPos.Angle(sPos);
 	    double recon_en = recon_gam*(1 - recon_beta*TMath::Cos(recon_theta))*coreEn;
@@ -997,14 +1074,12 @@ int main(int argc, char** argv) {
 	    TVector3 reconPlane = rPos.Cross(incBeam);
 
 	    double recon_phi = reconPlane.Phi();
-	    if(recon_phi < 0) {
+	    if(recon_phi < 0)
 	      recon_phi += TMath::TwoPi();
-	    }
 
 	    double reconAng = recon_phi - det_phi;
-	    if(reconAng < 0) {
+	    if(reconAng < 0)
 	      reconAng += TMath::TwoPi();
-	    }
 	    
 	    pCoreEnergyDS->Fill(coreEn);
 	    pCoreSumDS->Fill(det,coreEn);
@@ -1030,6 +1105,11 @@ int main(int argc, char** argv) {
 	      pDopEnergyDS_nfep->Fill(dopEn);
 	      pReconEnergyDS_nfep->Fill(recon_en);
 	    }
+
+	    if(!SUP) {
+	      pSupDopDS->Fill(dopEn);
+	      pSupReconEnDS->Fill(recon_en);
+	    }
 	    
 	    pDopEnergyDS->Fill(dopEn);
 	    pDopSumDS->Fill(det,dopEn);
@@ -1054,6 +1134,41 @@ int main(int argc, char** argv) {
 	    pReconPhCrtDS->Fill(recon_en,reconAng*r2d);
 	    
 	  } //End Tigress loop
+
+	  for(unsigned int j=0;j<data.tigressAB.size();j++) {
+
+	    int det = data.tigressAB[j].det;
+	    int seg = data.tigressAB[j].MainSeg();
+	    
+	    double en = data.tigressAB[j].cEn;
+	    double coreEn = rand->Gaus(en,Sigma(en));
+	    bool SUP = data.tigressAB[j].sup;
+	 
+	    TVector3 sPos = GetPos(det,seg);
+	    sPos.SetX(sPos.X() - beam_X);
+	    sPos.SetY(sPos.Y() - beam_Y);
+	    
+	    double theta = bPos.Angle(sPos);
+	    double dopEn = gam*(1 - beta*TMath::Cos(theta))*coreEn;
+
+	    double recon_theta = rPos.Angle(sPos);
+	    double recon_en = recon_gam*(1 - recon_beta*TMath::Cos(recon_theta))*coreEn;
+	    
+	    pAddDS->Fill(coreEn);
+	    pAddSumDS->Fill(det,coreEn);
+
+	    pAddDopDS->Fill(dopEn);
+	    pAddDopSumDS->Fill(det,dopEn);
+
+	    pAddReconEnDS->Fill(recon_en);
+
+	    if(!SUP) {
+	      pAddSupDopDS->Fill(dopEn);
+	      pAddSupReconEnDS->Fill(recon_en);
+	    }
+	    
+	  } //end Addback Tigress loop
+	  
 	} //End DS projectile gate
 
 	else if(!bDet && data.s3[i].rP && data.s3[i].sP) { //Projectile US gate
@@ -1075,16 +1190,19 @@ int main(int argc, char** argv) {
 	  rPos.SetTheta(Recoil_Theta_LAB(thetaCM,beam_en));
 	  rPos.SetPhi(bPos.Phi() - TMath::Pi());
 	  
-	  for(int i=0;i<data.nTi;i++) {
+	  for(int j=0;j<data.nTi;j++) {
 
-	    int det = data.tigress[i].det;
-	    int seg = data.tigress[i].MainSeg();
-	    double en = data.tigress[i].cEn;
+	    int det = data.tigress[j].det;
+	    int seg = data.tigress[j].MainSeg();
+	    double en = data.tigress[j].cEn;
 	    double coreEn = rand->Gaus(en,Sigma(en));
-	    bool FEP = data.tigress[i].fep;
-	    bool PFEP = data.tigress[i].pfep;
+	    bool FEP = data.tigress[j].fep;
+	    bool PFEP = data.tigress[j].pfep;
+	    bool SUP = data.tigress[j].sup;
 	  
 	    TVector3 sPos = GetPos(det,seg);
+	    sPos.SetX(sPos.X() - beam_X);
+	    sPos.SetY(sPos.Y() - beam_Y);
 
 	    double theta = bPos.Angle(sPos);
 	    double dopEn = gam*(1 - beta*TMath::Cos(theta))*coreEn;
@@ -1093,19 +1211,16 @@ int main(int argc, char** argv) {
 	    TVector3 detPlane = sPos.Cross(incBeam);
 
 	    double reac_phi = reacPlane.Phi();
-	    if(reac_phi < 0) {
+	    if(reac_phi < 0)
 	      reac_phi += TMath::TwoPi();
-	    }
 
 	    double det_phi = detPlane.Phi();
-	    if(det_phi < 0) {
+	    if(det_phi < 0)
 	      det_phi += TMath::TwoPi();
-	    }
 
 	    double planeAng = reac_phi - det_phi;
-	    if(planeAng < 0) {
+	    if(planeAng < 0)
 	      planeAng += TMath::TwoPi();
-	    }
 
 	    double recon_theta = rPos.Angle(sPos);
 	    double recon_en = recon_gam*(1 - recon_beta*TMath::Cos(recon_theta))*coreEn;
@@ -1113,14 +1228,12 @@ int main(int argc, char** argv) {
 	    TVector3 reconPlane = rPos.Cross(incBeam);
 
 	    double recon_phi = reconPlane.Phi();
-	    if(recon_phi < 0) {
+	    if(recon_phi < 0)
 	      recon_phi += TMath::TwoPi();
-	    }
 
 	    double reconAng = recon_phi - det_phi;
-	    if(reconAng < 0) {
+	    if(reconAng < 0)
 	      reconAng += TMath::TwoPi();
-	    }
 
 	    pCoreEnergyUS->Fill(coreEn);
 	    pCoreSumUS->Fill(det,coreEn);
@@ -1149,6 +1262,11 @@ int main(int argc, char** argv) {
 	      pDopEnergyUS_nfep->Fill(dopEn);
 	      pReconEnergyUS_nfep->Fill(recon_en);
 	    }
+
+	    if(!SUP) {
+	      pSupDopUS->Fill(dopEn);
+	      pSupReconUS->Fill(recon_en);
+	    }
 	    
 	    pDopvPartUS->Fill(dopEn,sec_en);
 
@@ -1170,6 +1288,37 @@ int main(int argc, char** argv) {
 	    pReconPhCrtUS->Fill(recon_en,reconAng*r2d);
 	  
 	  } //End Tigress loop
+
+	  for(unsigned int j=0;j<data.tigressAB.size();j++) {
+
+	    int det = data.tigressAB[j].det;
+	    int seg = data.tigressAB[j].MainSeg();
+	    
+	    double en = data.tigressAB[j].cEn;
+	    double coreEn = rand->Gaus(en,Sigma(en));
+	    //bool FEP = data.tigressAB[j].fep;
+	    //bool PFEP = data.tigressAB[j].pfep;
+	    bool SUP = data.tigressAB[j].sup;
+	 
+	    TVector3 sPos = GetPos(det,seg);
+	    sPos.SetX(sPos.X() - beam_X);
+	    sPos.SetY(sPos.Y() - beam_Y);
+	    
+	    double theta = bPos.Angle(sPos);
+	    double dopEn = gam*(1 - beta*TMath::Cos(theta))*coreEn;
+
+	    double recon_theta = rPos.Angle(sPos);
+	    double recon_en = recon_gam*(1 - recon_beta*TMath::Cos(recon_theta))*coreEn;
+
+	    pAddDopUS->Fill(dopEn);
+	    pAddReconUS->Fill(recon_en);
+	    if(!SUP) {
+	      pAddSupDopUS->Fill(dopEn);
+	      pAddSupReconUS->Fill(recon_en);
+	    }
+	    
+	  } //end Addback Tigress loop
+	  
 	} ////End US projectile gate
 
 	else if(data.s3[i].rR && data.s3[i].sR) { //Recoil gate
@@ -1191,14 +1340,15 @@ int main(int argc, char** argv) {
 	  rPos.SetTheta(Theta_LAB(thetaCM,beam_en));
 	  rPos.SetPhi(bPos.Phi() - TMath::Pi());
 
-	  for(int i=0;i<data.nTi;i++) {
+	  for(int j=0;j<data.nTi;j++) {
 
-	    int det = data.tigress[i].det;
-	    int seg = data.tigress[i].MainSeg();
-	    double en = data.tigress[i].cEn;
+	    int det = data.tigress[j].det;
+	    int seg = data.tigress[j].MainSeg();
+	    double en = data.tigress[j].cEn;
 	    double coreEn = rand->Gaus(en,Sigma(en));
-	    bool FEP = data.tigress[i].fep;
-	    bool PFEP = data.tigress[i].pfep;
+	    bool FEP = data.tigress[j].fep;
+	    bool PFEP = data.tigress[j].pfep;
+	    bool SUP = data.tigress[j].sup;
 	  
 	    TVector3 sPos = GetPos(det,seg);
 
@@ -1209,19 +1359,16 @@ int main(int argc, char** argv) {
 	    TVector3 detPlane = sPos.Cross(incBeam);
 
 	    double reac_phi = reacPlane.Phi();
-	    if(reac_phi < 0) {
+	    if(reac_phi < 0)
 	      reac_phi += TMath::TwoPi();
-	    }
 
 	    double det_phi = detPlane.Phi();
-	    if(det_phi < 0) {
+	    if(det_phi < 0)
 	      det_phi += TMath::TwoPi();
-	    }
 
 	    double planeAng = reac_phi - det_phi;
-	    if(planeAng < 0) {
+	    if(planeAng < 0)
 	      planeAng += TMath::TwoPi();
-	    }
 
 	    double recon_theta = rPos.Angle(sPos);
 	    double recon_en = recon_gam*(1 - recon_beta*TMath::Cos(recon_theta))*coreEn;
@@ -1229,14 +1376,12 @@ int main(int argc, char** argv) {
 	    TVector3 reconPlane = rPos.Cross(incBeam);
 
 	    double recon_phi = reconPlane.Phi();
-	    if(recon_phi < 0) {
+	    if(recon_phi < 0)
 	      recon_phi += TMath::TwoPi();
-	    }
 
 	    double reconAng = recon_phi - det_phi;
-	    if(reconAng < 0) {
+	    if(reconAng < 0)
 	      reconAng += TMath::TwoPi();
-	    }
 	    
 	    rCoreEnergy->Fill(coreEn);
 	    rCoreSum->Fill(det,coreEn);
@@ -1266,6 +1411,11 @@ int main(int argc, char** argv) {
 	      rReconEnergy_nfep->Fill(recon_en);
 	    }
 
+	    if(!SUP) {
+	      rSupDopEn->Fill(dopEn);
+	      rRecSupEn->Fill(recon_en);
+	    }
+
 	    rDopvPart->Fill(dopEn,sec_en);
 
 	    rThCor->Fill(coreEn,theta*r2d);
@@ -1285,7 +1435,39 @@ int main(int argc, char** argv) {
 	    rReconPhCor->Fill(coreEn,reconAng*r2d);
 	    rReconPhCrt->Fill(recon_en,reconAng*r2d);
 	    
-	  } //End Tigress loop  
+	  } //End Tigress loop
+
+	  for(unsigned int j=0;j<data.tigressAB.size();j++) {
+
+	    int det = data.tigressAB[j].det;
+	    int seg = data.tigressAB[j].MainSeg();
+	    
+	    double en = data.tigressAB[j].cEn;
+	    double coreEn = rand->Gaus(en,Sigma(en));
+	    //bool FEP = data.tigressAB[j].fep;
+	    //bool PFEP = data.tigressAB[j].pfep;
+	    bool SUP = data.tigressAB[j].sup;
+	 
+	    TVector3 sPos = GetPos(det,seg);
+	    sPos.SetX(sPos.X() - beam_X);
+	    sPos.SetY(sPos.Y() - beam_Y);
+	    
+	    double theta = bPos.Angle(sPos);
+	    double dopEn = gam*(1 - beta*TMath::Cos(theta))*coreEn;
+
+	    double recon_theta = rPos.Angle(sPos);
+	    double recon_en = recon_gam*(1 - recon_beta*TMath::Cos(recon_theta))*coreEn;
+
+	    rAddDopEn->Fill(dopEn);
+	    rRecAddEn->Fill(recon_en);
+
+	    if(!SUP) {
+	      rAddSupDopEn->Fill(dopEn);
+	      rRecAddSupEn->Fill(recon_en);
+	    }
+	    
+	  } //end Addback Tigress loop
+	  
 	} //End recoil gate
 	
       } //End S3 loop
@@ -1336,6 +1518,7 @@ int main(int argc, char** argv) {
 
   pSecDS->Write();
   rSec->Write();
+  pSvRDS->Write();
 
   sPid1_p->Write();
   sPid1_r->Write();
@@ -1344,8 +1527,18 @@ int main(int argc, char** argv) {
 
   coreEnergy->Write();
   coreSum->Write();
+  
   segEnergy->Write();
   segSum->Write();
+
+  addEnergy->Write();
+  addSum->Write();
+
+  supEnergy->Write();
+  supSum->Write();
+
+  addSupEn->Write();
+  addSupSum->Write();
 
   coreEn_Fep->Write();
   coreEn_NotFep->Write();
@@ -1360,6 +1553,9 @@ int main(int argc, char** argv) {
   pCoreEnergyDS->Write();
   pCoreSumDS->Write();
 
+  pAddDS->Write();
+  pAddSumDS->Write();
+  
   pCoreEnergyDS_fep->Write();
   pCoreEnergyDS_pfep->Write();
   pCoreEnergyDS_rfep->Write();
@@ -1369,6 +1565,12 @@ int main(int argc, char** argv) {
   
   pDopEnergyDS->Write();
   pDopSumDS->Write();
+
+  pAddDopDS->Write();
+  pAddDopSumDS->Write();
+
+  pSupDopDS->Write();
+  pAddSupDopDS->Write();
 
   pDopEnergyDS_fep->Write();
   pDopEnergyDS_pfep->Write();
@@ -1387,6 +1589,10 @@ int main(int argc, char** argv) {
 
   pReconEnergyDS->Write();
   pReconSumDS->Write();
+
+  pSupReconEnDS->Write();
+  pAddReconEnDS->Write();
+  pAddSupReconEnDS->Write();
 
   pReconEnergyDS_fep->Write();
   pReconEnergyDS_pfep->Write();
@@ -1419,6 +1625,10 @@ int main(int argc, char** argv) {
   pDopEnergyUS->Write();
   pDopSumUS->Write();
 
+  pSupDopUS->Write();
+  pAddDopUS->Write();
+  pAddSupDopUS->Write();
+
   pDopEnergyUS_fep->Write();
   pDopEnergyUS_pfep->Write();
   pDopEnergyUS_rfep->Write();
@@ -1436,6 +1646,10 @@ int main(int argc, char** argv) {
 
   pReconEnergyUS->Write();
   pReconSumUS->Write();
+
+  pSupReconUS->Write();
+  pAddReconUS->Write();
+  pAddSupReconUS->Write();
 
   pReconEnergyUS_fep->Write();
   pReconEnergyUS_pfep->Write();
@@ -1468,6 +1682,10 @@ int main(int argc, char** argv) {
   rDopEnergy->Write();
   rDopSum->Write();
 
+  rSupDopEn->Write();
+  rAddDopEn->Write();
+  rAddSupDopEn->Write();
+
   rDopEnergy_fep->Write();
   rDopEnergy_pfep->Write();
   rDopEnergy_rfep->Write();
@@ -1486,6 +1704,10 @@ int main(int argc, char** argv) {
   rReconEnergy->Write();
   rReconSum->Write();
 
+  rRecSupEn->Write();
+  rRecAddEn->Write();
+  rRecAddSupEn->Write();
+  
   rReconEnergy_fep->Write();
   rReconEnergy_pfep->Write();
   rReconEnergy_rfep->Write();
