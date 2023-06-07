@@ -1,9 +1,9 @@
 #ifndef Gamma_Decay_h
 #define Gamma_Decay_h 1
 
-#include "G4ParticleDefinition.hh"
 #include "Polarization_Transition.hh"
 
+#include "G4ParticleDefinition.hh"
 #include "G4VDecayChannel.hh"
 
 class Gamma_Decay : public G4VDecayChannel {

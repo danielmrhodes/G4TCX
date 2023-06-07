@@ -11,7 +11,6 @@
 
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
-#include "G4PhysicalConstants.hh"
 
 Excitation::Excitation(G4bool prj) : proj(prj) {
   

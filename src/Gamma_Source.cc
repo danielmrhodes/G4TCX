@@ -8,7 +8,6 @@
 
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
-#include "G4PhysicalConstants.hh"
 
 Gamma_Source::Gamma_Source() {
 

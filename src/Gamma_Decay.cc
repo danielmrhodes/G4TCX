@@ -1,5 +1,4 @@
 #include "Gamma_Decay.hh"
-#include "G4ParticleDefinition.hh"
 #include "G4ParticleMomentum.hh"
 #include "G4DynamicParticle.hh"
 #include "G4DecayProducts.hh"
