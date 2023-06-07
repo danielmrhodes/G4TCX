@@ -41,13 +41,14 @@ The three simulation modes require different commands in their macro files. Howe
 
 <pre>
 /Mode mode
-<i>(optional geometry commands)</i>
-<i>(mode specific commands)</i>
-<i>(optional output commands)</i>
+<i>--optional geometry commands--</i>
+<i>--mode specific commands--</i>
+<i>--optional output commands--</i>
+/run/numberOfThreads nThreads
 /run/beamOn nEvents
 </pre>
 
-The /Mode command must come first, and the parameter (mode) can be Source, Scattering, or Full. Example macros for each mode are in the Examples/Macros folder.
+The /Mode command must come first, and the parameter (mode) can be Source, Scattering, or Full. The default number of threads is four. Example macros for each mode are in the Examples/Macros folder.
 
 Output Commands
 -----------------
@@ -73,16 +74,15 @@ The /Geometry commands are common across all modes. With the exception of /Geome
 | /Geometry/S3/UpstreamOffset *double unit* | Set (positive) z-offset of upstream silicon detector. (Default: 3 cm) |
 | /Geometry/S3/DownstreamOffset *double unit* | Set (positive) z-offset of downstream silicon detector. (Default: 3 cm) |
 | /Geometry/Target/StandardTarget *string* | Set parameters for a standard target: 208Pb, 48Ti, 196Pt, 197Au, or 110Pd. |
-| /Geometry/Target/StepSize *double unit* | Set simulation step size inside the target. (Default: 0.05*target_width) |
+| /Geometry/Target/StepSize *double unit* | Set simulation step size inside the target. (Default: 0.05*thickness) |
 | /Geometry/Target/Z *int* | Set Z of target nucleus. (Default: 82) |
 | /Geometry/Target/N *int* | Set N of target nucleus. (Default: 126) |
 | /Geometry/Target/Density *double unit* | Set (volume) density of target material. (Default: 11.382 g/cm<sup>3</sup>) |
 | /Geometry/Target/Mass *double unit* | Set mass of target material. (Default: 207.97665 g/mole) |
 | /Geometry/Target/Thickness *double unit* | Set (linear) thickness of target. (Default: 882 nm) |
 | /Geometry/Target/Radius *double unit* | Set radius of target. (Default: 0.5 cm) |
-| /Geometry/Update | Update the simulation with your desired geometry. |
 
-The various /Construct commands are mandatory if you need to include that particular piece of the setup.
+The various /Construct commands are mandatory if you want to include that particular piece of the setup in the simulation.
 
 The /Geometry/Tigress/SetFrameConfiguration has four possible parameters, 0-3. Choose 0 for the full structure, 1 for the upstream lampshade only, 2 for the downstream lampshade only, or 3 for only the corona. Note the appropriate Tigress detectors will be automatically removed from the simulation if you choose a non-zero frame configuration.
 
@@ -147,7 +147,7 @@ There are no "safety checks" for these commands. For example, you could add an a
 
 Full Mode Commands
 -----------------
-For the Full CoulEx simulation, all Scattering mode commands still apply. Additionally, /Excitation commands can be called which determine the level scheme, excitation pattern, and nuclear alignment in both the projectile and recoil nucleus. All /Excitation commands are optional. Not calling any /Excitation commands will reduce the Full simulation to a Scattering simulation.
+For the Full CoulEx simulation, all Scattering mode commands still apply. Additionally, /Excitation commands can be called which determine the level scheme, excitation pattern, and nuclear alignment in both the projectile and recoil nucleus. All /Excitation commands are optional.
 
 | Command | Description |
 | --- | --- |
@@ -158,7 +158,7 @@ For the Full CoulEx simulation, all Scattering mode commands still apply. Additi
 | /Excitation/Projectile/NoFeeding | Turn off feeding to the state selected by the /OnlyConsiderState command. |
 | /Excitation/Projectile/PopulateState *int* | Choose one state to populate in the projectile, irrespective of scattering angle and beam energy. This only requires a level scheme file (the probabilities file will simply be ignored). |
 | /Excitation/Projectile/GroundStateSpin *double* | Set the spin of the projectile ground state. The spin must be integer or half-integer. (Default: 0.0) |
-| /DeorientationEffect/Projectile/CalculateGk *bool* | Control whether the deorientation effect coefficients G<sub>k</sub> will be calculated for the projectile. These attenuate the nuclear alignment induced after CoulEx, and are only used if the statistical tensors file is provided. (Default: true) |
+| /DeorientationEffect/Projectile/CalculateGk *bool* | Control whether the deorientation effect coefficients G<sub>k</sub>, which attenuate the nuclear alignment, will be calculated and applied for the projectile. (Default: true) |
 | /DeorientationEffect/Projectile/AverageJ *double* | Set the average atomic spin in the projectile for the deorentation effect two-state model (Default: 3.0) |
 | /DeorientationEffect/Projectile/Gamma *double* | Set the FWHM of the frequency distribution (ps^-1 ) in the projectile for the deorentation effect two-state model (Default: 0.02) |
 | /DeorientationEffect/Projectile/Lambda *double* | Set the transition rate (ps^-1 ) between static and fluctuating states in the projectile for the deorentation effect two-state model (Default: 0.0345) |
@@ -179,9 +179,9 @@ Input Preparation
 -----------------
 The ROOT script MakeInput.C, found in the Helpers folder, will make the probabilities file and statistical tensors file that can be given to G4TCX. You will need to edit the script with your particular reaction parameters. The script uses the Coulomb excitation code Cygnus [3] for the calculations. The Cygnus libraries must be loaded into the ROOT session before loading MakeInput.C, and the Cygnus nucleus file must already be created. See [3] for details.
 
-You can inspect the probabilities and statistical tensors calculated for the various states using the scripts prob_reader.C and tensor_reader.C. You must edit the tensor_reader.C file with the excited state spins for the nucleus you are looking at.
+You can inspect the probabilities and statistical tensors calculated for the various states using the scripts prob_reader.C and tensor_reader.C, also found in the Helpers folder. You must edit the tensor_reader.C script with the excited state spins for the nucleus you are looking at.
 
-There are two other scripts in the Helpers folder which can assist in preparing the necessary input files. The script MakeNucleus.C can take a Gosia output file and create a Cygnus nucleus file. The script MakeLevelScheme.C can take a Cygnus nucleus file and create the level scheme file needed by G4TCX for a Full simulation (not Source). Therefore you should only need to make one file manuall: a Gosia file, a Cygnus file, or the level scheme file.
+There are two other scripts in the Helpers folder which can assist in preparing the necessary input files. The script MakeNucleus.C can take a Gosia output file and create a Cygnus nucleus file. The script MakeLevelScheme.C can take a Cygnus nucleus file and create the level scheme file needed by G4TCX (for a Full simulation). Therefore, you should only need to create one file manuall: a Gosia file, a Cygnus file, or the level scheme file.
 
 The level scheme file has a different format depending on the simulation mode (Source or Full). These are  described below.
 
@@ -233,7 +233,9 @@ The Source level scheme file is the same the Full level schem file (above), but 
 
 Notes
 ----------------
-*If the incoming particle trajectory is not parallel to the z-axis, which can be accomplished with optional /Beam commands, the statistical tensor will not be correct. Correcting this requires a coordinate system rotation which is not yet implemented.*
+The simulation very rarely segfaults at the start, which I believe is due to some of the initial simulation setup not being strictly thread-safe. I've never seen a segfault during the event loop, and this doesn't seem to impact the simulation in any way.
+
+If the incoming particle trajectory is not parallel to the z-axis, which can be accomplished with optional /Beam commands, the statistical tensor will not be correct. Correcting this requires a coordinate system rotation which is not yet implemented.
 
 References
 -----------------
