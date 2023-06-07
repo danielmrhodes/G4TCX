@@ -9,7 +9,6 @@
 #include "G4MTRunManager.hh"
 #include "G4WorkerRunManager.hh"
 #include "G4SDManager.hh"
-#include "G4String.hh"
 #include "G4Threading.hh"
 
 Run_Action::Run_Action() {
@@ -29,8 +28,7 @@ Run_Action::~Run_Action() {
 }
 
 void Run_Action::BeginOfRunAction(const G4Run* aRun) {
-
-  //G4AutoLock l(&aMutex);
+  
   if(IsMaster())
     return;
   
