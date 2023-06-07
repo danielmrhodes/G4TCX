@@ -14,6 +14,7 @@ int main(int argc, char** argv) {
   
   //Construct the run manager
   G4MTRunManager* runManager = new G4MTRunManager();
+  runManager->SetNumberOfThreads(4);
 
   //Provide mandatory classes
   runManager->SetUserInitialization(new Detector_Construction());
@@ -22,15 +23,14 @@ int main(int argc, char** argv) {
 
   G4UImanager* UI = G4UImanager::GetUIpointer();
   if(argc == 1) { //Interactive Mode
-
-    /*
+    
     UI->ApplyCommand("/Geometry/Tigress/Construct");
     UI->ApplyCommand("/Geometry/S3/Construct");
     UI->ApplyCommand("/Geometry/Target/Construct");
 
     runManager->SetNumberOfThreads(1);
     runManager->Initialize();
-
+    
     G4VisManager* visManager = new G4VisExecutive();
     visManager->Initialize();
     
@@ -43,36 +43,10 @@ int main(int argc, char** argv) {
     
     delete session;
     delete visManager;
-    */
-
-    runManager->SetNumberOfThreads(2);
-    G4String filename = "co60.mac";
-
-    //Worker threads also need macro commands
-    runManager->SetUserInitialization(new Worker_Initialization(filename));
-
-    //Manually parse macro file for master thread commands
-    std::ifstream file(filename.c_str());
-    G4String line;
-    while(std::getline(file,line)) {
-
-      if(G4StrUtil::contains(line,"/run/beamOn"))
-	break;
-
-      if(G4StrUtil::contains(line,"/Geometry") || G4StrUtil::contains(line,"/Output")
-	 || G4StrUtil::contains(line,"/run"))
-	UI->ApplyCommand(line);
-      
-    }
-
-    runManager->Initialize();
-    
-    UI->ApplyCommand(line); //beamOn command
     
   }
   else { //Batch Mode
-
-    runManager->SetNumberOfThreads(2);
+    
     G4String filename = argv[1];
 
     //Worker threads also need macro commands
@@ -93,12 +67,12 @@ int main(int argc, char** argv) {
     }
 
     runManager->Initialize();
-    
     UI->ApplyCommand(line); //beamOn command
     
   }
   
   delete runManager;
+  
   return 0;
   
 }
