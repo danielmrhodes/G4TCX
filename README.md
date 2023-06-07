@@ -57,7 +57,7 @@ The /Output commands are common across all modes. Both /Output commands are opti
 | Command | Description |
 | --- | --- |
 | /Output/Filename *string* | Set the name of the output data file (Default: output.dat) |
-| /Output/OnlyWriteCoincidences | Only write coincidence data to file. This can significantly reduce the size of the output file |
+| /Output/OnlyWriteCoincidences | Only write particle-gamma coincidence data to file. This can significantly reduce the size of the output file |
 
 Geometry Commands
 -----------------
