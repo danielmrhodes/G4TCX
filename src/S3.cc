@@ -130,26 +130,5 @@ void S3::Placement(G4LogicalVolume* world, G4double USoff, G4double DSoff, G4boo
   new G4PVPlacement(0,G4ThreeVector(0,0,DSoff),pcb_holderL,"pcbH1",world,false,1,check);
   new G4PVPlacement(0,G4ThreeVector(0,0,-USoff),pcb_holderL,"pcbH0",world,false,0,check);
   
-  /*
-  //Make connectors between pcb holders
-  G4Tubs* conS = new G4Tubs("conS",0,0.394*cm,(DSoff+USoff-1.1*thickness)/2.0,0,2.0*pi);
-  G4LogicalVolume* conL = new G4LogicalVolume(conS,delrin,"conL");
-  conL->SetVisAttributes(vis4);
-
-  G4ThreeVector vec1(0,xy,0);
-  
-  vec1.rotateZ(pi/4.0);
-  new G4PVPlacement(0,vec1,conL,"con1",world,false,1,check);
-
-  vec1.rotateZ(pi/2.0);
-  new G4PVPlacement(0,vec1,conL,"con2",world,false,2,check);
-
-  vec1.rotateZ(pi/2.0);
-  new G4PVPlacement(0,vec1,conL,"con3",world,false,3,check);
-
-  vec1.rotateZ(pi/2.0);
-  new G4PVPlacement(0,vec1,conL,"con4",world,false,4,check);
-  */
-  
   return;
 }
