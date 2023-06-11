@@ -1,37 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-// $Id: DetectorConstruction.hh,v 1.1 2010-10-18 15:56:17 maire Exp $
-// GEANT4 tag $Name: geant4-09-04-patch-02 $
-//
-// 
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 #ifndef DETECTIONSYSTEMTIGRESS_HH
 #define DETECTIONSYSTEMTIGRESS_HH
 
@@ -50,21 +16,16 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 
-class DetectionSystemTigress
-{
+class DetectionSystemTigress {
+
 public:
+
   DetectionSystemTigress(G4int sel, G4int suppSwitch, G4double detRad, G4int hevimetSel,
 			 G4bool chk);
   ~DetectionSystemTigress();
 
-  void Build();
-
-  void PlaceCrystal(G4LogicalVolume* exp_hall_log, G4int det);
   void PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log, G4int det);
   void PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4int det);
-  
-  // For detector specific dead layers
-  void BuildDeadLayerSpecificCrystal(G4int det);
 
   void BuildEverythingButCrystals(G4int det);
   G4double GetCrystalDistanceFromOrigin() {return fCrystalDistFromOrigin;}
@@ -74,26 +35,12 @@ public:
   G4double TransZ(G4double x, G4double z, G4double theta);
 
   // For detector specific dead layers
-  G4int PlaceDeadLayerSpecificCrystal(G4LogicalVolume* exp_hall_log, G4int detector_number, G4int position_number, G4bool posTigress);
   G4int PlaceEverythingButCrystals(G4LogicalVolume* exp_hall_log, G4int detector_number, G4bool posTigress);
 
   void SetDeadLayer(G4int detNum, G4int cryNum, G4double deadLayer) { fTigressDeadLayers[detNum][cryNum] = deadLayer; }
 
 private:
   
-  G4String fSdName0;
-  G4String fSdName1;
-  G4String fSdName2;
-  G4String fSdName3;
-  G4String fSdName4;
-  G4String fSdName5;
-  G4String fColNameGe;
-  G4String fColNameLeftCasing;
-  G4String fColNameRightCasing;
-  G4String fColNameLeftExtension;
-  G4String fColNameRightExtension;
-  G4String fColNameBackPlug;
-
   G4bool fIncludeExtensionSuppressors;
   G4bool fIncludeSideSuppressors;
   G4bool fIncludeBackSuppressors;
@@ -237,16 +184,16 @@ private:
 
   G4double fShift;
   G4double fSuppShift ;
-
+  
   G4int fCopyNumber;
   G4int fCopyNumberTwo;
-  G4int fGermaniumCopyNumber;
+  
   G4int fLeftSuppressorSideCopyNumber;
   G4int fRightSuppressorSideCopyNumber;
   G4int fLeftSuppressorExtensionCopyNumber;
   G4int fRightSuppressorExtensionCopyNumber;
   G4int fBackSuppressorCopyNumber;
-    
+  
   G4double fRhombiDiameter;
   G4double fNewRhombiRadius;
 
@@ -306,10 +253,7 @@ private:
   void ConstructComplexDetectorBlockWithDeadLayer();
 
   // For detector specific dead layers
-  void ConstructComplexDetectorBlockWithDetectorSpecificDeadLayer(G4int det, G4int cry);
-  void ConstructNewSuppressorCasingDetectorSpecificDeadLayer(G4int det, G4int cry);
   void ConstructDetector();
-  void ConstructComplexDetectorBlock();
   void ConstructColdFinger();
   void ConstructNewHeavyMet();
 
@@ -400,8 +344,7 @@ private:
   G4Tubs* LiquidNitrogenTank();
   G4Tubs* LiquidNitrogenTankLid();
   G4Tubs* LiquidNitrogen();
-
-
+  
   //internal methods for ConstructBasicDetectorBlock()
   G4Box* RectangularSegment();
   G4Trd* TrapezoidalSegment();
@@ -409,8 +352,6 @@ private:
   std::vector<G4IntersectionSolid*> SegmentedQuarterDetector();
   //internal methods for ConstructComplexDetectorBlock()
   G4SubtractionSolid* QuarterDetector();
-  // For detector specific dead layers
-  G4SubtractionSolid* QuarterSpecificDeadLayerDetector(G4int det, G4int cry);
 
   //internal methods for ConstructComplexDetectorBlockWithPlastic()
   G4UnionSolid* InterCrystalelectrodeMatBack();
@@ -474,7 +415,6 @@ private:
 
   // internal methods
   void BuildOneDetector(G4int det);
-  //    void PlaceDetector(G4int detectorNumber);
 };
 
 #endif
