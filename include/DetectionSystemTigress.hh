@@ -242,15 +242,13 @@ private:
   G4AssemblyVolume* fBackAndSideSuppressorShellAssembly ;
   G4AssemblyVolume* fExtensionSuppressorShellAssembly ;
   G4AssemblyVolume* fHevimetAssembly ;
-    
-
+  
   // Logical volumes
   G4LogicalVolume* fAirBoxLog;
 
   // methods to construct all of the components of the detector
   void ConstructNewSuppressorCasingWithShells(G4int det);
   void BuildelectrodeMatElectrodes();
-  void ConstructComplexDetectorBlockWithDeadLayer();
 
   // For detector specific dead layers
   void ConstructDetector();
@@ -350,7 +348,6 @@ private:
   G4Trd* TrapezoidalSegment();
 
   std::vector<G4IntersectionSolid*> SegmentedQuarterDetector();
-  //internal methods for ConstructComplexDetectorBlock()
   G4SubtractionSolid* QuarterDetector();
 
   //internal methods for ConstructComplexDetectorBlockWithPlastic()
@@ -412,9 +409,7 @@ private:
   G4double fTigressDeadLayers[16][4];
   G4Colour fTigressCrystalColours[4];
   G4Colour fTigressDeadLayerColours[4];
-
-  // internal methods
-  void BuildOneDetector(G4int det);
+  
 };
 
 #endif
