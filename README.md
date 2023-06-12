@@ -7,7 +7,7 @@ Requirements
 ------------------
 - G4TCX has only been tested on GEANT4 v11.0.0.
 - The GSL libraries are required
-- In order to use the file correlator.cc to sort and histogram the simulated data, a ROOT installation is required. ROOT is also required to use the scripts prob_reader.C and tensor_reader.C.
+- In order to use the file correlator.cc to sort and histogram the simulated data, a ROOT installation is required. ROOT is also required to use any of the scripts in the Helpers folder.
 
 Running G4TCX
 -----------------
@@ -33,7 +33,7 @@ The G4TCX simulation has three modes: Source, Scattering, and Full. Each mode ha
 
 - Source: Simulates either a simple isotropic gamma-ray, or a user-definable gamma-ray cascade. No massive particles involved.
 - Scattering: Simulates two-body scattering events. No gamma-rays involved. 
-- Full: Simulates Coulomb excitation events with user-definable level schemes, excitation probabilities, and statistical tensors. Both the scattering angle and beam energy dependence of Coulbomb excitation are accounted for with these inputs.
+- Full: Simulates Coulomb excitation events with user-definable level schemes, excitation probabilities, and statistical tensors. Both the scattering angle and beam energy dependence of Coulomb excitation are accounted for.
 
 Macro Files
 -----------------
@@ -61,7 +61,7 @@ The /Output commands are common across all modes. Both /Output commands are opti
 
 Geometry Commands
 -----------------
-The /Geometry commands are common across all modes. With the exception of /Geometry/Update, all /Geometry commands are optional.
+The /Geometry commands are common across all modes. All /Geometry commands are optional.
 
 | Command | Description |
 | --- | --- |
@@ -147,7 +147,7 @@ There are no "safety checks" for these commands. For example, you could add an a
 
 Full Mode Commands
 -----------------
-For the Full CoulEx simulation, all Scattering mode commands still apply. Additionally, /Excitation commands can be called which determine the level scheme, excitation pattern, and nuclear alignment in both the projectile and recoil nucleus. All /Excitation commands are optional.
+For the Full Coulomb excitation simulation, all Scattering mode commands still apply. Additionally, /Excitation commands can be called which determine the level scheme, excitation pattern, and nuclear alignment in both the projectile and recoil nucleus. All /Excitation commands are optional.
 
 | Command | Description |
 | --- | --- |
@@ -181,7 +181,7 @@ The ROOT script MakeInput.C, found in the Helpers folder, will make the probabil
 
 You can inspect the probabilities and statistical tensors calculated for the various states using the scripts prob_reader.C and tensor_reader.C, also found in the Helpers folder. You must edit the tensor_reader.C script with the excited state spins for the nucleus you are looking at.
 
-There are two other scripts in the Helpers folder which can assist in preparing the necessary input files. The script MakeNucleus.C can take a Gosia output file and create a Cygnus nucleus file. The script MakeLevelScheme.C can take a Cygnus nucleus file and create the level scheme file needed by G4TCX (for a Full simulation). Therefore, you should only need to create one file manuall: a Gosia file, a Cygnus file, or the level scheme file.
+There are two other scripts in the Helpers folder which can assist in preparing the necessary input files. The script MakeNucleus.C can take a Gosia output file and create a Cygnus nucleus file. The script MakeLevelScheme.C can take a Cygnus nucleus file and create the level scheme file needed by G4TCX (for a Full simulation). Therefore, you should only need to create one file manually: a Gosia file, a Cygnus file, or the level scheme file.
 
 The level scheme file has a different format depending on the simulation mode (Source or Full). These are  described below.
 
@@ -204,11 +204,13 @@ II<sub>N</sub> En<sub>N</sub> Sp<sub>N</sub> Tau<sub>N</sub> Nb<sub>N</sub>
  IF<sub>Nb<sub>N</sub></sub> P<sub>Nb<sub>N</sub></sub> L1<sub>Nb<sub>N</sub></sub> L2<sub>Nb<sub>N</sub></sub> DL<sub>Nb<sub>N</sub></sub> CC<sub>Nb<sub>N</sub></sub>
 </pre>
 
-Here II<sub>i</sub> is the index of state i, En<sub>i</sub> is its energy in keV, Sp<sub>i</sub> is its spin (J), Tau<sub>i</sub> is its mean-lifetime in ps, and Nb<sub>i</sub> is the number of gamma decays from this state. Note that if state i cannot decay via gamma-ray emission, you should set Nb<sub>i</sub>=0. IF<sub>j</sub> is the index of the final state for gamma decay j of this state. P<sub>j</sub> is the probability of that decay (relative to the other gamma-ray decays), L1<sub>j</sub> is the higher multipolarity of the transition, L2<sub>j</sub> is the lower multipolarity of the transition, and DL<sub>j</sub> is the mixing ratio. CC<sub>j</sub> is the total conversion coefficient of this gamma-ray transition. 
+Here II<sub>i</sub> is the index of state i, En<sub>i</sub> is its energy in keV, Sp<sub>i</sub> is its spin (J), Tau<sub>i</sub> is its mean-lifetime in ps, and Nb<sub>i</sub> is the number of gamma decays from this state. Note that if state i cannot decay via gamma-ray emission, you should set Nb<sub>i</sub>=0. IF<sub>j</sub> is the index of the final state for gamma decay j of this state. P<sub>j</sub> is the probability of that decay (relative to the other gamma-ray decays), L1<sub>j</sub> is the higher multipolarity of the transition, L2<sub>j</sub> is the lower multipolarity of the transition, and DL<sub>j</sub> is the L1/L2 mixing ratio. CC<sub>j</sub> is the total conversion coefficient of this gamma-ray transition. 
 
 The states must be declared in order, i.e. II<sub>1</sub> = 1, II<sub>2</sub> = 2 and so on. This technically makes the initial state index redundant. The ground state (index 0) is not included in the level scheme file. There is no limit on the number of excited states or decays from a state.
 
 The spin of a state must be integer or half-integer. For the gamma transitions, L1 > L2. If DL = 0, the transition will be pure L1 and L2 is ignored. Example level scheme files for a Full simulation are in the Examples/LevelSchemes/Full folder.
+
+*An initial state II can only decay to a final state IF that has already been declared in the level scheme file, i.e. II > IF. If IF > II, the simulation will segfault.*
 
 Source Mode Level Scheme File Format
 -----------------
