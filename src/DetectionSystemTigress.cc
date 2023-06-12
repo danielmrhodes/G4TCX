@@ -130,7 +130,7 @@ G4double DetectionSystemTigress::TransZ(G4double x, G4double z, G4double theta) 
   return -x*sin(theta)+z*cos(theta);
 }
 
-G4int DetectionSystemTigress::PlaceEverythingButCrystals(G4LogicalVolume* expHallLog, G4int detectorNumber, G4bool posTigress) {
+G4int DetectionSystemTigress::PlaceEverythingButCrystals(G4LogicalVolume* expHallLog, G4int detectorNumber) {
   
   if(expHallLog == nullptr) {
     G4cerr<<__PRETTY_FUNCTION__<<": expHallLog == nullptr!"<<std::endl;
@@ -145,8 +145,8 @@ G4int DetectionSystemTigress::PlaceEverythingButCrystals(G4LogicalVolume* expHal
   G4double beta   = fCoords[positionNumber][3]*deg; // pitch
   G4double gamma  = fCoords[positionNumber][4]*deg; // roll
 
-  //In TIGRESS upstream is now downstream relative to TIGRESS. However, we want to maintain the same numbering scheme as TIGRESS. Net result is that the lampshade angles change by 45 degrees.
-  if(posTigress && (positionNumber < 4 || positionNumber > 11)) {
+  //GRIFFIN -> TIGRESS coordinates. Lampshade angles are rotated 45 degrees.
+  if(positionNumber < 4 || positionNumber > 11) {
     phi       = fCoords[positionNumber][1]*deg - 45.0*deg;
     gamma     = fCoords[positionNumber][4]*deg - 45.0*deg;
   }
@@ -453,9 +453,7 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
   G4double beta   = fCoords[positionNumber][3]*deg; // pitch
   G4double gamma  = fCoords[positionNumber][4]*deg; // roll
   
-  //In GRIFFIN upstream is now downstream relative to TIGRESS.
-  //However, we want to maintain the same numbering scheme as TIGRESS.
-  //Net result is that the lampshade angles change by 45 degrees.
+  //GRIFFIN -> TIGRESS coordinates. Lampshade angles are rotated 45 degrees.
   if(positionNumber < 4 || positionNumber > 11) {
     phi       = fCoords[positionNumber][1]*deg - 45.0*deg;
     gamma     = fCoords[positionNumber][4]*deg - 45.0*deg;
@@ -574,15 +572,14 @@ void DetectionSystemTigress::PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4i
   //supVisAtt->SetForceSolid(true);
   
   G4int positionNumber = detectorNumber;
-  G4bool posTigress = true;
   G4double theta  = fCoords[positionNumber][0]*deg;
   G4double phi    = fCoords[positionNumber][1]*deg;
   G4double alpha  = fCoords[positionNumber][2]*deg; // yaw
   G4double beta   = fCoords[positionNumber][3]*deg; // pitch
   G4double gamma  = fCoords[positionNumber][4]*deg; // roll
 
-  //In TIGRESS upstream is now downstream relative to TIGRESS. However, we want to maintain the same numbering scheme as TIGRESS. Net result is that the lampshade angles change by 45 degrees.
-  if(posTigress && (positionNumber < 4 || positionNumber > 11)) {
+  ///GRIFFIN -> TIGRESS coordinates. Lampshade angles are rotated 45 degrees.
+  if(positionNumber < 4 || positionNumber > 11) {
     phi       = fCoords[positionNumber][1]*deg - 45.0*deg;
     gamma     = fCoords[positionNumber][4]*deg - 45.0*deg;
   }

@@ -164,7 +164,7 @@ void Detector_Construction::PlaceTigress() {
 
     //These two functions no longer build the suppressors crystals
     tig->BuildEverythingButCrystals(detNum);
-    tig->PlaceEverythingButCrystals(logic_world,detNum,true);
+    tig->PlaceEverythingButCrystals(logic_world,detNum);
     
     tig->PlaceSegmentedCrystal(logic_world,detNum);
     tig->PlaceSuppressors(logic_world,detNum);

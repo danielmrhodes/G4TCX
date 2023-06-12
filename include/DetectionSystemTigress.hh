@@ -35,7 +35,7 @@ public:
   G4double TransZ(G4double x, G4double z, G4double theta);
 
   // For detector specific dead layers
-  G4int PlaceEverythingButCrystals(G4LogicalVolume* exp_hall_log, G4int detector_number, G4bool posTigress);
+  G4int PlaceEverythingButCrystals(G4LogicalVolume* exp_hall_log, G4int detector_number);
 
   void SetDeadLayer(G4int detNum, G4int cryNum, G4double deadLayer) { fTigressDeadLayers[detNum][cryNum] = deadLayer; }
 
