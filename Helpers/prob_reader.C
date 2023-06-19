@@ -63,7 +63,7 @@ std::vector<double> ReadProbFile(std::string fn, std::vector<double>& energies,
 TGraph2D* g;
 void prob_reader(int index = 0) {
 
-  std::string file_name = "probabilities.prb";
+  std::string file_name = "Examples/Probabilities/cd106_on_ti48.prb";
   
   std::vector<double> energies;
   std::vector<double> thetas;

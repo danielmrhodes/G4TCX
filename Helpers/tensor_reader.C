@@ -129,7 +129,7 @@ TGraph2D* tensor_reader(int index = 1, int k=0, int kappa=0, bool norm=true) {
     return NULL;
   }
   
-  std::string file_name = "tensors.ten";
+  std::string file_name = "Examples/StatisticalTensors/cd106_on_ti48.ten";
   std::vector<double> energies;
   std::vector<double> thetas;
   std::vector<double> values;
