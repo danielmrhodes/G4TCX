@@ -21,8 +21,9 @@ void Worker_Initialization::WorkerStart() const {
       UI->ApplyCommand(line);
     
   }
-  
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  if(G4Threading::G4GetThreadId())
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
   return;
 }
