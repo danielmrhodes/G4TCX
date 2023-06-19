@@ -59,6 +59,8 @@ The /Output commands are common across all modes. Both /Output commands are opti
 | /Output/Filename *string* | Set the name of the output data file (Default: output.dat) |
 | /Output/OnlyWriteCoincidences | Only write particle-gamma coincidence data to file. This can significantly reduce the size of the output file |
 
+Note that the /Output/OnlyWriteCoincidences only affects the main data file (output.dat). The output-info.dat file will still contain the information from every simulated event.
+
 Geometry Commands
 -----------------
 The /Geometry commands are common across all modes. All /Geometry commands are optional.
