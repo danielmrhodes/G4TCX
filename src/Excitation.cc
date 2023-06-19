@@ -71,7 +71,8 @@ void Excitation::BuildLevelScheme() {
   
   G4IonTable* table = (G4IonTable*)(G4ParticleTable::GetParticleTable()->GetIonTable());
   G4ParticleDefinition* GS = table->GetIon(Z,A,0.0*MeV);
-  GS->SetPDGLifeTime(-1.0);
+  if(!threadID)
+    GS->SetPDGLifeTime(-1.0);
 
   levels.push_back(GS);
   spins.clear();
@@ -134,19 +135,19 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
     G4ParticleDefinition* part = table->GetIon(Z,A,energy);
     if(nbr) {
       
-      if(!threadID)
+      if(!threadID) {
 	part->SetDecayTable(new G4DecayTable());
-      
-      part->SetPDGLifeTime(lifetime);
+	part->SetPDGLifeTime(lifetime);	
+      }
       part->GetProcessManager()->SetParticleType(part);
       part->GetProcessManager()->AddProcess(new G4Decay(),0,-1,0);
-      
     }
     else {
-      if(!threadID)
+      if(!threadID) {
 	std::cout << " \033[1;36m Warning: " << nuc << " state " << state_index
 		  << " has no decay branches.\033[m";
-      part->SetPDGLifeTime(-1.0);
+	part->SetPDGLifeTime(-1.0);
+      }
     }
     if(!threadID)
       std::cout << std::endl;
@@ -171,7 +172,8 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
       if(!threadID)
 	part->GetDecayTable()->Insert(new Gamma_Decay(part,levels.at(index),BR,energy,
 						      ((G4Ions*)(levels.at(index)))->GetExcitationEnergy(),
-						      G4int(2.0*spin + 0.01),G4int(2.0*spins.at(index) + 0.01),
+						      G4int(2.0*spin + 0.01),
+						      G4int(2.0*spins.at(index) + 0.01),
 						      L0,Lp,del,cc,emit_gamma,proj));
       
     }
@@ -609,7 +611,8 @@ G4double Excitation::GetExcitation(G4int index) {
   
 }
 
-std::vector< std::vector<G4complex> >& Excitation::GetPolarization(G4int index, G4double en, G4double th, G4double ph) {
+std::vector<std::vector<G4complex>> Excitation::GetPolarization(G4int index, G4double en, G4double th,
+								G4double ph) {
 
   return polar->GetPolarization(index,en,th,ph);
   

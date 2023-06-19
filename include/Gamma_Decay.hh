@@ -18,12 +18,12 @@ public:
   G4DecayProducts* DecayIt(G4double);
   G4double GetDaughterExcitation() {return EnF;}
 
-  static std::vector< std::vector<G4complex> >& GetProjectilePolarization() {return polarizationP;}
-  static void SetProjectilePolarization(const std::vector< std::vector<G4complex> >& polar);
+  static std::vector<std::vector<G4complex>> GetProjectilePolarization() {return polarizationP;}
+  static void SetProjectilePolarization(const std::vector<std::vector<G4complex>> polar);
   static void UnpolarizeProjectile();
 
-  static std::vector< std::vector<G4complex> >& GetRecoilPolarization() {return polarizationR;}
-  static void SetRecoilPolarization(const std::vector< std::vector<G4complex> >& polar);
+  static std::vector<std::vector<G4complex>> GetRecoilPolarization() {return polarizationR;}
+  static void SetRecoilPolarization(const std::vector<std::vector<G4complex>> polar);
   static void UnpolarizeRecoil();
   
   static G4double Pmx(G4double e, G4double p1, G4double p2);
@@ -40,8 +40,8 @@ private:
   
   Polarization_Transition* trans;
 
-  static inline G4ThreadLocal std::vector< std::vector<G4complex> > polarizationP;
-  static inline G4ThreadLocal std::vector< std::vector<G4complex> > polarizationR;
+  static inline G4ThreadLocal std::vector<std::vector<G4complex>> polarizationP;
+  static inline G4ThreadLocal std::vector<std::vector<G4complex>> polarizationR;
 
   G4bool proj;
   

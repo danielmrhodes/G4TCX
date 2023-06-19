@@ -150,6 +150,8 @@ void Polarization::ReadTensorFile() {
     
     std::stringstream ss3(line);
     ss3 >> index >> spin >> k >> kappa >> val;
+    //if(val < 1.0e-10)
+    //val = 0.0;
 
     G4int offset = GetOffset(index,k,kappa)*numE*numT;
     values.at(offset + indexT*numE + indexE) = val;
@@ -304,8 +306,8 @@ void Polarization::Clean() {
   return;
 }
 
-std::vector< std::vector<G4complex> >& Polarization::GetPolarization(G4int state, G4double en,
-								     G4double th, G4double ph) {
+std::vector<std::vector<G4complex>> Polarization::GetPolarization(G4int state, G4double en,
+								  G4double th, G4double ph) {
 
   if(!state)
     return unpolarized;

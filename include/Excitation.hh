@@ -22,7 +22,8 @@ public:
   G4int ChooseState(G4double beamEn, G4double thetaCM);
   G4double GetExcitation(G4int index);
 
-  std::vector< std::vector<G4complex> >& GetPolarization(G4int index, G4double en, G4double th, G4double ph); 
+  std::vector<std::vector<G4complex>> GetPolarization(G4int index, G4double en, G4double th,
+						      G4double ph); 
 
   G4ParticleDefinition* GetDefinition(G4int index) {return levels[index];}
   std::vector<G4ParticleDefinition*> GetLevels() {return levels;}

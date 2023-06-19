@@ -79,6 +79,8 @@ G4DecayProducts* Gamma_Decay::DecayIt(G4double) {
   //calculate daughter momentum
   daughtermomentum = Pmx(parentmass,daughtermass[0],daughtermass[1]);
 
+  //G4double costheta = 2*G4UniformRand() - 1.0;
+  //G4double phi = CLHEP::twopi*G4UniformRand();
   G4double costheta;
   G4double phi;
   trans->SampleGammaTransition(proj,twoJi,twoJf,transL,transLp,delta,costheta,phi);
@@ -124,7 +126,7 @@ inline G4double Gamma_Decay::Pmx(G4double e, G4double p1, G4double p2) {
   
 }
 
-void Gamma_Decay::SetProjectilePolarization(const std::vector< std::vector<G4complex> >& polar) {
+void Gamma_Decay::SetProjectilePolarization(const std::vector<std::vector<G4complex>> polar) {
 
   CleanProjectile(); 
   for(std::vector<G4complex> pol : polar)
@@ -153,7 +155,7 @@ void Gamma_Decay::CleanProjectile() {
   return;
 }
 
-void Gamma_Decay::SetRecoilPolarization(const std::vector< std::vector<G4complex> >& polar) {
+void Gamma_Decay::SetRecoilPolarization(const std::vector<std::vector<G4complex>> polar) {
 
   CleanRecoil(); 
   for(std::vector<G4complex> pol : polar)

@@ -39,8 +39,8 @@ private:
 
   // Gamma angle generation and decay: call these functions in this order!
   // All angles are in the same coordinate system: user may choose any axis
-  G4double GenerateGammaCosTheta(const POLAR& pol);
-  G4double GenerateGammaPhi(const G4double cosTheta, const POLAR& pol);
+  G4double GenerateGammaCosTheta(const POLAR pol);
+  G4double GenerateGammaPhi(const G4double cosTheta, const POLAR pol);
 
   inline G4double LnFactorial(int k) const { return G4Pow::GetInstance()->logfactorial(k); }
 

@@ -16,8 +16,8 @@ public:
   void BuildStatisticalTensors();
   void SetSpins();
 
-  std::vector< std::vector<G4complex> >& GetPolarization(G4int state, G4double en, G4double th,
-							 G4double ph);
+  std::vector<std::vector<G4complex>> GetPolarization(G4int state, G4double en, G4double th,
+						      G4double ph);
 
   void SetFileName(G4String n) {fn = n;}
   void SetCalcGk(G4bool calc) {calcGk = calc;}
@@ -29,7 +29,7 @@ public:
   void SetFieldCoef(G4double coef) {Field = coef;}
   void SetFieldExp(G4double ex) {Power = ex;}
 
-  static void Print(const std::vector< std::vector<G4complex> > polar);
+  static void Print(const std::vector<std::vector<G4complex>> polar);
 
 private:
 
@@ -60,8 +60,8 @@ private:
   std::vector<gsl_spline2d*> interps; //one interpolator for each component
   
   std::vector<G4double> spins; //Spins of the excited states
-  std::vector< std::vector<G4complex> > polarization;
-  std::vector< std::vector<G4complex> > unpolarized; //Unpolarized statistical tensor
+  std::vector<std::vector<G4complex>> polarization;
+  std::vector<std::vector<G4complex>> unpolarized; //Unpolarized statistical tensor
 
   G4String fn; //Statistical tensor file name
   G4bool calcGk; //Flag to calculate depolarization coefficients

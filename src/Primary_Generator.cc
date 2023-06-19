@@ -281,13 +281,8 @@ void Primary_Generator::GenerateFullPrimaries(G4Event* evt) {
   }
 
   //Align excited states
-  //Gamma_Decay::UnpolarizeProjectile(); //remove old polarization
   Gamma_Decay::SetProjectilePolarization(exciteP->GetPolarization(pI,en,th,phiB));
-  //exciteP->Polarize(pI,en,th,phiB);
-
-  //exciteR->Unpolarize(); //remove old polarization
   Gamma_Decay::SetRecoilPolarization(exciteR->GetPolarization(rI,en,th,phiB));
-  //exciteR->Polarize(rI,en,th,phiB);
   
   //Beam vertex
   gun->SetParticleDefinition(exciteP->GetDefinition(pI));
@@ -375,11 +370,9 @@ void Primary_Generator::UpdateReaction() {
   s3_1 = G4ThreeVector(0.0,0.0,con->GetDS_Offset());
 
   G4Material* mat = con->GetTargetMaterial();
-  //if(con->GetTargetMaterial()) {
   if(mat) {
     
     G4EmCalculator calc;
-    //dedx = calc.ComputeTotalDEDX(beam_En,projGS,con->GetTargetMaterial());
     dedx = calc.ComputeTotalDEDX(beam_En,projGS,mat);
     width = con->GetTargetThickness();
 
