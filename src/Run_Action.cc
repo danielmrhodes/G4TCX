@@ -16,7 +16,7 @@ Run_Action::Run_Action() {
   messenger = new Run_Action_Messenger(this);
 
   fname = "output.dat";
-  dname = "info.dat";
+  dname = "";
 
   owc = false;
 }
@@ -54,15 +54,17 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
   //Must have three letter extension for this to work (i.e. output.dat)
   G4String name = fname.substr(0,fname.length()-4) + std::to_string(threadID)
     + fname.substr(fname.length()-4,fname.length());
-
-  //run->SetOutputFileName(name);
+  
   run->SetOutputFile(fopen(name.c_str(),"wb"));
 
   //Must have three letter extension for this to work (i.e. output.dat)
-  name = dname.substr(0,dname.length()-4) + std::to_string(threadID)
-    + dname.substr(dname.length()-4,dname.length());
+  if(dname == "")
+    name = fname.substr(0,fname.length()-4) + "-info" + std::to_string(threadID)
+      + fname.substr(fname.length()-4,fname.length());
+  else
+    name = dname.substr(0,dname.length()-4) + std::to_string(threadID)
+      + dname.substr(dname.length()-4,dname.length());
   
-  //run->SetDiagnosticsFileName(name);
   run->SetDiagnosticsFile(fopen(name.c_str(),"wb"));
 
   G4int nEvents = aRun->GetNumberOfEventToBeProcessed();
@@ -131,6 +133,9 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
   G4cout << "Event " << nEvents << " (100%)\nRun Complete!\n\nMerging output files... " << G4endl;
   
   G4int num = ((G4MTRunManager*)G4MTRunManager::GetRunManager())->GetNumberOfThreads();
+
+  if(dname == "")
+    dname = fname.substr(0,fname.length()-4) + "-info" + fname.substr(fname.length()-4,fname.length());
   
   std::ofstream dataFile(fname.c_str(),std::ios::out);
   std::ofstream infoFile(dname.c_str(),std::ios::out);
@@ -147,7 +152,7 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
 
     inFileF.close();
     std::remove(name.c_str());
-
+    
     name = dname.substr(0,dname.length()-4) + std::to_string(i)
       + dname.substr(dname.length()-4,dname.length());
 
