@@ -69,7 +69,7 @@ G4double Polarization_Transition::GammaTransF3Coefficient(G4int K, G4int K2,  G4
   return transF3Coeff;
 }
 
-G4double Polarization_Transition::GenerateGammaCosTheta(const POLAR& pol) {
+G4double Polarization_Transition::GenerateGammaCosTheta(const POLAR pol) {
   
   std::size_t length = pol.size();
   // Isotropic case
@@ -108,7 +108,7 @@ G4double Polarization_Transition::GenerateGammaCosTheta(const POLAR& pol) {
   return kPolyPDF.GetRandomX();
 }
 
-G4double Polarization_Transition::GenerateGammaPhi(const G4double cosTheta, const POLAR& pol) {
+G4double Polarization_Transition::GenerateGammaPhi(const G4double cosTheta, const POLAR pol) {
   
   G4int length = (G4int)pol.size();
   // Isotropic case
@@ -193,14 +193,6 @@ G4double Polarization_Transition::GenerateGammaPhi(const G4double cosTheta, cons
   return G4UniformRand()*CLHEP::twopi;
 }
 
-//void Polarization_Transition::SampleGammaTransition(Polarized_Particle* pol_part,  G4int twoJ1,
-//						    G4int twoJ2, G4int L0, G4int Lp, G4double mpRatio,
-//						    G4double& cosTheta, G4double& phi) {
-
-//std::array<G4double,2> Polarization_Transition::SampleGammaTransition(const POLAR pol, G4int twoJ1,
-//								      G4int twoJ2, G4int L0, G4int Lp,
-//								      G4double mpRatio) {
-
 void Polarization_Transition::SampleGammaTransition(G4bool proj, G4int twoJ1, G4int twoJ2,
 						    G4int L0, G4int Lp, G4double mpRatio,
 						    G4double& cosTheta, G4double& phi) {
@@ -254,9 +246,12 @@ void Polarization_Transition::SampleGammaTransition(G4bool proj, G4int twoJ1, G4
   }
 
   std::size_t newlength = fTwoJ2+1;
+  if(newlength > 7) //Added to avoid rare segfault DMR
+    newlength = 7;
+  
   POLAR newPol;
   map<G4int, map<G4int, G4double> >* cachePtr = nullptr;
-
+  
   for(G4int k2=0; k2<(G4int)newlength; ++k2) {
     std::vector<G4complex> npolar;
     npolar.resize(k2+1, 0);
@@ -279,7 +274,7 @@ void Polarization_Transition::SampleGammaTransition(G4bool proj, G4int twoJ1, G4
             if(std::abs(tmpAmp) < kEps) continue;
             if(recalcTF3) {
               tF3 = GammaTransF3Coefficient(k, k2, k1);
-              recalcTF3 = false;
+	      recalcTF3 = false;
             }
             if(std::abs(tF3) < kEps) break;
             tmpAmp *= tF3;
@@ -288,7 +283,7 @@ void Polarization_Transition::SampleGammaTransition(G4bool proj, G4int twoJ1, G4
 	      * sqrt((2.*k+1.)*(2.*k1+1.)/(2.*k2+1.));
             //AR-13Jun2017 Useful for debugging very long computations
             //G4cout << "G4PolarizationTransition::UpdatePolarizationToFinalState : k1=" << k1 
-            //       << " ; k2=" << k2 << " ; kappa1=" << kappa1 << " ; kappa2=" << kappa2 << G4endl;
+	    //     << " ; k2=" << k2 << " ; kappa1=" << kappa1 << " ; kappa2=" << kappa2 << G4endl;
             tmpAmp *= fgLegendrePolys.EvalAssocLegendrePoly(k, kappa, cosTheta, cachePtr);
             if(kappa != 0) {
               tmpAmp *= G4Exp(0.5*(LnFactorial(((G4int)k)-kappa) 
