@@ -25,6 +25,7 @@
 /Beam/SigmaY 0.85 mm
 #
 /Output/FileName scattering.dat
+/Output/WriteDiagnostics
 #
 /run/numberOfThreads 6
 /run/beamOn 1000000

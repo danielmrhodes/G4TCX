@@ -27,6 +27,7 @@
 /Excitation/Recoil/StatisticalTensors Examples/StatisticalTensors/ti48_by_cd106.ten
 #
 /Output/FileName full.dat
+/Output/WriteDiagnostics
 /Output/OnlyWriteCoincidences
 #
 /run/numberOfThreads 6

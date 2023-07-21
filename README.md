@@ -57,6 +57,8 @@ The /Output commands are common across all modes. Both /Output commands are opti
 | Command | Description |
 | --- | --- |
 | /Output/Filename *string* | Set the name of the output data file (Default: output.dat) |
+| /Output/DiagnosticsFilename *string* | Set the name of the diagnostics data file (Default: output-info.dat) |
+| /Output/WriteDiagnostics | Write the simulation's diagnostic information to file |
 | /Output/OnlyWriteCoincidences | Only write particle-gamma coincidence data to file. This can significantly reduce the size of the output file |
 
 Note that the /Output/OnlyWriteCoincidences only affects the main data file (output.dat). The output-info.dat file will still contain the information from every simulated event.
@@ -92,12 +94,14 @@ Note that the /Geometry/Target/ commands do **NOT** define the recoiling nucleus
 
 Source Mode Commands
 -----------------
-There are two /Source commands, one of which must be called. They are mutually exclusive.
+Either the /Source/Energy command or the /Source/LevelScheme command must be provided to G4TCX. These two commands are mutually exclusive. All other /Source commands are optional.
 
 | Command | Description |
 | --- | --- |
 | /Source/Energy *double unit* | Simulate a single isotropic gamma-ray of this energy |
 | /Source/LevelScheme *string* | Simulate a gamma-ray cascade defined by this file |
+| /Source/GroundStateSpin *double* | Set the spin of the gamma source ground state. The spin must be integer or half-integer. (Default: 0.0) |
+| /Source/Position *vector unit* | Set the position of the gamma-ray source (Default: 0.0 0.0 0.0 mm) |
 
 See the Source Level Scheme File Format section below for details on the level scheme file.
 
@@ -206,7 +210,7 @@ II<sub>N</sub> En<sub>N</sub> Sp<sub>N</sub> Tau<sub>N</sub> Nb<sub>N</sub>
  IF<sub>Nb<sub>N</sub></sub> P<sub>Nb<sub>N</sub></sub> L1<sub>Nb<sub>N</sub></sub> L2<sub>Nb<sub>N</sub></sub> DL<sub>Nb<sub>N</sub></sub> CC<sub>Nb<sub>N</sub></sub>
 </pre>
 
-Here II<sub>i</sub> is the index of state i, En<sub>i</sub> is its energy in keV, Sp<sub>i</sub> is its spin (J), Tau<sub>i</sub> is its mean-lifetime in ps, and Nb<sub>i</sub> is the number of gamma decays from this state. Note that if state i cannot decay via gamma-ray emission, you should set Nb<sub>i</sub>=0. IF<sub>j</sub> is the index of the final state for gamma decay j of this state. P<sub>j</sub> is the probability of that decay (relative to the other gamma-ray decays), L1<sub>j</sub> is the higher multipolarity of the transition, L2<sub>j</sub> is the lower multipolarity of the transition, and DL<sub>j</sub> is the L1/L2 mixing ratio. CC<sub>j</sub> is the total conversion coefficient of this gamma-ray transition. 
+Here II<sub>i</sub> is the index of state i, En<sub>i</sub> is its energy in keV, Sp<sub>i</sub> is its spin (J), Tau<sub>i</sub> is its mean-lifetime in ps, and Nb<sub>i</sub> is the number of gamma decays from this state. Note that if state i cannot decay via gamma-ray emission, you should set Nb<sub>i</sub>=0. IF<sub>j</sub> is the index of the final state for gamma decay j of this state. P<sub>j</sub> is the probability of that decay (relative to the other gamma-ray decays). L1<sub>j</sub> is one multipolarity of the transition, L2<sub>j</sub> is the other multipolarity of the transition, and DL<sub>j</sub> is the L2/L1 mixing ratio. By most mixing ratio conventions, this implies L2 > L1. CC<sub>j</sub> is the total conversion coefficient of this gamma-ray transition. 
 
 The states must be declared in order, i.e. II<sub>1</sub> = 1, II<sub>2</sub> = 2 and so on. This technically makes the initial state index redundant. The ground state (index 0) is not included in the level scheme file. There is no limit on the number of excited states or decays from a state.
 

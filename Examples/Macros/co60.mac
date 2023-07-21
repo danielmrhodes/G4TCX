@@ -1,12 +1,13 @@
 /Mode Source
 /Geometry/Tigress/Construct
-/Geometry/Tigress/SetConfiguration 1
-/Geometry/Tigress/SetFrameConfiguration 0
+/Geometry/Tigress/Configuration 1
+/Geometry/Tigress/FrameConfiguration 0
 /Geometry/Update
 #
 /Source/LevelScheme Examples/LevelSchemes/Source/co60.lvl
 #
 /Output/FileName co60.dat
+/Output/WriteDiagnostics
 #
 /run/numberOfThreads 6
 /run/beamOn 5000000
