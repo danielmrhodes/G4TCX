@@ -19,6 +19,7 @@ Run_Action::Run_Action() {
   dname = "";
 
   owc = false;
+  write_diag = false;
 }
 
 Run_Action::~Run_Action() {
@@ -31,7 +32,8 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
   
   if(IsMaster())
     return;
-  
+
+  G4int threadID = G4Threading::G4GetThreadId(); 
   G4WorkerRunManager* Rman = (G4WorkerRunManager*)G4MTRunManager::GetRunManager();
 
   Primary_Generator* gen = (Primary_Generator*)Rman->GetUserPrimaryGeneratorAction();
@@ -45,28 +47,30 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
 
   Run* run = static_cast<Run*>(Rman->GetNonConstCurrentRun());
   run->SetPrimaryGenerator(gen);
-
-  if(owc)
-    run->OWC();
-
-  G4int threadID = G4Threading::G4GetThreadId();
   
-  //Must have three letter extension for this to work (i.e. output.dat)
+  //Must have three letter extension for this to work (i.e. xxxx.dat)
   G4String name = fname.substr(0,fname.length()-4) + std::to_string(threadID)
     + fname.substr(fname.length()-4,fname.length());
   
   run->SetOutputFile(fopen(name.c_str(),"wb"));
-
-  //Must have three letter extension for this to work (i.e. output.dat)
-  if(dname == "")
-    name = fname.substr(0,fname.length()-4) + "-info" + std::to_string(threadID)
-      + fname.substr(fname.length()-4,fname.length());
-  else
-    name = dname.substr(0,dname.length()-4) + std::to_string(threadID)
-      + dname.substr(dname.length()-4,dname.length());
+  if(owc)
+    run->OnlyWriteCoincidences();
   
-  run->SetDiagnosticsFile(fopen(name.c_str(),"wb"));
+  if(write_diag) {
+    run->WriteDiagnostics();
+    
+    //Must have three letter extension for this to work (i.e. xxxx.dat)
+    if(dname == "")
+      name = fname.substr(0,fname.length()-4) + "-info" + std::to_string(threadID)
+	+ fname.substr(fname.length()-4,fname.length());
+    else
+      name = dname.substr(0,dname.length()-4) + std::to_string(threadID)
+	+ dname.substr(dname.length()-4,dname.length());
+    
+    run->SetDiagnosticsFile(fopen(name.c_str(),"wb"));
 
+  }
+  
   G4int nEvents = aRun->GetNumberOfEventToBeProcessed();
   
   Event_Action* evtAct = (Event_Action*)Rman->GetUserEventAction();
@@ -75,7 +79,7 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
 
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
-  G4String message = "";
+  G4String description = "";
   switch(mode) {
     case Primary_Generator::MODE::Scattering: {
 
@@ -83,7 +87,7 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
       iSD->SetProjectileName(gen->GetProjectileName());
       iSD->SetRecoilName(gen->GetRecoilName());
 
-      message = "Simulating " + std::to_string(nEvents) + " two-body scattering events";
+      description = " two-body scattering events";
       
       break;
   
@@ -93,7 +97,7 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
       GammaSD* gSD = (GammaSD*)SDman->FindSensitiveDetector("GammaTracker");
       gSD->SetTrackingAction(trkAct);
       
-      message = "Simulating " + std::to_string(nEvents) + " source gamma-ray events";
+      description = " source gamma-ray events";
       
       break;
 
@@ -109,7 +113,7 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
 
       trkAct->SetProjectileName(gen->GetProjectileName());
       
-      message = "Simulating " + std::to_string(nEvents) + " full CoulEx events";
+      description = " full CoulEx events";
       
       break;
 
@@ -117,7 +121,7 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
   } 
   
   if(!threadID)
-    std::cout << "\nStarting run!\n" << message << std::endl;
+    std::cout << "\nStarting run!\nSimulating " << nEvents << description << std::endl;
   else
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
@@ -133,13 +137,8 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
   G4cout << "Event " << nEvents << " (100%)\nRun Complete!\n\nMerging output files... " << G4endl;
   
   G4int num = ((G4MTRunManager*)G4MTRunManager::GetRunManager())->GetNumberOfThreads();
-
-  if(dname == "")
-    dname = fname.substr(0,fname.length()-4) + "-info" + fname.substr(fname.length()-4,fname.length());
   
   std::ofstream dataFile(fname.c_str(),std::ios::out);
-  std::ofstream infoFile(dname.c_str(),std::ios::out);
-  
   for(G4int i=0;i<num;i++) {
 
     G4String name = fname.substr(0,fname.length()-4) + std::to_string(i)
@@ -153,22 +152,37 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
     inFileF.close();
     std::remove(name.c_str());
     
-    name = dname.substr(0,dname.length()-4) + std::to_string(i)
+    G4cout << "\r Data file " << i+1 << "/" << num << " merged" << std::flush;
+    
+  }
+  dataFile.close();
+  
+  if(!write_diag) {
+    G4cout << "\nDone!" << G4endl;
+    return;
+  }
+  G4cout << "\n";
+
+  if(dname == "")
+    dname = fname.substr(0,fname.length()-4) + "-info" + fname.substr(fname.length()-4,fname.length());
+
+  std::ofstream infoFile(dname.c_str(),std::ios::out);
+  for(G4int i=0;i<num;i++) {
+
+    G4String name = dname.substr(0,dname.length()-4) + std::to_string(i)
       + dname.substr(dname.length()-4,dname.length());
 
     std::ifstream inFileD(name.c_str(),std::ios::in);
-
+    
     std::copy((std::istreambuf_iterator<char>(inFileD)),std::istreambuf_iterator<char>(),
 	      std::ostreambuf_iterator<char>(infoFile));
-
+    
     inFileD.close();
     std::remove(name.c_str());
-    
-    G4cout << "\r File " << i+1 << "/" << num << " merged" << std::flush;
-    
-  }
 
-  dataFile.close();
+    G4cout << "\r Diagnostics file " << i+1 << "/" << num << " merged" << std::flush;
+  }
+  
   infoFile.close();
   
   G4cout << "\nDone!" << G4endl;

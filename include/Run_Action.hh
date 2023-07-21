@@ -25,7 +25,9 @@ public:
   void SetOutputFileName(G4String n) {fname = n;}
   void SetDiagnosticsFileName(G4String n) {dname = n;}
   
-  void OWC() {owc = true;}
+  void OnlyWriteCoincidences() {owc = true;}
+  void WriteDiagnostics() {write_diag = true;}
+  
 
 private:
   
@@ -34,6 +36,7 @@ private:
   Run_Action_Messenger* messenger;
   
   G4bool owc;
+  G4bool write_diag;
   G4String fname;
   G4String dname;
 

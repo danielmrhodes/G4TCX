@@ -24,13 +24,18 @@ public:
   void SetDiagnosticsFile(FILE* f) {diagnostics = f;}
 
   void SetPrimaryGenerator(Primary_Generator* gn) {gen = gn;}
-  void OWC() {owc = true;}
+  
+  void OnlyWriteCoincidences() {owc = true;}
+  void WriteDiagnostics() {write_diag = true;}
 
 private:
   
   Primary_Generator* gen;
-  G4bool owc;
 
+  //flags for data output
+  G4bool owc;//only write coincidence data
+  G4bool write_diag; //write the diagnostics file
+  
   FILE* output;
   FILE* diagnostics;
 

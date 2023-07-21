@@ -12,6 +12,7 @@ Run::Run() {
   diagnostics = NULL;
 
   owc = false;
+  write_diag = false;
   
 }
 
@@ -30,7 +31,8 @@ void Run::RecordEvent(const G4Event* evt) {
 		    false,false,false,false,false,false,false,false,false,false,false,false,false,
 		    false,false,false,false,false,false,false,false,false,false,false,false,false,
 		    false,false,false,false,false,false,false,false,false,false,false,false};
-  
+
+  //G4int nFEP = 0;
   G4HCofThisEvent* HCE = evt->GetHCofThisEvent();
   for(G4int i=0;i<HCE->GetNumberOfCollections();i++) {
 
@@ -41,7 +43,7 @@ void Run::RecordEvent(const G4Event* evt) {
       for(unsigned int j=0;j<iHC->entries();j++) {
 
 	if(nS > 4) {
-	  G4cout << "Too many ion hits!" << G4endl;
+	  std::cout << "Too many ion hits!" << std::endl;
 	  break;
 	}
     
@@ -72,18 +74,18 @@ void Run::RecordEvent(const G4Event* evt) {
       for(unsigned int j=0;j<gHC->entries();j++) {
 
 	if(nT > 99) {
-	  G4cout << "Too many gamma hits!" << G4endl;
+	  std::cout << "Too many gamma hits!" << std::endl;
 	  break;
 	}
     
         Gamma_Hit* hit = (Gamma_Hit*)gHC->GetHit(j);
-        G4ThreeVector pos = hit->GetPos();
-
+	G4ThreeVector pos = hit->GetPos();
+	//if(hit->IsFEP())
+	//nFEP++;
+	
 	data.tData[nT] = {hit->GetDetector(),hit->GetSegment(),hit->GetEdep()/keV,
 			  pos.x()/cm,pos.y()/cm,pos.z()/cm,hit->IsFEP(),hit->IsProjFEP(),false};
-
 	nT++;
-
       }
     }
     else if(name == "suppressorCollection") {
@@ -103,33 +105,40 @@ void Run::RecordEvent(const G4Event* evt) {
   for(G4int i=0;i<nT;i++)
     data.tData[i].sup = sup[data.tData[i].det-1];
   
-  G4int num = evt->GetEventID();
-
-  INFO info;
-  info.evtNum = num;
-  info.indexP = gen->GetProjectileIndex();
-  info.indexR = gen->GetRecoilIndex();
-
-  info.beamEn = gen->GetBeamEnergy();
-  info.thetaCM = gen->GetThetaCM();
-  
-  info.projDS = pFlagDS;
-  info.projUS = pFlagUS;
-  info.rec = rFlag;
-  
-  Header header;
-  header.evtNum = num;
-  header.nSdata = nS;
-  header.nTdata = nT;
-
-  fwrite(&info,info.bytes(),1,diagnostics);
   G4Run::RecordEvent(evt);
+
+  G4int num = evt->GetEventID();
+  if(write_diag) {
+  
+    INFO info;
+    info.evtNum = num;
+    info.indexP = gen->GetProjectileIndex();
+    info.indexR = gen->GetRecoilIndex();
+
+    info.beamEn = gen->GetBeamEnergy();
+    info.thetaCM = gen->GetThetaCM();
+  
+    info.projDS = pFlagDS;
+    info.projUS = pFlagUS;
+    info.rec = rFlag;
+    
+    fwrite(&info,info.bytes(),1,diagnostics);
+    
+  }
   
   if(nS == 0 && nT == 0)
     return;
 
   if(owc && (nS == 0 || nT == 0))
     return;
+
+  //if(nFEP < 2 || nT != 4)
+  //return;
+  
+  Header header;
+  header.evtNum = num;
+  header.nSdata = nS;
+  header.nTdata = nT;
   
   fwrite(&header,header.bytes(),1,output);
   fwrite(&data.sData,sizeof(S3Data),nS,output);
@@ -142,7 +151,9 @@ void Run::Merge(const G4Run* aRun) {
 
   const Run* run = static_cast<const Run*>(aRun);
   fclose(run->GetOutputFile());
-  fclose(run->GetDiagnosticsFile());
+
+  if(write_diag)
+    fclose(run->GetDiagnosticsFile());
   
   G4Run::Merge(aRun);
   

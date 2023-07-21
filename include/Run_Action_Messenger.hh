@@ -23,8 +23,11 @@ private:
   //Output directory
   G4UIdirectory* output_dir;
   
-  G4UIcmdWithAString* name_cmd;
+  G4UIcmdWithAString* fname_cmd;
+  G4UIcmdWithAString* dname_cmd;  
+  
   G4UIcmdWithoutParameter* owc_cmd;
+  G4UIcmdWithoutParameter* wd_cmd;
   
 };
 
