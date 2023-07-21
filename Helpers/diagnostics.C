@@ -8,8 +8,8 @@ void diagnostics(std::string input_filename = "output-info.dat",
     return;
   }
 
-  const int nStatesP = 1;
-  const int nStatesR = 1;
+  const int nStatesP = 10;
+  const int nStatesR = 10;
 
   TH1* hevt = new TH1D("hevt","Event Number",10000,0.0,50000000.0);
   

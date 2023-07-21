@@ -134,7 +134,6 @@ void Excitation::ReadLevelSchemeFile(G4int Z, G4int A) {
     
     G4ParticleDefinition* part = table->GetIon(Z,A,energy);
     if(nbr) {
-      
       if(!threadID) {
 	part->SetDecayTable(new G4DecayTable());
 	part->SetPDGLifeTime(lifetime);	

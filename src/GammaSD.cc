@@ -106,7 +106,6 @@ void GammaSD::EndOfEvent(G4HCofThisEvent* HCE) {
 	if(std::find(projGams.begin(),projGams.end(),it->first) != projGams.end()) {
 	  hit->SetProjFEP();
 	}
-	  
       }
     }
     

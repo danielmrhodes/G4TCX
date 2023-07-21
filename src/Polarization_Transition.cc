@@ -246,7 +246,7 @@ void Polarization_Transition::SampleGammaTransition(G4bool proj, G4int twoJ1, G4
   }
 
   std::size_t newlength = fTwoJ2+1;
-  if(newlength > 7) //Added to avoid rare segfault DMR
+  if(newlength > 7) //Added to avoid rare seg fault DMR
     newlength = 7;
   
   POLAR newPol;

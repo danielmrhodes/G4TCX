@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     
     UI->ApplyCommand("/vis/open OGLSX");
     UI->ApplyCommand("/vis/drawVolume");
+    UI->ApplyCommand("/vis/scene/add/trajectories");
     UI->ApplyCommand("/vis/viewer/zoom 6");
     
     G4UIsession* session = new G4UIterminal(new G4UItcsh());
