@@ -19,6 +19,8 @@ public:
   
   FILE* GetOutputFile() const {return output;}
   FILE* GetDiagnosticsFile() const {return diagnostics;}
+
+  void SetGammaTrigger(G4int trig) {gammaTrigger = trig;}
   
   void SetOutputFile(FILE* f) {output = f;}
   void SetDiagnosticsFile(FILE* f) {diagnostics = f;}
@@ -35,6 +37,8 @@ private:
   //flags for data output
   G4bool owc;//only write coincidence data
   G4bool write_diag; //write the diagnostics file
+
+  G4int gammaTrigger;
   
   FILE* output;
   FILE* diagnostics;

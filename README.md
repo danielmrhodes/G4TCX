@@ -52,7 +52,7 @@ The /Mode command must come first, and the parameter (mode) can be Source, Scatt
 
 Output Commands
 -----------------
-The /Output commands are common across all modes. Both /Output commands are optional.
+The /Output commands are common across all modes. All /Output commands are optional.
 
 | Command | Description |
 | --- | --- |
@@ -60,6 +60,7 @@ The /Output commands are common across all modes. Both /Output commands are opti
 | /Output/DiagnosticsFilename *string* | Set the name of the diagnostics data file (Default: output-info.dat) |
 | /Output/WriteDiagnostics | Write the simulation's diagnostic information to file |
 | /Output/OnlyWriteCoincidences | Only write particle-gamma coincidence data to file. This can significantly reduce the size of the output file |
+| /Output/GammaMultTrigger *int* | Set gamma-ray multiplicity condition (number of Tigress cores) for writing data to the output file. (Default: 0) |
 
 Note that the /Output/OnlyWriteCoincidences only affects the main data file (output.dat). The output-info.dat file will still contain the information from every simulated event.
 

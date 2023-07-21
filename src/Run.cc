@@ -11,6 +11,8 @@ Run::Run() {
   output = NULL;
   diagnostics = NULL;
 
+  gammaTrigger = 0;
+  
   owc = false;
   write_diag = false;
   
@@ -26,13 +28,14 @@ void Run::RecordEvent(const G4Event* evt) {
   G4bool pFlagUS = false;
   G4bool rFlag = false;
 
+  //Flags for suppressed gamma hits
   G4bool sup[64] = {false,false,false,false,false,false,false,false,false,false,false,false,false,
 		    false,false,false,false,false,false,false,false,false,false,false,false,false,
 		    false,false,false,false,false,false,false,false,false,false,false,false,false,
 		    false,false,false,false,false,false,false,false,false,false,false,false,false,
 		    false,false,false,false,false,false,false,false,false,false,false,false};
-
-  //G4int nFEP = 0;
+  
+  G4int gammaMult = 0;
   G4HCofThisEvent* HCE = evt->GetHCofThisEvent();
   for(G4int i=0;i<HCE->GetNumberOfCollections();i++) {
 
@@ -79,12 +82,15 @@ void Run::RecordEvent(const G4Event* evt) {
 	}
     
         Gamma_Hit* hit = (Gamma_Hit*)gHC->GetHit(j);
-	G4ThreeVector pos = hit->GetPos();
-	//if(hit->IsFEP())
-	//nFEP++;
 	
-	data.tData[nT] = {hit->GetDetector(),hit->GetSegment(),hit->GetEdep()/keV,
-			  pos.x()/cm,pos.y()/cm,pos.z()/cm,hit->IsFEP(),hit->IsProjFEP(),false};
+	G4int seg = hit->GetSegment();
+	if(!seg)
+	  gammaMult++;
+	  
+	G4ThreeVector pos = hit->GetPos();
+	
+	data.tData[nT] = {hit->GetDetector(),seg,hit->GetEdep()/keV,pos.x()/cm,pos.y()/cm,pos.z()/cm,
+			  hit->IsFEP(),hit->IsProjFEP(),false};
 	nT++;
       }
     }
@@ -132,8 +138,8 @@ void Run::RecordEvent(const G4Event* evt) {
   if(owc && (nS == 0 || nT == 0))
     return;
 
-  //if(nFEP < 2 || nT != 4)
-  //return;
+  if(gammaMult < gammaTrigger)
+    return;
   
   Header header;
   header.evtNum = num;

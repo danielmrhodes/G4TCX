@@ -4,7 +4,6 @@
 #include "Run_Action_Messenger.hh"
 #include "Run.hh"
 
-#include "G4AutoLock.hh"
 #include "G4UserRunAction.hh"
 #include "G4Run.hh"
 
@@ -22,6 +21,8 @@ public:
   G4String GetOutputFileName() const {return fname;}
   G4String GetDiagnosticsFileName() const {return dname;}
 
+  void SetGammaTrigger(G4int trig) {gammaTrigger = trig;}
+  
   void SetOutputFileName(G4String n) {fname = n;}
   void SetDiagnosticsFileName(G4String n) {dname = n;}
   
@@ -37,13 +38,12 @@ private:
   
   G4bool owc;
   G4bool write_diag;
+
+  G4int gammaTrigger;
+  
   G4String fname;
   G4String dname;
 
 };
-
-namespace {
-  G4Mutex aMutex = G4MUTEX_INITIALIZER;
-}
   
 #endif

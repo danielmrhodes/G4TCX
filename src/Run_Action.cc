@@ -18,6 +18,8 @@ Run_Action::Run_Action() {
   fname = "output.dat";
   dname = "";
 
+  gammaTrigger = 0;
+  
   owc = false;
   write_diag = false;
 }
@@ -47,6 +49,7 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
 
   Run* run = static_cast<Run*>(Rman->GetNonConstCurrentRun());
   run->SetPrimaryGenerator(gen);
+  run->SetGammaTrigger(gammaTrigger);
   
   //Must have three letter extension for this to work (i.e. xxxx.dat)
   G4String name = fname.substr(0,fname.length()-4) + std::to_string(threadID)

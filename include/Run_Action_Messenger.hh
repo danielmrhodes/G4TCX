@@ -4,6 +4,7 @@
 #include "Run_Action.hh"
 #include "G4UImessenger.hh"
 #include "G4UIcmdWithoutParameter.hh"
+#include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithAString.hh"
 
 class Run_Action;
@@ -24,7 +25,9 @@ private:
   G4UIdirectory* output_dir;
   
   G4UIcmdWithAString* fname_cmd;
-  G4UIcmdWithAString* dname_cmd;  
+  G4UIcmdWithAString* dname_cmd; 
+
+  G4UIcmdWithAnInteger* gtrg_cmd;
   
   G4UIcmdWithoutParameter* owc_cmd;
   G4UIcmdWithoutParameter* wd_cmd;

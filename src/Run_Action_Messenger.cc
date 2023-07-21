@@ -13,6 +13,10 @@ Run_Action_Messenger::Run_Action_Messenger(Run_Action* rA) : runAct(rA) {
   dname_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
   dname_cmd->SetGuidance("Set name of diagnostics file");
 
+  gtrg_cmd = new G4UIcmdWithAnInteger("/Output/GammaMultTrigger",this);
+  gtrg_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
+  gtrg_cmd->SetGuidance("Set gamma-ray multiplicity trigger condition");
+  
   owc_cmd = new G4UIcmdWithoutParameter("/Output/OnlyWriteCoincidences",this);
   owc_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
   owc_cmd->SetGuidance("Only write coincidence data to file");
@@ -28,8 +32,10 @@ Run_Action_Messenger::~Run_Action_Messenger() {
   delete output_dir;
   delete fname_cmd;
   delete dname_cmd;
+  delete gtrg_cmd;
   delete owc_cmd;
   delete wd_cmd;
+  
 }
 
 void Run_Action_Messenger::SetNewValue(G4UIcommand* command, G4String newValue) {
@@ -43,6 +49,10 @@ void Run_Action_Messenger::SetNewValue(G4UIcommand* command, G4String newValue) 
   if(command == dname_cmd) {
     runAct->SetDiagnosticsFileName(newValue);
     message = "Setting diagnostics file name to " + newValue;
+  }
+  else if(command == gtrg_cmd) {
+    runAct->SetGammaTrigger(gtrg_cmd->GetNewIntValue(newValue));
+    message = "Setting gamma-ray multiplicity trigger condition to " + newValue;
   }
   else if(command == owc_cmd) {
     runAct->OnlyWriteCoincidences();
