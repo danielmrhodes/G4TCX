@@ -12,8 +12,7 @@
 Gamma_Source::Gamma_Source() {
 
   messenger = new Gamma_Source_Messenger(this);
-
-  source_energy = -1.0*MeV;
+  
   GSS = 0.0;
   file_name = "";
 
@@ -28,17 +27,7 @@ Gamma_Source::~Gamma_Source() {
 
 void Gamma_Source::BuildLevelScheme() {
   
-  if(source_energy > 0.0*MeV) {
-
-    if(!threadID)
-      std::cout << "Simple isotropic gamma-ray of " << source_energy/keV
-	     << " keV will be emitted each event" << std::endl;
-
-    return;
-  }
-
   if(file_name == "") {
-
     if(!threadID)
       std::cout << "\033[1;31mNeither the source level scheme file nor the source energy is set!"
 	     << " The simulation will break now...\033[m" << std::endl;
@@ -88,7 +77,7 @@ void Gamma_Source::BuildLevelScheme() {
 
     G4ParticleDefinition* part = table->GetIon(82,208,energy);
     if(nbr) {
-      if(!(part->GetDecayTable())) {	
+      if(!threadID) {	
 	part->SetDecayTable(new G4DecayTable());
 	part->SetPDGLifeTime(lifetime);
       }   

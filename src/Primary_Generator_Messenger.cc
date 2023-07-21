@@ -11,6 +11,14 @@ Primary_Generator_Messenger::Primary_Generator_Messenger(Primary_Generator* gen)
   update_cmd = new G4UIcmdWithoutParameter("/UpdateGenerator",this);
   update_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
   update_cmd->SetGuidance("Update Primary Generator");
+
+  sEn_cmd = new G4UIcmdWithADoubleAndUnit("/Source/Energy",this);
+  sEn_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
+  sEn_cmd->SetGuidance("Set energy of simple isotropic gamma-ray");
+
+  sPos_cmd = new G4UIcmdWith3VectorAndUnit("/Source/Position",this);
+  sPos_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,G4ApplicationState::G4State_Idle);
+  sPos_cmd->SetGuidance("Set position of gamma source");
   
   //Incoming beam directory
   incoming_dir = new G4UIdirectory("/Beam/");
@@ -98,9 +106,12 @@ Primary_Generator_Messenger::~Primary_Generator_Messenger() {
   delete onlyR_cmd;
 
   delete inEl_cmd;
+  
+  delete sEn_cmd;
+  delete sPos_cmd;
+
   delete mode_cmd;
   delete update_cmd;
-
 }
 
 void Primary_Generator_Messenger::SetNewValue(G4UIcommand* command, G4String newValue) {
@@ -181,6 +192,17 @@ void Primary_Generator_Messenger::SetNewValue(G4UIcommand* command, G4String new
     message =  "Setting DeltaE = -Q of scattering reaction to " + newValue;
   }
 
+  ///Gamma-ray source commands///
+  if(command == sEn_cmd) {
+    generator->SetSourceEnergy(sEn_cmd->GetNewDoubleValue(newValue));
+    message = "Setting source gamma-ray energy to " + newValue;
+  }
+  else if(command == sPos_cmd) {
+    generator->SetSourcePosition(sPos_cmd->GetNew3VectorValue(newValue));
+    message = "Setting gamma source position to " + newValue;
+  }
+  ///////////////////////////////
+  
   else if(command == mode_cmd) {
     generator->SetMode(newValue);
     message =  "Simulation mode: " + newValue;

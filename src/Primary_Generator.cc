@@ -10,7 +10,7 @@
 #include "G4UnitsTable.hh"
 #include "G4PhysicalConstants.hh"
 
-#include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
 #include "G4EmCalculator.hh"
 
 Primary_Generator::Primary_Generator() {
@@ -31,6 +31,9 @@ Primary_Generator::Primary_Generator() {
   th = 0.0*rad;
   en = 0.0*MeV;
 
+  source_energy = -1.0*MeV;
+  source_pos = G4ThreeVector();
+  
   dedx = 0.0*(MeV/mm);
   //dedx1 = NULL;
   width = 0.0*mm;
@@ -193,19 +196,15 @@ void Primary_Generator::GenerateScatteringPrimaries(G4Event* evt) {
 void Primary_Generator::GenerateSourcePrimaries(G4Event* evt) {
   
   //Simple isotropic gamma
-  if(source->GetEnergy() > 0.0*MeV) {
+  if(source_energy > 0.0*MeV) {
     
-    gun->SetParticleDefinition(G4Gamma::Definition());
-    gun->SetParticlePosition(G4ThreeVector());
-    gun->SetParticleEnergy(source->GetEnergy());
     gun->SetParticleMomentumDirection(G4RandomDirection());
     gun->GeneratePrimaryVertex(evt);
 
     return;
   }
 
-  //Remove polarization
-  //source->Unpolarize();
+  //Remove old polarization
   Gamma_Decay::UnpolarizeProjectile();
   
   //Choose excited state
@@ -213,9 +212,6 @@ void Primary_Generator::GenerateSourcePrimaries(G4Event* evt) {
 
   //Make vertex
   gun->SetParticleDefinition(source->GetDefinition(pI));
-  gun->SetParticleEnergy(0.0*MeV);
-  gun->SetParticlePosition(G4ThreeVector());
-  gun->SetParticleMomentumDirection(G4ThreeVector());
   gun->GeneratePrimaryVertex(evt);
   
   return;
@@ -304,6 +300,8 @@ void Primary_Generator::GenerateFullPrimaries(G4Event* evt) {
 
 void Primary_Generator::Update() {
 
+  G4int threadID = G4Threading::G4GetThreadId();
+  
   //Don't change the order of these functions
   switch(mode) {
 
@@ -322,8 +320,22 @@ void Primary_Generator::Update() {
     }
 
     case MODE::Source: {
-      
-      source->BuildLevelScheme();
+
+      gun->SetParticlePosition(source_pos);
+      if(source_energy > 0.0*MeV) {
+
+	gun->SetParticleDefinition(G4Gamma::Definition());
+	gun->SetParticleEnergy(source_energy);
+	
+	if(!threadID)
+	  std::cout << "Simple isotropic gamma-ray of " << source_energy/keV
+		    << " keV will be emitted each event" << std::endl;
+      }
+      else {
+	gun->SetParticleEnergy(0.0*MeV);
+	gun->SetParticleMomentumDirection(G4ThreeVector());
+	source->BuildLevelScheme();
+      }
       
       break;
     }
@@ -364,7 +376,7 @@ void Primary_Generator::UpdateReaction() {
   reac->ConstructRutherfordCM(beam_En,deltaE);
   
   Detector_Construction* con =
-    (Detector_Construction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction();
+    (Detector_Construction*)G4MTRunManager::GetRunManager()->GetUserDetectorConstruction();
   
   s3_0 = G4ThreeVector(0.0,0.0,-con->GetUS_Offset());
   s3_1 = G4ThreeVector(0.0,0.0,con->GetDS_Offset());

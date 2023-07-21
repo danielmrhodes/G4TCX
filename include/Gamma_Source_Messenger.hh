@@ -22,7 +22,6 @@ private:
   
   G4UIdirectory* source_dir; //Source directory
   
-  G4UIcmdWithADoubleAndUnit* en_cmd;
   G4UIcmdWithAString* fn_cmd;
   G4UIcmdWithADouble* gs_cmd;
 

@@ -6,6 +6,7 @@
 #include "G4UImessenger.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
 
 class Primary_Generator;
@@ -46,6 +47,10 @@ private:
   //Inelastic scattering
   G4UIcmdWithADoubleAndUnit* inEl_cmd;
 
+  //Source commands
+  G4UIcmdWithADoubleAndUnit* sEn_cmd;
+  G4UIcmdWith3VectorAndUnit* sPos_cmd;
+  
   //Mode command
   G4UIcmdWithAString* mode_cmd;
 
