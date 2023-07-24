@@ -38,6 +38,8 @@ int main(int argc, char** argv) {
     UI->ApplyCommand("/vis/drawVolume");
     UI->ApplyCommand("/vis/scene/add/trajectories");
     UI->ApplyCommand("/vis/viewer/zoom 6");
+    //UI->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 90 0");
+    
     
     G4UIsession* session = new G4UIterminal(new G4UItcsh());
     session->SessionStart();
