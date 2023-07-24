@@ -89,7 +89,7 @@ The /Geometry commands are common across all modes. All /Geometry commands are o
 
 The various /Construct commands are mandatory if you want to include that particular piece of the setup in the simulation.
 
-The /Geometry/Tigress/SetFrameConfiguration has four possible parameters, 0-3. Choose 0 for the full structure, 1 for the upstream lampshade only, 2 for the downstream lampshade only, or 3 for only the corona. Note the appropriate Tigress detectors will be automatically removed from the simulation if you choose a non-zero frame configuration.
+The /Geometry/Tigress/SetFrameConfiguration has four possible parameters, 0-3. Choose 0 for the full structure, 1 for the corona plus upstream lampshade, 2 for the corona plus downstream lampshade, or 3 for only the corona. The appropriate Tigress detectors will be automatically removed from the simulation if you choose a non-zero frame configuration.
 
 Note that the /Geometry/Target/ commands do **NOT** define the recoiling nucleus for the kinematics or excitation, it only defines "bulk" material properties of the target.
 
