@@ -46,14 +46,6 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
   offsetDS_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
 				   G4ApplicationState::G4State_Idle);
   offsetDS_cmd->SetGuidance("Set (positive) z-offset of downstream detector (Default: 3 cm)");
-
-  //Spice directory
-  spice_dir = new G4UIdirectory("/Geometry/Spice/");
-
-  placeSp_cmd = new G4UIcmdWithoutParameter("/Geometry/Spice/Construct",this);
-  placeSp_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
-				  G4ApplicationState::G4State_Idle);
-  placeSp_cmd->SetGuidance("Place the Spice detector");
   
   //Target directory
   target_dir = new G4UIdirectory("/Geometry/Target/");
@@ -123,9 +115,6 @@ Detector_Construction_Messenger::~Detector_Construction_Messenger() {
   delete placeSi_cmd;
   delete offsetUS_cmd;
   delete offsetDS_cmd;
-
-  delete spice_dir;
-  delete placeSp_cmd;
     
   delete target_dir;
   delete placeTarg_cmd;
@@ -177,13 +166,6 @@ void Detector_Construction_Messenger::SetNewValue(G4UIcommand* command, G4String
     G4cout << "Setting downstream S3 offset to " << newValue << G4endl;
   }
   ///////////////////////////
-
-  /////Spice commands/////
-  else if(command == placeSp_cmd) {
-    construction->SetPlaceSpice();
-    G4cout << "Simulation will include the Spice detector" << G4endl;
-  }
-  ////////////////////////
   
   /////Target commands/////
   else if(command == placeTarg_cmd) {

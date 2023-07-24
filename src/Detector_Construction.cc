@@ -1,8 +1,6 @@
 #include "Detector_Construction.hh"
 
-#include "ApparatusSpiceTargetChamber.hh"
 #include "ApparatusTigressStructure.hh"
-#include "DetectionSystemSpice.hh"
 #include "DetectionSystemTigress.hh"
 #include "S3.hh"
 #include "Primary_Generator.hh"
@@ -38,7 +36,6 @@ Detector_Construction::Detector_Construction() {
 
   place_tigress = false;
   place_s3 = false;
-  place_spice = false;
   place_target = false;
   check = false;
 
@@ -80,9 +77,6 @@ G4VPhysicalVolume* Detector_Construction::Construct() {
 
   if(place_s3)
     PlaceS3();
-
-  if(place_spice)
-    PlaceSpice();
   
   if(place_target) {
 
@@ -179,20 +173,6 @@ void Detector_Construction::PlaceS3() {
   S3* s3 = new S3();
   s3->Placement(logic_world,US_Offset,DS_Offset,check);
   
-  return;
-}
-
-void Detector_Construction::PlaceSpice() {
-
-  //sets lens for SPICE - should be matched with field
-  G4String Options = "MedLiteColEff";
-  
-  ApparatusSpiceTargetChamber* chamber = new ApparatusSpiceTargetChamber(Options,check);
-  chamber->Build(logic_world);
-
-  DetectionSystemSpice* spice = new DetectionSystemSpice(check) ;
-  spice->BuildPlace(logic_world);
-
   return;
 }
 

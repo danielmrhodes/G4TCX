@@ -18,13 +18,11 @@ public:
   G4VPhysicalVolume* Construct();
 
   void PlaceTigress();
-  void PlaceSpice();
   void PlaceS3();
   void PlaceTarget(G4UserLimits* uLim);
 
   void SetPlaceTigress() {place_tigress = true;}
   void SetPlaceS3() {place_s3 = true;}
-  void SetPlaceSpice() {place_spice = true;}
   void SetPlaceTarget() {place_target = true;} 
   
   void SetUS_Offset(G4double off) {US_Offset = off;}
@@ -88,7 +86,6 @@ private:
 
   G4bool place_tigress;
   G4bool place_s3;
-  G4bool place_spice;
   G4bool place_target;
 
   G4bool check; //surface overlap check
