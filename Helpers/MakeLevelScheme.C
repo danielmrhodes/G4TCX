@@ -3,8 +3,8 @@ void MakeLevelScheme() {
   //This script takes a Cygnus nucleus file as input and outputs the level scheme file necessary for G4TCX
   //I would double-check all the branching ratios came out correct as those are most important
 
-  const std::string input = "pd110.txt"; //Cygnus nucleus file, must already exist
-  const std::string output = "pd110.lvl"; //A new file will be created with this name
+  const std::string input = "kr78.txt"; //Cygnus nucleus file, must already exist
+  const std::string output = "kr78.lvl"; //A new file will be created with this name
 
   std::ofstream file;
   file.open(output.c_str(),std::ios::out);
@@ -56,7 +56,7 @@ void MakeLevelScheme() {
       }  
 
       double mx = mixings[j][i];
-      if(mx > 0.0)
+      if(std::abs(mx) > 0.0)
 	l2 = 1;
       
       if(l2 == 1 && l1 != 2) { //Not implemented yet
@@ -64,6 +64,9 @@ void MakeLevelScheme() {
 	file.close();
 	return;
       }
+
+      if(l2 > 0 && l2 < l1)
+	std::swap(l1,l2);
       
       file << " " << j << " " << br << " " << l1 << " " << l2 << " " << mx << " " << 0.0 << "\n";
     }

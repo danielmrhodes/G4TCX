@@ -4,12 +4,12 @@ void MakeInput() {
   
   const int beamA = 78;
   const int beamZ = 38;
-  const int targA = 197;
-  const int targZ = 79;
+  const int targA = 196;
+  const int targZ = 78;
 
   //Energy range for deltaE across target
-  const double eMax = 432.0;
-  const double eMin = 384.0;
+  const double eMax = 335.0;
+  const double eMin = 290.0;
   const int nBinsE = 12; //Nmber of energy meshpoints
 
   const int nBinsT = 30; //Number of scattering angle meshpoints
