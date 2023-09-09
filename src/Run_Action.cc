@@ -135,9 +135,9 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
 
   if(!IsMaster())
     return;
-
+  
   G4int nEvents = aRun->GetNumberOfEventToBeProcessed();
-  G4cout << "Event " << nEvents << " (100%)\nRun Complete!\n\nMerging output files... " << G4endl;
+  std::cout << "Event " << nEvents << " (100%)\nRun Complete!\n\nMerging output files... " << std::endl;
   
   G4int num = ((G4MTRunManager*)G4MTRunManager::GetRunManager())->GetNumberOfThreads();
   
@@ -155,24 +155,26 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
     inFileF.close();
     std::remove(name.c_str());
     
-    G4cout << "\r Data file " << i+1 << "/" << num << " merged" << std::flush;
+    std::cout << "\r Data file " << i+1 << "/" << num << " merged" << std::flush;
     
   }
   dataFile.close();
   
   if(!write_diag) {
-    G4cout << "\nDone!" << G4endl;
+    std::cout << "\nDone!" << std::endl;
     return;
   }
-  G4cout << "\n";
+  std::cout << "\n";
 
   if(dname == "")
     dname = fname.substr(0,fname.length()-4) + "-info" + fname.substr(fname.length()-4,fname.length());
 
+  //std::cout << "Merging to " << dname << std::endl;
+  
   std::ofstream infoFile(dname.c_str(),std::ios::out);
   for(G4int i=0;i<num;i++) {
 
-    G4String name = dname.substr(0,dname.length()-4) + std::to_string(i)
+    std::string name = dname.substr(0,dname.length()-4) + std::to_string(i)
       + dname.substr(dname.length()-4,dname.length());
 
     std::ifstream inFileD(name.c_str(),std::ios::in);
@@ -181,14 +183,14 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
 	      std::ostreambuf_iterator<char>(infoFile));
     
     inFileD.close();
-    std::remove(name.c_str());
+    //std::remove(name.c_str());
 
-    G4cout << "\r Diagnostics file " << i+1 << "/" << num << " merged" << std::flush;
+    std::cout << "\r Diagnostics file " << i+1 << "/" << num << " merged" << std::flush;
   }
   
   infoFile.close();
   
-  G4cout << "\nDone!" << G4endl;
+  std::cout << "\nDone!" << std::endl;
   
   return;
 }

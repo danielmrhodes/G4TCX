@@ -118,6 +118,7 @@ void Run::RecordEvent(const G4Event* evt) {
   
     INFO info;
     info.evtNum = num;
+    
     info.indexP = gen->GetProjectileIndex();
     info.indexR = gen->GetRecoilIndex();
 
