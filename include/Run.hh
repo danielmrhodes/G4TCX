@@ -20,6 +20,8 @@ public:
   FILE* GetOutputFile() const {return output;}
   FILE* GetDiagnosticsFile() const {return diagnostics;}
 
+  G4bool GetWriteDiagnostics() const {return write_diag;}
+
   void SetGammaTrigger(G4int trig) {gammaTrigger = trig;}
   
   void SetOutputFile(FILE* f) {output = f;}

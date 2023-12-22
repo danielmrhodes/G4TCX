@@ -159,7 +159,7 @@ void Run::Merge(const G4Run* aRun) {
   const Run* run = static_cast<const Run*>(aRun);
   fclose(run->GetOutputFile());
 
-  if(write_diag)
+  if(run->GetWriteDiagnostics())
     fclose(run->GetDiagnosticsFile());
   
   G4Run::Merge(aRun);
