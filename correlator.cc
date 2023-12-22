@@ -597,6 +597,12 @@ int main(int argc, char** argv) {
     std::cout << "Give your input and output files different names" << std::endl;
     return 1;
   }
+
+  FILE* input_file = fopen(input_filename,"rb");
+  if(input_file == NULL) {
+    std::cout << "Could not open file " << input_filename << std::endl;
+    return 1;
+  }
   
   //S3 singles
   TH2* bSum = new TH2D("Summary","S3 Summary",120,1,121,500,0,500);
@@ -811,16 +817,15 @@ int main(int argc, char** argv) {
   TH2* rReconPhCor = new TH2D("ReconPhi_CorrRec","Recon Phi Correlation",3000,0,3000,32,0,thing1);
   TH2* rReconPhCrt = new TH2D("ReconPhi_CrctRec","Recon Phi Correction",6000,0,3000,32,0,thing1);
 
-  std::cout << "Correlating and histograming data..." << std::endl;
-  FILE* input_file = fopen(input_filename,"rb");
-
   FillPositonVectors();
   const TVector3 incBeam = TVector3(0.0,0.0,1.0);
   const double Sol2_En = KE_LAB(Theta_CM_FP(Theta_LAB_Max(beam_en),beam_en),beam_en);
   const double r2d = TMath::RadToDeg();
 
   TRandom* rand = new TRandom(50747227);
-   
+
+  std::cout << "Correlating and histograming data..." << std::endl;
+  
   Header header;
   RawData raw_data;
   while(fread(&header,header.bytes(),1,input_file)) {

@@ -27,7 +27,8 @@ int main(int argc, char** argv) {
     UI->ApplyCommand("/Geometry/Tigress/Construct");
     UI->ApplyCommand("/Geometry/S3/Construct");
     UI->ApplyCommand("/Geometry/Target/Construct");
-
+    UI->ApplyCommand("/Geometry/CheckOverlaps");
+    
     runManager->SetNumberOfThreads(1);
     runManager->Initialize();
     
@@ -38,7 +39,8 @@ int main(int argc, char** argv) {
     UI->ApplyCommand("/vis/drawVolume");
     UI->ApplyCommand("/vis/scene/add/trajectories");
     UI->ApplyCommand("/vis/viewer/zoom 6");
-    //UI->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 90 0");
+    UI->ApplyCommand("/vis/viewer/zoom 2");
+    UI->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 90 -22.50");
     
     
     G4UIsession* session = new G4UIterminal(new G4UItcsh());

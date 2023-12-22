@@ -75,7 +75,7 @@ The /Geometry commands are common across all modes. All /Geometry commands are o
 | /Geometry/Target/Construct | Include the target in the simulation |
 | /Geometry/Tigress/Configuration *int* | Set whether Tigress is in its high efficiency (0) or high peak-to-total (1) configuration (default: 0) |
 | /Geometry/Tigress/FrameConfiguration *int* | Set the Tigress frame configuration. See text below for an explanation (default: 0) |
-| /Geometry/Tigress/RemoveDetector *int* |Remove a Tigress detector (clover) from the simulation |
+| /Geometry/Tigress/RemovePosition *int* |Remove a Tigress detector (clover) from the simulation |
 | /Geometry/S3/UpstreamOffset *double unit* | Set (positive) z-offset of upstream silicon detector. (Default: 3 cm) |
 | /Geometry/S3/DownstreamOffset *double unit* | Set (positive) z-offset of downstream silicon detector. (Default: 3 cm) |
 | /Geometry/Target/StandardTarget *string* | Set parameters for a standard target: 208Pb, 48Ti, 196Pt, 197Au, or 110Pd. |
