@@ -52,7 +52,7 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
   run->SetGammaTrigger(gammaTrigger);
   
   //Must have three letter extension for this to work (i.e. xxxx.dat)
-  G4String name = fname.substr(0,fname.length()-4) + std::to_string(threadID)
+  G4String name = fname.substr(0,fname.length()-4) + "-" + std::to_string(threadID)
     + fname.substr(fname.length()-4,fname.length());
   
   run->SetOutputFile(fopen(name.c_str(),"wb"));
@@ -64,10 +64,10 @@ void Run_Action::BeginOfRunAction(const G4Run* aRun) {
     
     //Must have three letter extension for this to work (i.e. xxxx.dat)
     if(dname == "")
-      name = fname.substr(0,fname.length()-4) + "-info" + std::to_string(threadID)
+      name = fname.substr(0,fname.length()-4) + "-info-" + std::to_string(threadID)
 	+ fname.substr(fname.length()-4,fname.length());
     else
-      name = dname.substr(0,dname.length()-4) + std::to_string(threadID)
+      name = dname.substr(0,dname.length()-4) + "-" + std::to_string(threadID)
 	+ dname.substr(dname.length()-4,dname.length());
     
     run->SetDiagnosticsFile(fopen(name.c_str(),"wb"));
@@ -138,13 +138,13 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
   
   G4int nEvents = aRun->GetNumberOfEventToBeProcessed();
   std::cout << "Event " << nEvents << " (100%)\nRun Complete!\n\nMerging output files... " << std::endl;
-  
+
   G4int num = ((G4MTRunManager*)G4MTRunManager::GetRunManager())->GetNumberOfThreads();
   
   std::ofstream dataFile(fname.c_str(),std::ios::out);
   for(G4int i=0;i<num;i++) {
 
-    G4String name = fname.substr(0,fname.length()-4) + std::to_string(i)
+    G4String name = fname.substr(0,fname.length()-4) + "-" + std::to_string(i)
       + fname.substr(fname.length()-4,fname.length());
     
     std::ifstream inFileF(name.c_str(),std::ios::in);
@@ -167,14 +167,13 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
   std::cout << "\n";
 
   if(dname == "")
-    dname = fname.substr(0,fname.length()-4) + "-info" + fname.substr(fname.length()-4,fname.length());
-
-  //std::cout << "Merging to " << dname << std::endl;
+    dname = fname.substr(0,fname.length()-4) + "-info"
+      + fname.substr(fname.length()-4,fname.length());
   
   std::ofstream infoFile(dname.c_str(),std::ios::out);
   for(G4int i=0;i<num;i++) {
 
-    std::string name = dname.substr(0,dname.length()-4) + std::to_string(i)
+    std::string name = dname.substr(0,dname.length()-4) + "-" + std::to_string(i)
       + dname.substr(dname.length()-4,dname.length());
 
     std::ifstream inFileD(name.c_str(),std::ios::in);
@@ -183,7 +182,7 @@ void Run_Action::EndOfRunAction(const G4Run* aRun) {
 	      std::ostreambuf_iterator<char>(infoFile));
     
     inFileD.close();
-    //std::remove(name.c_str());
+    std::remove(name.c_str());
 
     std::cout << "\r Diagnostics file " << i+1 << "/" << num << " merged" << std::flush;
   }

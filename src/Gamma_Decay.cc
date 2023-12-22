@@ -1,14 +1,8 @@
 #include "Gamma_Decay.hh"
-#include "G4ParticleMomentum.hh"
 #include "G4DynamicParticle.hh"
 #include "G4DecayProducts.hh"
-#include "G4PhysicalConstants.hh"
 #include "Randomize.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
 #include "G4HadronicException.hh"
-
-#include "G4RandomDirection.hh"
 
 Gamma_Decay::Gamma_Decay(G4ParticleDefinition* Parent, G4ParticleDefinition* daughter, G4double BR,
 			 G4double Ei, G4double Ef, G4int twoJP, G4int twoJD, G4int L0, G4int Lp,
@@ -53,8 +47,6 @@ Gamma_Decay::~Gamma_Decay() {
 }
 
 G4DecayProducts* Gamma_Decay::DecayIt(G4double) {
-
-  if (GetVerboseLevel()>1) G4cout << "G4GeneralPhaseSpaceDecay::TwoBodyDecayIt()"<<G4endl;
   
   //daughters'mass
   G4double daughtermass[2]; 
@@ -75,12 +67,10 @@ G4DecayProducts* Gamma_Decay::DecayIt(G4double) {
   //create G4Decayproducts  @@GF why dummy parentparticle?
   G4DecayProducts *products = new G4DecayProducts(*parentparticle);
   delete parentparticle;
-
+  
   //calculate daughter momentum
   daughtermomentum = Pmx(parentmass,daughtermass[0],daughtermass[1]);
-
-  //G4double costheta = 2*G4UniformRand() - 1.0;
-  //G4double phi = CLHEP::twopi*G4UniformRand();
+  
   G4double costheta;
   G4double phi;
   trans->SampleGammaTransition(proj,twoJi,twoJf,transL,transLp,delta,costheta,phi);

@@ -39,7 +39,7 @@ private:
   const G4double* theDaughterMasses;
   
   Polarization_Transition* trans;
-
+  
   static inline G4ThreadLocal std::vector<std::vector<G4complex>> polarizationP;
   static inline G4ThreadLocal std::vector<std::vector<G4complex>> polarizationR;
 
