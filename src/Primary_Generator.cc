@@ -42,7 +42,7 @@ Primary_Generator::Primary_Generator() {
   beam_Y = 0.0*mm;
   beam_AX = 0.0*rad;
   beam_AY = 0.0*rad;
-  beam_En = 0.0*MeV;
+  beam_En = 300.0*MeV;
   
   sigma_X = 0.0*mm;
   sigma_Y = 0.0*mm;
@@ -84,11 +84,22 @@ void Primary_Generator::GeneratePrimaries(G4Event* evt) {
 
       /*
       //isotropic particle
-      G4ThreeVector dir = G4RandomDirection();
-      G4ThreeVector pos = G4ThreeVector(0.0*mm,0.0*mm,0.0*mm);
+      G4double cosT_min = 0.66913061; //cos(16 deg)
+      G4double cosT_max = 0.96126170; //cos(48 deg)
+      
+      G4double cosTheta = G4RandFlat::shoot(cosT_min,cosT_max);
+      G4double sinTheta2 = 1.0 - cosTheta*cosTheta;
+      if(sinTheta2 < 0.0)
+	sinTheta2 = 0.0;
+
+      G4double sinTheta = std::sqrt(sinTheta2);
+      G4double phi = G4RandFlat::shoot(-pi,pi);
+      
+      G4ThreeVector dir = G4ThreeVector(sinTheta*std::cos(phi),sinTheta*std::sin(phi),cosTheta).unit();
+      G4ThreeVector pos = G4ThreeVector(beam_X,beam_Y,0.0*mm);
       
       gun->SetParticleDefinition(projGS);
-      gun->SetParticleEnergy(300.0*MeV);
+      gun->SetParticleEnergy(beam_En);
       gun->SetParticleMomentumDirection(dir);
       gun->SetParticlePosition(pos);
       gun->GeneratePrimaryVertex(evt);
