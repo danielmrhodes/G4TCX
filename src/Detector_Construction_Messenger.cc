@@ -7,6 +7,11 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
   //All geometries accessed through this directory
   geometry_dir = new G4UIdirectory("/Geometry/");
 
+  check_cmd = new G4UIcmdWithoutParameter("/Geometry/CheckOverlaps",this);
+  check_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
+				G4ApplicationState::G4State_Idle);
+  check_cmd->SetGuidance("Check for overlapping volumes");
+
   //Tigress directory
   tigress_dir = new G4UIdirectory("/Geometry/Tigress/");
 
@@ -15,10 +20,10 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
 				   G4ApplicationState::G4State_Idle);
   placeTig_cmd->SetGuidance("Place the Tigress array");
 
-  removeTigDet_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/RemoveDetector",this);
+  removeTigDet_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/RemovePosition",this);
   removeTigDet_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
 				       G4ApplicationState::G4State_Idle);
-  removeTigDet_cmd->SetGuidance("Remove a tigress detector from the simulation");
+  removeTigDet_cmd->SetGuidance("Remove a tigress position (clover) from the simulation");
 
   tigConfig_cmd = new G4UIcmdWithAnInteger("/Geometry/Tigress/Configuration",this);
   tigConfig_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
@@ -86,7 +91,7 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
   target_cmd = new G4UIcmdWithAString("/Geometry/Target/StandardTarget",this);
   target_cmd->AvailableForStates(G4ApplicationState::G4State_PreInit,
 				 G4ApplicationState::G4State_Idle);
-  target_cmd->SetCandidates("48Ti Ti48 48ti ti48 208Pb Pb208 208pb pb208 196Pt Pt196 196pt pt196 110Pd Pd110 110pd pd110 197Au Au197 197au au197");
+  target_cmd->SetCandidates("48Ti Ti48 48ti ti48 208Pb Pb208 208pb pb208 196Pt Pt196 196pt pt196 194Pt Pt194 194pt pt194 110Pd Pd110 110pd pd110 197Au Au197 197au au197");
   target_cmd->SetGuidance("Construct a standard target: 208Pb, 48Ti, 196Pt, 110Pd, or 197Au");
 
   step_cmd = new G4UIcmdWithADoubleAndUnit("/Geometry/Target/StepSize",this);
@@ -104,6 +109,7 @@ Detector_Construction_Messenger::Detector_Construction_Messenger(Detector_Constr
 Detector_Construction_Messenger::~Detector_Construction_Messenger() {
 
   delete geometry_dir;
+  delete check_cmd;
 
   delete tigress_dir;
   delete placeTig_cmd;
@@ -130,15 +136,20 @@ Detector_Construction_Messenger::~Detector_Construction_Messenger() {
 }
 
 void Detector_Construction_Messenger::SetNewValue(G4UIcommand* command, G4String newValue) {
+
+  if(command == check_cmd) {
+    construction->CheckOverlaps();
+    G4cout << "Will check the geometry for overlapping physical volumes" << G4endl;
+  }
   
   /////TIGRESS commands/////
-  if(command == placeTig_cmd) {
+  else if(command == placeTig_cmd) {
     construction->SetPlaceTigress();
     G4cout << "Simulation will include the Tigress array" << G4endl;
   }
   else if(command == removeTigDet_cmd) {
-    construction->RemoveTigressDetector(removeTigDet_cmd->GetNewIntValue(newValue));
-    G4cout << "Removing Tigress detector " << newValue << " from the simulation"  << G4endl;
+    construction->RemoveTigressPosition(removeTigDet_cmd->GetNewIntValue(newValue));
+    G4cout << "Removing Tigress position " << newValue << " from the simulation"  << G4endl;
   }
   else if(command == tigConfig_cmd) {
     construction->SetTigressConfig(tigConfig_cmd->GetNewIntValue(newValue));

@@ -29,6 +29,9 @@ private:
   G4UIdirectory* s3_dir;
   G4UIdirectory* spice_dir;
 
+  //Check overlaps
+  G4UIcmdWithoutParameter* check_cmd;
+  
   //Tigress commands
   G4UIcmdWithoutParameter* placeTig_cmd;
   G4UIcmdWithAnInteger* removeTigDet_cmd;

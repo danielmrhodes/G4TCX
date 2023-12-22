@@ -43,7 +43,7 @@ Detector_Construction::Detector_Construction() {
     tigressDets.push_back(i);
 
   //0 for high eff, 1 for high P/T
-  tigress_config = 1;
+  tigress_config = 0;
 
   // 0 for full structure, 1 for corona plus upstream lampshade, 2 corona plus downstream lampshade, 3 for corona only
   frame_config = 0;
@@ -71,6 +71,11 @@ G4VPhysicalVolume* Detector_Construction::Construct() {
   G4Box* solid_world = new G4Box("World_Solid",2.0*m,2.0*m,2.0*m);
   logic_world = new G4LogicalVolume(solid_world,world_mat,"World_Logical");
   world = new G4PVPlacement(0,G4ThreeVector(),logic_world,"World",0,false,0,false);
+  
+  if(place_s3) { 
+    RemoveTigressPosition(6);
+    RemoveTigressPosition(10);
+  }
 
   if(place_tigress)
     PlaceTigress();
@@ -78,26 +83,17 @@ G4VPhysicalVolume* Detector_Construction::Construct() {
   if(place_s3)
     PlaceS3();
   
-  if(place_target) {
-
-    G4UserLimits* uLim = NULL;
-    if(target_step > 0.0)
-      uLim = new G4UserLimits(target_step);
-    else
-      uLim = new G4UserLimits(0.05*target_thickness);
-    
-    PlaceTarget(uLim);
-    
-  }
+  if(place_target)
+    PlaceTarget();
   
   return world;
 }
 
 void Detector_Construction::ConstructSDandField() {
-
+  
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
-
   if(place_tigress) {
+    
     G4String gSDname = "GammaTracker";
     GammaSD* gSD = (GammaSD*)SDman->FindSensitiveDetector(gSDname,false);
     if(!gSD) {
@@ -138,7 +134,7 @@ void Detector_Construction::ConstructSDandField() {
 	  SetSensitiveDetector("S3Log" + std::to_string(det*10000 + (ring+1)*100 + sec + 1),iSD);
 
   }
- 
+  
   return;
   
 }
@@ -149,14 +145,11 @@ void Detector_Construction::PlaceTigress() {
   structure->Build();
   structure->Place(logic_world,frame_config);
 
-  
+  DetectionSystemTigress* tig = new DetectionSystemTigress(tigress_config,1,fTigressFwdBackPosition,
+							   fHevimetSelector,check);
   for(G4int detNum : tigressDets) {
-    
-    DetectionSystemTigress* tig = new DetectionSystemTigress(tigress_config,1,
-							     fTigressFwdBackPosition,
-							     fHevimetSelector,check);
 
-    //These two functions no longer build the suppressors crystals
+    //These two functions no longer build the suppressor crystals
     tig->BuildEverythingButCrystals(detNum);
     tig->PlaceEverythingButCrystals(logic_world,detNum);
     
@@ -176,7 +169,7 @@ void Detector_Construction::PlaceS3() {
   return;
 }
 
-void Detector_Construction::PlaceTarget(G4UserLimits* uLim) {
+void Detector_Construction::PlaceTarget() {
 
   //Target material (isotopically pure)
   target_mat = new G4Material("target_mat",target_density,1); //Bulk material
@@ -184,10 +177,16 @@ void Detector_Construction::PlaceTarget(G4UserLimits* uLim) {
   G4Isotope* target_iso = new G4Isotope("target_iso",target_Z,target_N,target_mass); //Isotope
   target_ele->AddIsotope(target_iso,1.0);
   target_mat->AddElement(target_ele,1.0);
-  
     
   G4Tubs* solid_target = new G4Tubs("Target_Sol",0*cm,target_radius,
 				    target_thickness/2.0,0.0*deg,360.0*deg);
+
+  G4UserLimits* uLim = NULL;
+  if(target_step > 0.0)
+    uLim = new G4UserLimits(target_step);
+  else
+    uLim = new G4UserLimits(0.05*target_thickness);
+  
   G4LogicalVolume* logic_target = new G4LogicalVolume(solid_target,target_mat,"Target_Logical",
 						      0,0,uLim);
 
@@ -198,6 +197,36 @@ void Detector_Construction::PlaceTarget(G4UserLimits* uLim) {
   logic_target->SetVisAttributes(vis1);					      
 
   new G4PVPlacement(0,G4ThreeVector(),logic_target,"Target",logic_world,false,0,check);
+
+  if(target_Z == 82) { //make backings for 208Pb target (here the C is upstream)
+    
+    G4double carbon_width = 0.1775*um;
+    G4Tubs* carbonS = new G4Tubs("CarbonLayerS",0*cm,target_radius,carbon_width/2.0,0.0*deg,360.0*deg);
+
+    G4NistManager* nist = G4NistManager::Instance();
+    G4Material* carbon_mat = nist->FindOrBuildMaterial("G4_GRAPHITE");
+
+    G4LogicalVolume* carbonL = new G4LogicalVolume(carbonS,carbon_mat,"CarbonLayerL",0,0,uLim);
+
+    G4VisAttributes* vis2 = new G4VisAttributes(G4Colour::Grey());
+    vis2->SetVisibility(true);
+    //vis2->SetForceSolid(true);
+    carbonL->SetVisAttributes(vis2);	
+
+    new G4PVPlacement(0,G4ThreeVector(0,0,-(target_thickness+carbon_width)/2.0),carbonL,"CarbonLayer",
+		      logic_world,false,0,check);
+
+    G4double al_width = 0.0222*um;
+    G4Tubs* alS = new G4Tubs("AlLayerS",0*cm,target_radius,al_width/2.0,0.0*deg,360.0*deg);
+
+    G4Material* al_mat = nist->FindOrBuildMaterial("G4_Al");
+    G4LogicalVolume* alL = new G4LogicalVolume(alS,al_mat,"AlLayerL",0,0,uLim);
+    alL->SetVisAttributes(vis2);
+
+    new G4PVPlacement(0,G4ThreeVector(0,0,(target_thickness+al_width)/2.0),alL,"AluminiumLayer",
+		      logic_world,false,0,check);
+    
+  }
   
   return;
 }
@@ -212,20 +241,20 @@ void Detector_Construction::SetTigressFrameConfig(int config) {
 
   case 1:
     for(G4int i=0;i<4;i++)
-      RemoveTigressDetector(i);
+      RemoveTigressPosition(i);
     break;
 
   case 2:
     for(G4int i=12;i<16;i++)
-      RemoveTigressDetector(i);
+      RemoveTigressPosition(i);
     break;
 
   case 3:
     for(G4int i=0;i<4;i++)
-      RemoveTigressDetector(i);
+      RemoveTigressPosition(i);
     
     for(G4int i=12;i<16;i++)
-      RemoveTigressDetector(i);
+      RemoveTigressPosition(i);
 
     break;
 
@@ -238,8 +267,9 @@ void Detector_Construction::SetTigressFrameConfig(int config) {
   return;
 }
 
-void Detector_Construction::RemoveTigressDetector(G4int detNum) {
-  
+void Detector_Construction::RemoveTigressPosition(G4int posNum) {
+
+  G4int detNum = posNum - 1;
   for(unsigned int i=0;i<tigressDets.size();i++) {
 
     if(tigressDets.at(i) == detNum) {
@@ -275,6 +305,14 @@ void Detector_Construction::SetTarget(G4String target) {
     target_density = 21.547*g/cm3;
     target_mass = 195.9650*g/mole;
     target_thickness = 738*nm;
+    target_radius = 0.5*cm;
+  }
+  else if(target == "194Pt" || target == "Pt194" || target == "pt194" || target == "194pt") {
+    target_Z = 78;
+    target_N = 116;
+    target_density = 21.327*g/cm3;
+    target_mass = 193.963*g/mole;
+    target_thickness = 483*nm;
     target_radius = 0.5*cm;
   }
   else if(target == "110Pd" || target == "Pd110" || target == "pd110" || target == "110pd") {

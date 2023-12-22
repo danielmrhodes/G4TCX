@@ -19,8 +19,9 @@ public:
 
   void PlaceTigress();
   void PlaceS3();
-  void PlaceTarget(G4UserLimits* uLim);
+  void PlaceTarget();
 
+  void CheckOverlaps() {check = true;}
   void SetPlaceTigress() {place_tigress = true;}
   void SetPlaceS3() {place_s3 = true;}
   void SetPlaceTarget() {place_target = true;} 
@@ -47,7 +48,7 @@ public:
 
   void SetTigressConfig(G4int config) {tigress_config = config;}
   void SetTigressFrameConfig(G4int config);
-  void RemoveTigressDetector(G4int detNum);
+  void RemoveTigressPosition(G4int posNum);
   
 private:
 
