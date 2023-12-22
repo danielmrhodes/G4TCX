@@ -2,7 +2,8 @@
 //Ordering must be the same as the level scheme file
 std::vector<double> spins = {2.0,4.0,2.0,0.0,4.0,3.0,6.0,5.0,8.0,2.0,6.0}; //106Cd
 //std::vector<double> spins = {2.0,4.0,2.0,6.0,4.0}; //48Ti
-//std::vector<double> spins = {2.0,4.0,6.0,8.0,10.0,12.0,2.0,3.0,4.0,5.0,6.0,0.0,2.0,4.0,3.0,5.0,7.0}; //78Kr
+
+std::string file_nameT = "Examples/StatisticalTensors/cd106_on_ti48.ten";
 
 int MaxK(double spin) {
 
@@ -100,51 +101,49 @@ void ReadTensorFile(std::string fn, std::vector<double>& energies, std::vector<d
   return;
 }
 
-TGraph2D* g;
-TGraph2D* tensor_reader(int index = 1, int k=0, int kappa=0, bool norm=true) {
-
+void tensor_reader(int index = 1, int k=0, int kappa=0, bool norm=false) {
+  
   if(index < 1) {
     std::cout << "index must be larger than 0" << std::endl;
-    return NULL;
+    return;
   }
 
   if(index > spins.size()) {
     std::cout << "Only " << spins.size() << " excited states" << std::endl;
-    return NULL;
+    return;
   }
   
   if(k%2) {
     std::cout << "k should be even" << std::endl;
-    return NULL;
+    return;
   }
   
   if(k > MaxK(spins.at(index-1))) {
     std::cout << "max k is " << MaxK(spins.at(index-1)) << " for state " << index
 	      << std::endl;
-    return NULL;
+    return;
   }
 
   if(kappa > k) {
     std::cout << "kappa can't be larger than k" << std::endl;
-    return NULL;
+    return;
   }
   
-  std::string file_name = "Examples/StatisticalTensors/cd106_on_ti48.ten";
   std::vector<double> energies;
   std::vector<double> thetas;
   std::vector<double> values;
-  ReadTensorFile(file_name,energies,thetas,values);
+  ReadTensorFile(file_nameT,energies,thetas,values);
 
   int numE = energies.size();
   int numT = thetas.size();
   
-  if(!g)
-    g = new TGraph2D(numT*numE);
+  TGraph2D* g = new TGraph2D(numT*numE);
+  g->SetName(Form("gT%02d",index));
   
   if(norm)
-    g->SetTitle(Form("State %d Polarization Tensor Component %d %d; Energy (MeV); Theta (deg); Value",index,k,kappa));
+    g->SetTitle(Form("State %d Polarization Tensor Component %d %d; Energy (MeV); Theta (rad); Value",index,k,kappa));
   else
-    g->SetTitle(Form("State %d Statistical Tensor Component %d %d; Energy (MeV); Theta (deg); Value",
+    g->SetTitle(Form("State %d Statistical Tensor Component %d %d; Energy (MeV); Theta (rad); Value",
 		     index,k,kappa));
   
   g->SetMarkerStyle(20);
@@ -152,6 +151,22 @@ TGraph2D* tensor_reader(int index = 1, int k=0, int kappa=0, bool norm=true) {
   g->GetXaxis()->SetTitleOffset(2.2);
   g->GetYaxis()->SetTitleOffset(2.2);
   g->GetZaxis()->SetTitleOffset(1.2);
+
+  double spE = (energies.back() - energies.front())/double(numE - 1);
+  double elow = energies.front() - spE/2.0;
+  double emax = energies.back() + spE/2.0;
+
+  double spT = (thetas.back() - thetas.front())/double(numT - 1);
+  double tlow = thetas.front() - spT/2.0;
+  double tmax = thetas.back() + spT/2.0;
+  
+  GH2D* h = new GH2D(Form("hT%02d",index),"tmp",numE,elow,emax,numT,tlow,tmax);
+
+  if(norm)
+    h->SetTitle(Form("State %d Polarization Tensor Component %d %d; Energy (MeV); ThetaCM (rad); Value",index,k,kappa));
+  else
+    h->SetTitle(Form("State %d Statistical Tensor Component %d %d; Energy (MeV); ThetaCM (rad); Value",
+		     index,k,kappa));
 
   int off00 = GetOffset(index,0,0)*numE*numT;
   int offset = GetOffset(index,k,kappa)*numE*numT;
@@ -166,11 +181,16 @@ TGraph2D* tensor_reader(int index = 1, int k=0, int kappa=0, bool norm=true) {
 	val /= values[off00 + j*numE + i];
       
       g->SetPoint(i*numT + j,en,th,val);
+      h->Fill(en,th,val);
       
     }
   }
 
+  new GCanvas();
   g->Draw("pcol");
+
+  new GCanvas();
+  h->Draw("colz");
   
-  return g;
+  return;
 }
