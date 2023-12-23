@@ -86,6 +86,7 @@ The /Geometry commands are common across all modes. All /Geometry commands are o
 | /Geometry/Target/Mass *double unit* | Set mass of target material. (Default: 207.97665 g/mole) |
 | /Geometry/Target/Thickness *double unit* | Set (linear) thickness of target. (Default: 882 nm) |
 | /Geometry/Target/Radius *double unit* | Set radius of target. (Default: 0.5 cm) |
+| /Geometry/CheckOverlaps | Check for overlapping physical volumes. |
 
 The various /Construct commands are mandatory if you want to include that particular piece of the setup in the simulation.
 
