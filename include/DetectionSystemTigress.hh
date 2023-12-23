@@ -347,8 +347,11 @@ private:
   G4Box* RectangularSegment();
   G4Trd* TrapezoidalSegment();
 
-  std::vector<G4IntersectionSolid*> SegmentedQuarterDetector(G4double layer);
+  //std::vector<G4IntersectionSolid*> SegmentedQuarterDetector(G4double layer);
+  std::vector<G4IntersectionSolid*> SegmentedQuarterDetector(G4double frontLayer, G4double backLayer, G4double innerLayer, G4double outterLayer);
   G4SubtractionSolid* QuarterDetector(G4double layer);
+  G4SubtractionSolid* QuarterDetector2(G4double frontLayer, G4double backLayer, G4double innerLayer, G4double outterLayer);
+  G4SubtractionSolid* FullQuarterDetector();
 
   //internal methods for ConstructComplexDetectorBlockWithPlastic()
   G4UnionSolid* InterCrystalelectrodeMatBack();
