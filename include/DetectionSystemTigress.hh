@@ -28,14 +28,13 @@ public:
   void PlaceSuppressors(G4LogicalVolume* exp_hall_log, G4int det);
 
   void BuildEverythingButCrystals(G4int det);
-  G4double GetCrystalDistanceFromOrigin() {return fCrystalDistFromOrigin;}
+  G4int PlaceEverythingButCrystals(G4LogicalVolume* exp_hall_log, G4int detector_number);
 
   G4double TransX(G4double x, G4double y, G4double z, G4double theta, G4double phi);
   G4double TransY(G4double x, G4double y, G4double z, G4double theta, G4double phi);
   G4double TransZ(G4double x, G4double z, G4double theta);
-
-  // For detector specific dead layers
-  G4int PlaceEverythingButCrystals(G4LogicalVolume* exp_hall_log, G4int detector_number);
+  
+  G4double GetCrystalDistanceFromOrigin() {return fCrystalDistFromOrigin;}
 
   void SetDeadLayer(G4int detNum, G4int cryNum, G4double deadLayer) { fTigressDeadLayers[detNum][cryNum] = deadLayer; }
 
@@ -348,7 +347,7 @@ private:
   G4Trd* TrapezoidalSegment();
 
   //std::vector<G4IntersectionSolid*> SegmentedQuarterDetector(G4double layer);
-  std::vector<G4IntersectionSolid*> SegmentedQuarterDetector(G4double frontLayer, G4double backLayer, G4double innerLayer, G4double outterLayer);
+  std::vector<G4IntersectionSolid*> SegmentedQuarterDetector(G4double frontLayer, G4double backLayer, G4double innerLayer, G4double outterLayer, G4double middleLayer, G4bool full);
   G4SubtractionSolid* QuarterDetector(G4double frontLayer, G4double backLayer, G4double innerLayer, G4double outterLayer);
   G4SubtractionSolid* FullQuarterDetector();
 

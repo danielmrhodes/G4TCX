@@ -441,14 +441,7 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
     phi       = fCoords[positionNumber][1]*deg - 45.0*deg;
     gamma     = fCoords[positionNumber][4]*deg - 45.0*deg;
   }
-
-  G4double x;
-  G4double y;
-  G4double z;
-
-  G4double x0, y0, z0;
-
-  G4int i;
+  
   const G4int start = 0;
   const G4int stop = 4;
   
@@ -456,15 +449,10 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
   G4double distFromOriginDet = fAirBoxBackLengthDet/2.0 +fAirBoxFrontLengthDet
     + fNewRhombiRadiusDet;
 
-  x0 = (fGermaniumWidth + fGermaniumSeparation)/2.0;
-  y0 = (fGermaniumWidth + fGermaniumSeparation)/2.0;
-  z0 = fGermaniumLength/2.0 + fCanFaceThickness/2.0 + fGermaniumDistFromCanFace + fShift
+  G4double x0 = (fGermaniumWidth + fGermaniumSeparation)/2.0;
+  G4double y0 = (fGermaniumWidth + fGermaniumSeparation)/2.0;
+  G4double z0 = fGermaniumLength/2.0 + fCanFaceThickness/2.0 + fGermaniumDistFromCanFace + fShift
     + fAppliedBackShift + distFromOriginDet;
-
-  /////////////////////////////////////////////////////////////////////
-  // now we place all 4 of the 1/4 detectors using the LogicalVolume
-  // of the 1st, ensuring that they too will have the hole
-  /////////////////////////////////////////////////////////////////////
 
   G4RotationMatrix* rotateGermanium[4];
   G4ThreeVector moveGermanium[4];
@@ -473,26 +461,30 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
   yellow->SetVisibility(true);
   yellow->SetForceSolid(true);
 
-  G4double frontLayer = 0.25*mm;
-  G4double backLayer = 0.5*mm;
-  G4double innerLayer = 1.5*mm;
-  G4double outterLayer = 0.25*mm;
+  G4double frontLayer = 0.4*mm;
+  G4double backLayer = 0.05*mm;
+  G4double innerLayer = 2.50*mm;
+  G4double outterLayer = 0.20*mm;
+  G4double middleLayer = 0.20*mm;
+  G4bool full = false;
+  std::vector<G4IntersectionSolid*> segments = SegmentedQuarterDetector(frontLayer,backLayer,innerLayer,outterLayer,middleLayer,full);
   
-  G4SubtractionSolid* geFull = FullQuarterDetector();
-  G4SubtractionSolid* geSmall = QuarterDetector(frontLayer,backLayer,innerLayer,outterLayer);
-  G4SubtractionSolid* geDeadS = new G4SubtractionSolid("geDeadLayersS",geFull,geSmall,NULL,G4ThreeVector());
-  G4LogicalVolume* geDeadL = new G4LogicalVolume(geDeadS,materialGe,"geDeadLayersL");
+  G4LogicalVolume* geDeadL = NULL;
+  if(!full) {
+    G4SubtractionSolid* geFull = FullQuarterDetector();
+    G4SubtractionSolid* geSmall = QuarterDetector(frontLayer,backLayer,innerLayer,outterLayer);
+    G4SubtractionSolid* geDeadS = new G4SubtractionSolid("geDeadLayersS",geFull,geSmall,NULL,G4ThreeVector());
+    geDeadL = new G4LogicalVolume(geDeadS,materialGe,"geDeadLayersL");
 
-  G4VisAttributes* deadLayerVisAtt = new G4VisAttributes(G4Colour::Magenta());
-  deadLayerVisAtt->SetVisibility(true);
-  //deadLayerVisAtt->SetForceSolid(true);
+    G4VisAttributes* deadLayerVisAtt = new G4VisAttributes(G4Colour::Magenta());
+    deadLayerVisAtt->SetVisibility(true);
+    //deadLayerVisAtt->SetForceSolid(true);
 
-  geDeadL->SetVisAttributes(deadLayerVisAtt);
-  
-  std::vector<G4IntersectionSolid*> segments = SegmentedQuarterDetector(frontLayer,backLayer,innerLayer,outterLayer);  
+    geDeadL->SetVisAttributes(deadLayerVisAtt);
+  }
   
   G4int segNums[8] = {4,3,2,1,8,7,6,5};
-  for(i=start; i<stop; i++) {
+  for(G4int i=start; i<stop; i++) {
 
     G4VisAttributes* germaniumBlock1VisAtt = new G4VisAttributes(fTigressCrystalColours[i]);
     germaniumBlock1VisAtt->SetVisibility(true);
@@ -506,9 +498,9 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
     rotateGermanium[i]->rotateZ(gamma);
     rotateGermanium[i]->invert();
     
-    x = -x0*pow(-1, floor((i+1)/2));
-    y = -y0*pow(-1, floor((i+2)/2));
-    z = z0;
+    G4double x = -x0*pow(-1, floor((i+1)/2));
+    G4double y = -y0*pow(-1, floor((i+2)/2));
+    G4double z = z0;
     
     moveGermanium[i] = G4ThreeVector(DetectionSystemTigress::TransX(x,y,z,theta,phi),
 				     DetectionSystemTigress::TransY(x,y,z,theta,phi),
@@ -540,9 +532,11 @@ void DetectionSystemTigress::PlaceSegmentedCrystal(G4LogicalVolume* exp_hall_log
 			fSurfCheck);
     }
 
-    G4int copyDL = detectorNumber*4 + i + 1;
-    new G4PVPlacement(rotateGermanium[i],moveGermanium[i],geDeadL,
-    		      "GeDeadLayers",exp_hall_log,0,copyDL,fSurfCheck);
+    if(!full) {
+      G4int copyDL = detectorNumber*4 + i + 1;
+      new G4PVPlacement(rotateGermanium[i],moveGermanium[i],geDeadL,
+			"GeDeadLayers",exp_hall_log,0,copyDL,fSurfCheck);
+    }
   }
   
   return;
@@ -2519,7 +2513,7 @@ G4SubtractionSolid* DetectionSystemTigress::QuarterDetector(G4double frontLayer,
   G4double halfWidthY     = halfWidthX;
   G4double halfLengthZ    = fGermaniumLength/2.0;
 
-  G4Box* rectangularGermanium = new G4Box("rectangularGermanium", halfWidthX, halfWidthY, halfLengthZ);
+  G4Box* rectangularGermanium = new G4Box("rectangularGermanium",halfWidthX,halfWidthY,halfLengthZ);
 
   G4double outerRadius = ((fGermaniumWidth +fGermaniumShift)*1.5)/2.;
 
@@ -2529,7 +2523,7 @@ G4SubtractionSolid* DetectionSystemTigress::QuarterDetector(G4double frontLayer,
   G4double startAngle = 0.0*M_PI;
   G4double finalAngle = 2.0*M_PI;
 
-  G4ThreeVector moveChoppingCylinder(fGermaniumShift, -(fGermaniumShift), 0);
+  G4ThreeVector moveChoppingCylinder(fGermaniumShift,-(fGermaniumShift),0);
   G4Tubs* choppingCylinder = new G4Tubs("choppingCylinder", innerRadius,
 					outerRadius, halfLengthZ+1.0*cm, startAngle, finalAngle);
 
@@ -2556,7 +2550,7 @@ G4SubtractionSolid* DetectionSystemTigress::QuarterDetector(G4double frontLayer,
   G4RotationMatrix* rotateRoundedEdge = new G4RotationMatrix;
   rotateRoundedEdge->rotateZ(-M_PI/2.0);
 
-  G4ThreeVector moveRoundedEdge(fGermaniumShift, -fGermaniumShift,
+  G4ThreeVector moveRoundedEdge(fGermaniumShift,-fGermaniumShift,
 				fGermaniumLength/2.0 -fGermaniumCornerConeEndLength/2.0
 				+ fQuarterDetectorCxnB);
 
@@ -2631,9 +2625,15 @@ G4SubtractionSolid* DetectionSystemTigress::QuarterDetector(G4double frontLayer,
 }//end ::QuarterDetector2
 
 std::vector<G4IntersectionSolid*> DetectionSystemTigress::SegmentedQuarterDetector(G4double frontLayer, G4double backLayer, G4double innerLayer,
-										   G4double outterLayer) {
+										   G4double outterLayer, G4double middleLayer, G4bool full) {
   
-  G4SubtractionSolid* ge_total = QuarterDetector(frontLayer,backLayer,innerLayer,outterLayer);
+  G4SubtractionSolid* ge_total = NULL;
+  if(!full)
+    ge_total = QuarterDetector(frontLayer,backLayer,innerLayer,outterLayer);
+  else {
+    ge_total = FullQuarterDetector();
+    middleLayer = 0.0*mm;
+  }
   
   G4double halfWidthX     = fGermaniumWidth/2.0;
   G4double halfWidthY     = halfWidthX;
@@ -2643,9 +2643,9 @@ std::vector<G4IntersectionSolid*> DetectionSystemTigress::SegmentedQuarterDetect
   std::vector<G4IntersectionSolid*> segments;
   for(G4int i=0;i<8;i++) {
 
-    G4ThreeVector shift(halfWidthX,halfWidthY,2.*halfLengthZ - 31.0*mm);
+    G4ThreeVector shift(halfWidthX,halfWidthY,2.*halfLengthZ - 31.0*mm + middleLayer);
     if(i>3)
-      shift.setZ(-31.0*mm);
+      shift.setZ(-31.0*mm - middleLayer);
       
     if(i==1 || i==5)
       shift.setY(-1.0*shift.getY());
