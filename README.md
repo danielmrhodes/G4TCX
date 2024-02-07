@@ -41,9 +41,9 @@ The three simulation modes require different commands in their macro files. Howe
 
 <pre>
 /Mode mode
-<i>--optional geometry commands--</i>
+<i>--geometry commands--</i>
 <i>--mode specific commands--</i>
-<i>--optional output commands--</i>
+<i>--output commands--</i>
 /run/numberOfThreads nThreads
 /run/beamOn nEvents
 </pre>
@@ -66,7 +66,7 @@ Note that the /Output/OnlyWriteCoincidences only affects the main data file (out
 
 Geometry Commands
 -----------------
-The /Geometry commands are common across all modes. All /Geometry commands are optional.
+The /Geometry commands are common across all modes.
 
 | Command | Description |
 | --- | --- |

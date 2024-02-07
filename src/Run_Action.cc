@@ -32,9 +32,18 @@ Run_Action::~Run_Action() {
 
 void Run_Action::BeginOfRunAction(const G4Run* aRun) {
   
-  if(IsMaster())
-    return;
+  if(IsMaster()) {
 
+    G4int num = ((G4MTRunManager*)G4MTRunManager::GetRunManager())->GetNumberOfThreads();
+    
+    std::cout << "\nUsing " << num << " thread";
+    if(num > 1)
+      std::cout << "s";
+    std::cout << " for the simulation" << std::endl;
+    
+    return;
+  }
+  
   G4int threadID = G4Threading::G4GetThreadId(); 
   G4WorkerRunManager* Rman = (G4WorkerRunManager*)G4MTRunManager::GetRunManager();
 

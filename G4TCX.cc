@@ -14,7 +14,6 @@ int main(int argc, char** argv) {
   
   //Construct the run manager
   G4MTRunManager* runManager = new G4MTRunManager();
-  runManager->SetNumberOfThreads(4);
 
   //Provide mandatory classes
   runManager->SetUserInitialization(new Detector_Construction());
